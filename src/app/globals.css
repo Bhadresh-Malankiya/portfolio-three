@@ -10,10 +10,12 @@
   --color-line: #ffffff14;
   --color-line-strong: #ffffff28;
 
-  /* Paper — the one deliberately warm surface, reserved for the memoir pages. */
-  --color-paper: #eeebe3;
-  --color-paper-2: #e3dfd3;
-  --color-paper-ink: #18160f;
+  /* Paper — the one deliberately warm surface, reserved for the memoir pages.
+     Deliberately dialed back from a near-white cream (#eeebe3) — that read
+     as too bright/glary next to the rest of the dark site. */
+  --color-paper: #ddd4bd;
+  --color-paper-2: #cfc3a3;
+  --color-paper-ink: #221d13;
 
   /* The single highlight accent — used sparingly and on purpose. */
   --color-gold: #e3a857;

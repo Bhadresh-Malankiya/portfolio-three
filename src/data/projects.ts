@@ -44,7 +44,7 @@ export const projects: Project[] = [
     kind: "Sole ownership",
     oneLiner: "AI-first exam and quiz platform with proctoring — built from a blank folder, on his own terms.",
     motif: "proctor",
-    featured: true,
+    featured: false,
     tech: ["Next.js", "React", "Node.js", "OpenAI", "Claude", "Gemini", "PostgreSQL", "pgvector", "Stripe"],
     metrics: [
       { value: "400K+", label: "student exams handled" },
@@ -99,7 +99,7 @@ export const projects: Project[] = [
     kind: "Sole ownership",
     oneLiner: "Multi-tenant AI support agent platform with threshold-based auto-reply — built solo, on weekends.",
     motif: "inbox",
-    featured: true,
+    featured: false,
     tech: ["Node.js", "IMAP IDLE", "AES-256", "JWT", "PostgreSQL"],
     metrics: [
       { value: "~90%", label: "less support engineer time" },
@@ -123,7 +123,7 @@ export const projects: Project[] = [
     kind: "Client project",
     oneLiner: "AI-powered social content management system, built for a German company.",
     motif: "cms",
-    featured: false,
+    featured: true,
     tech: ["Next.js", "NestJS", "GraphQL", "Hasura Cloud", "PostgreSQL"],
     metrics: [
       { value: "6 mo", label: "delivery timeline" },
@@ -193,7 +193,7 @@ export const projects: Project[] = [
     kind: "Founder venture",
     oneLiner: "Real-time crypto trading platform, built under MB Systems.",
     motif: "ticker",
-    featured: false,
+    featured: true,
     tech: ["React.js", "Node.js", "Binance API", "Socket.io", "MongoDB", "AWS"],
     metrics: [
       { value: "10K+", label: "users" },
@@ -205,7 +205,26 @@ export const projects: Project[] = [
     ],
     role: "Founder & lead engineer",
     status: "Built under MB Systems (2023–24)",
-    images: ["/images/bps.jpeg"],
+    frame: "phone",
+    images: [
+      "/images/bps_1.png",
+      "/images/bps_2.png",
+      "/images/bps_3.png",
+      "/images/bps_4.png",
+      "/images/bps_5.png",
+      "/images/bps_6.png",
+      "/images/bps_7.png",
+      "/images/bps_8.png",
+      "/images/bps_9.png",
+      "/images/bps_10.png",
+      "/images/bps_11.png",
+      "/images/bps_12.png",
+      "/images/bps_13.png",
+      "/images/bps_14.png",
+      "/images/bps_15.png",
+      "/images/bps_16.png",
+      "/images/bps_17.png",
+    ],
   },
   {
     slug: "intuitive-surgical-dashboard",
@@ -335,4 +354,4 @@ export const projects: Project[] = [
   },
 ];
 
-export const flagshipSlugs = ["quzo-ai", "extendedforms-io", "helpdesk-ai"];
+export const flagshipSlugs = ["extendedforms-io", "zwopr", "bps-trading"];

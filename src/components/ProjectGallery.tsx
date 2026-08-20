@@ -13,95 +13,124 @@ type Props = {
   big?: boolean;
   bare?: boolean;
   className?: string;
-  /** Overrides the height/aspect-ratio classes on the actual image box (the
-   * default `className` only styles the outer frame — border, radius, etc). */
+  /** Overrides the height classes on the frame (the default `className`
+   * only styles the outer track — border, radius, etc). */
   mediaClassName?: string;
-  /** Renders small clickable thumbnails below the frame. */
-  showThumbnails?: boolean;
+  /** Stretch the (single) image to fill the track's box with object-cover —
+   * for fixed-width slots like the project grid cards. Skips all carousel
+   * behavior; only makes sense with one image. */
+  fill?: boolean;
 };
 
-function Dots({ count, index, onPick }: { count: number; index: number; onPick: (i: number) => void }) {
-  if (count <= 1) return null;
+const PHONE_RATIO = 9 / 19.5;
+const BROWSER_RATIO = 16 / 10;
+const AUTO_MS = 4000;
+
+function Chrome({ url }: { url?: string }) {
   return (
-    <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center gap-1.5">
-      {Array.from({ length: count }).map((_, i) => (
-        <button
-          key={i}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onPick(i);
-          }}
-          aria-label={`Show screenshot ${i + 1} of ${count}`}
-          className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-gold" : "w-1.5 bg-white/30 hover:bg-white/50"}`}
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-1.5 bg-gradient-to-b from-ink/85 via-ink/40 to-transparent px-3 py-2.5">
+      <span className="h-2 w-2 rounded-full bg-white/25" />
+      <span className="h-2 w-2 rounded-full bg-white/25" />
+      <span className="h-2 w-2 rounded-full bg-white/25" />
+      {url && (
+        <div className="ml-1 flex-1 truncate rounded-full bg-ink/60 px-3 py-0.5 text-center font-mono text-[10px] text-fg/70 backdrop-blur-sm">
+          {url.replace("https://", "")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * One slide in the coverflow: sized by a fixed HEIGHT (100% of the track),
+ * with width auto-derived from its own aspect ratio — never the other way
+ * around. (An earlier version sized by width % + aspect-ratio, which let
+ * height run away unconstrained; a tall phone screenshot ended up several
+ * times taller than the track and just got clipped top and bottom, losing
+ * its bezel entirely.) Positioned by `left` in real measured pixels — CSS
+ * transform percentages resolve against the element's *own* box, not the
+ * parent's, so getting the peek offset right needs actual container width,
+ * not a percentage trick.
+ */
+function Slide({
+  src,
+  name,
+  index,
+  total,
+  url,
+  frame,
+  offset,
+  leftPx,
+  onSelect,
+}: {
+  src: string;
+  name: string;
+  index: number;
+  total: number;
+  url?: string;
+  frame: "browser" | "phone";
+  offset: number;
+  leftPx: number;
+  onSelect: () => void;
+}) {
+  const abs = Math.abs(offset);
+  const visible = abs <= 1;
+  const alt = `${name} — screenshot ${index + 1} of ${total}`;
+
+  return (
+    <motion.div
+      className={`absolute top-1/2 h-[86%] ${offset === 0 ? "cursor-default" : "cursor-pointer"}`}
+      style={{ aspectRatio: frame === "phone" ? PHONE_RATIO : BROWSER_RATIO, zIndex: 10 - abs }}
+      animate={{
+        left: leftPx,
+        x: "-50%",
+        y: "-50%",
+        scale: offset === 0 ? 1 : 0.82,
+        opacity: visible ? (offset === 0 ? 1 : 0.4) : 0,
+        pointerEvents: visible ? "auto" : "none",
+      }}
+      transition={{ type: "spring", stiffness: 260, damping: 32 }}
+      onClick={offset !== 0 ? onSelect : undefined}
+    >
+      <div
+        className={`relative h-full w-full overflow-hidden bg-ink-3/70 ${
+          frame === "phone" ? "rounded-[1.8rem] border-[6px] border-ink-2 shadow-xl" : "rounded-lg border border-line-strong"
+        }`}
+      >
+        {frame === "phone" && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
+            <div className="h-1 w-10 rounded-full bg-white/25" />
+          </div>
+        )}
+        {frame === "browser" && <Chrome url={url} />}
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(min-width: 1024px) 900px, 90vw"
+          className="object-contain"
+          draggable={false}
+          priority={index === 0}
         />
-      ))}
-    </div>
+        {/* the dimming "overlay" on non-active slides */}
+        {offset !== 0 && <div className="absolute inset-0 bg-ink/55" />}
+      </div>
+    </motion.div>
   );
 }
 
-function Arrows({ onPrev, onNext }: { onPrev: () => void; onNext: () => void }) {
+function Arrow({ dir, onClick }: { dir: "left" | "right"; onClick: () => void }) {
+  const Icon = dir === "left" ? ChevronLeft : ChevronRight;
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-between px-2 opacity-0 transition-opacity duration-200 group-hover/gallery:opacity-100">
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onPrev();
-        }}
-        aria-label="Previous screenshot"
-        className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-full bg-ink/70 text-fg backdrop-blur transition-colors hover:bg-ink hover:text-gold"
-      >
-        <ChevronLeft size={16} />
-      </button>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onNext();
-        }}
-        aria-label="Next screenshot"
-        className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-full bg-ink/70 text-fg backdrop-blur transition-colors hover:bg-ink hover:text-gold"
-      >
-        <ChevronRight size={16} />
-      </button>
-    </div>
-  );
-}
-
-/** All frames stay mounted and simply crossfade opacity — avoids the "flash
- * of nothing" that mount/unmount-based transitions (e.g. AnimatePresence in
- * `mode="wait"`) produce between two images. Each frame also carries its own
- * slow, staggered Ken Burns drift so the active image never sits dead still. */
-function GalleryFrames({ images, index, name, reduced }: { images: string[]; index: number; name: string; reduced: boolean }) {
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {images.map((src, i) => (
-        <motion.div
-          key={src}
-          className="absolute inset-0"
-          initial={false}
-          animate={{ opacity: i === index ? 1 : 0 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          style={{ zIndex: i === index ? 1 : 0 }}
-        >
-          <motion.div
-            className="absolute inset-0"
-            animate={reduced ? undefined : { scale: [1, 1.055, 1] }}
-            transition={reduced ? undefined : { duration: 14, repeat: Infinity, ease: "easeInOut", delay: i * 1.7 }}
-          >
-            <Image
-              src={src}
-              alt={`${name} — screenshot ${i + 1} of ${images.length}`}
-              fill
-              sizes="(min-width: 1024px) 900px, 100vw"
-              className="object-contain"
-              priority={i === 0}
-            />
-          </motion.div>
-        </motion.div>
-      ))}
-    </div>
+    <button
+      onClick={onClick}
+      aria-label={dir === "left" ? "Previous screenshot" : "Next screenshot"}
+      className={`pointer-events-auto absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line-strong bg-ink/80 text-fg backdrop-blur transition-all hover:border-gold hover:text-gold ${
+        dir === "left" ? "left-1 sm:left-3" : "right-1 sm:right-3"
+      }`}
+    >
+      <Icon size={16} />
+    </button>
   );
 }
 
@@ -114,112 +143,148 @@ export default function ProjectGallery({
   bare = false,
   className = "",
   mediaClassName,
-  showThumbnails = false,
+  fill = false,
 }: Props) {
-  const mediaSize = mediaClassName ?? (big ? "h-80 sm:h-[30rem]" : "h-48 sm:h-56");
+  const heightClass = mediaClassName ?? (big ? "h-[42vh] sm:h-[50vh]" : "h-72 sm:h-80");
+  const multi = images.length > 1;
+  const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const reduced = useReducedMotion();
-  const multi = images.length > 1;
+  const [trackWidth, setTrackWidth] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const dragStartX = useRef<number | null>(null);
+  const dragMoved = useRef(false);
 
   useEffect(() => {
-    if (!multi || reduced || paused) return;
-    intervalRef.current = setInterval(() => setIndex((i) => (i + 1) % images.length), 4200);
+    if (!multi || fill || reduced || paused) return;
+    intervalRef.current = setInterval(() => setIndex((i) => (i + 1) % images.length), AUTO_MS);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [multi, reduced, paused, images.length]);
+  }, [multi, fill, reduced, paused, images.length]);
 
-  const next = () => setIndex((i) => (i + 1) % images.length);
-  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  useEffect(() => {
+    if (fill || !trackRef.current) return;
+    const el = trackRef.current;
+    const ro = new ResizeObserver(([entry]) => setTrackWidth(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fill]);
 
-  const hoverProps = multi
-    ? {
-        onMouseEnter: () => setPaused(true),
-        onMouseLeave: () => setPaused(false),
-      }
-    : {};
+  function go(dir: 1 | -1) {
+    setIndex((i) => (i + dir + images.length) % images.length);
+  }
 
-  if (frame === "phone") {
-    return (
-      <div>
-        <div
-          {...hoverProps}
-          className={`group/gallery relative flex items-center justify-center bg-ink-3/70 ${
-            bare ? "" : "rounded-lg border border-line-strong"
-          } ${mediaSize} ${className}`}
-        >
+  function onPointerDown(e: React.PointerEvent) {
+    if (!multi) return;
+    dragStartX.current = e.clientX;
+    dragMoved.current = false;
+  }
+  function onPointerMove(e: React.PointerEvent) {
+    if (dragStartX.current === null) return;
+    if (Math.abs(e.clientX - dragStartX.current) > 6) dragMoved.current = true;
+  }
+  function onPointerUp(e: React.PointerEvent) {
+    if (dragStartX.current === null) return;
+    const dx = e.clientX - dragStartX.current;
+    dragStartX.current = null;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+  }
+
+  if (fill) {
+    const src = images[0];
+    if (frame === "phone") {
+      return (
+        <div className={`relative flex items-center justify-center overflow-hidden bg-ink-3/70 ${bare ? "" : "rounded-lg border border-line-strong"} ${heightClass} ${className}`}>
           <div className="relative my-2 aspect-[9/19.5] h-[92%] overflow-hidden rounded-[1.8rem] border-[6px] border-ink-2 bg-ink shadow-xl">
-            <div className="absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
               <div className="h-1 w-10 rounded-full bg-white/25" />
             </div>
-            <GalleryFrames images={images} index={index} name={name} reduced={!!reduced} />
-            <Dots count={images.length} index={index} onPick={setIndex} />
+            <Image
+              src={src}
+              alt={`${name} screenshot`}
+              fill
+              sizes="280px"
+              className="object-cover"
+              draggable={false}
+              priority
+            />
           </div>
-          {multi && <Arrows onPrev={prev} onNext={next} />}
         </div>
-        {showThumbnails && multi && (
-          <ThumbnailStrip images={images} index={index} onPick={setIndex} name={name} />
-        )}
+      );
+    }
+    return (
+      <div className={`relative overflow-hidden bg-ink-3/70 ${bare ? "" : "rounded-lg border border-line-strong"} ${heightClass} ${className}`}>
+        <Chrome url={url} />
+        <Image
+          src={src}
+          alt={`${name} screenshot`}
+          fill
+          sizes="(min-width: 1024px) 900px, 100vw"
+          className="object-cover"
+          draggable={false}
+          priority
+        />
       </div>
     );
   }
 
-  return (
-    <div>
-      <div
-        {...hoverProps}
-        className={`group/gallery relative overflow-hidden ${bare ? "" : "rounded-lg border border-line-strong"} bg-ink-3/70 ${className}`}
-      >
-        <div className="flex items-center gap-3 border-b border-line bg-ink-2/80 px-3 py-2">
-          <div className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-          </div>
-          {url && (
-            <div className="flex-1 truncate rounded-full bg-ink px-3 py-1 text-center font-mono text-[10px] text-muted">
-              {url.replace("https://", "")}
-            </div>
-          )}
-        </div>
-        <div className={`relative ${mediaSize}`}>
-          <GalleryFrames images={images} index={index} name={name} reduced={!!reduced} />
-          <Dots count={images.length} index={index} onPick={setIndex} />
-          {multi && <Arrows onPrev={prev} onNext={next} />}
-        </div>
-      </div>
-      {showThumbnails && multi && <ThumbnailStrip images={images} index={index} onPick={setIndex} name={name} />}
-    </div>
-  );
-}
+  // How far apart (in px) each slot sits, as a fraction of the measured
+  // track width — phone slides are much narrower than the track, so they
+  // need a smaller step to still overlap/peek instead of floating apart.
+  const stepPx = trackWidth * (frame === "phone" ? 0.24 : 0.36);
+  const centerPx = trackWidth / 2;
 
-function ThumbnailStrip({
-  images,
-  index,
-  onPick,
-  name,
-}: {
-  images: string[];
-  index: number;
-  onPick: (i: number) => void;
-  name: string;
-}) {
   return (
-    <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-      {images.map((src, i) => (
-        <button
-          key={src}
-          onClick={() => onPick(i)}
-          aria-label={`Jump to screenshot ${i + 1}`}
-          className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-md border transition-all ${
-            i === index ? "border-gold opacity-100" : "border-line opacity-50 hover:opacity-80"
-          }`}
-        >
-          <Image src={src} alt={`${name} thumbnail ${i + 1}`} fill sizes="80px" className="object-cover" />
-        </button>
-      ))}
+    <div className={`group/gallery relative ${className}`}>
+      <div
+        ref={trackRef}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        className={`relative overflow-hidden ${heightClass} ${multi ? "cursor-grab active:cursor-grabbing touch-pan-y" : ""}`}
+      >
+        {trackWidth > 0 &&
+          images.map((src, i) => {
+            let offset = i - index;
+            if (offset > images.length / 2) offset -= images.length;
+            if (offset < -images.length / 2) offset += images.length;
+            return (
+              <Slide
+                key={src}
+                src={src}
+                name={name}
+                index={i}
+                total={images.length}
+                url={url}
+                frame={frame}
+                offset={offset}
+                leftPx={centerPx + offset * stepPx}
+                onSelect={() => {
+                  if (!dragMoved.current) setIndex(i);
+                }}
+              />
+            );
+          })}
+      </div>
+
+      {multi && !bare && (
+        <>
+          <Arrow dir="left" onClick={() => go(-1)} />
+          <Arrow dir="right" onClick={() => go(1)} />
+          <div className="pointer-events-none mt-3 flex justify-center gap-1.5">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-gold" : "w-1.5 bg-fg/25"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -26,6 +26,7 @@ export default function ProjectCard({ project, index = 0 }: { project: Project; 
                 url={project.url}
                 frame={project.frame}
                 bare
+                fill
                 className="rounded-none border-0"
               />
             ) : (

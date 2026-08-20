@@ -10,6 +10,7 @@ import DownloadsSection from "@/components/DownloadsSection";
 import ProjectShowcase from "@/components/ProjectShowcase";
 import ImpactSection from "@/components/ImpactSection";
 import SkillsIndex from "@/components/SkillsIndex";
+import KineticMarquee from "@/components/KineticMarquee";
 import Scene3D from "@/components/Scene3D";
 import ContactCTA from "@/components/ContactCTA";
 import CertificationsStrip from "@/components/CertificationsStrip";
@@ -18,6 +19,10 @@ import Eyebrow from "@/components/Eyebrow";
 import { projects, flagshipSlugs } from "@/data/projects";
 import { fieldGuides } from "@/data/fieldGuides";
 
+// Section order is deliberately client-first: hook → proof → the actual work
+// → efficiency/stack/trust signals, and only *then* the deeper memoir/resume
+// material and field notes for whoever scrolls that far. A hiring manager
+// skimming for thirty seconds should hit the work well before the life story.
 export default function Home() {
   const flagship = flagshipSlugs.map((s) => projects.find((p) => p.slug === s)!);
 
@@ -43,6 +48,31 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-8 sm:pt-28">
+          <SectionHeading
+            eyebrow="Selected work"
+            title="Three products. Three different reasons they exist. Scroll."
+            description="One built inside a company, one built entirely alone, one built purely on weekends because a customer shouldn't wait two days for something that simple."
+            align="center"
+          />
+        </div>
+        <ProjectShowcase projects={flagship} />
+        {/* `relative z-10` is load-bearing: ProjectShowcase's panels use
+            position:sticky, which paints above later *static* siblings
+            regardless of DOM order, so without this the last panel silently
+            eats clicks on the button below it. */}
+        <div className="relative z-10 mx-auto -mt-16 max-w-6xl px-5 pb-20 text-center sm:px-8 sm:pb-28">
+          <Link
+            href="/projects"
+            className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold"
+          >
+            See all 13 projects
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </section>
+
       <section className="border-t border-line bg-ink-2/20">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
           <SectionHeading
@@ -55,6 +85,36 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+          <SectionHeading
+            eyebrow="The stack"
+            title="Fluent fast, on whatever the next problem requires."
+            description="The skill that compounds isn't permanent expertise in one tool — it's the process for becoming fluent in the next one quickly enough that the tool stops being the bottleneck."
+          />
+          <Reveal delay={0.1} className="hidden overflow-hidden rounded-xl border border-line bg-ink-3/40 lg:block">
+            <div className="h-44">
+              <Scene3D variant="network" className="h-full w-full" />
+            </div>
+            <p className="border-t border-line px-4 py-2.5 font-mono text-[11px] text-muted">
+              13 projects, one connected practice
+            </p>
+          </Reveal>
+        </div>
+        <div className="mt-12">
+          <SkillsIndex />
+        </div>
+      </section>
+
+      <section className="border-t border-line bg-ink-2/20">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <Eyebrow>Certifications & recognition</Eyebrow>
+          <CertificationsStrip />
+        </div>
+      </section>
+
+      <KineticMarquee lineA="Bhadreshkumar Malankiya" lineB="The Weekend Builder" />
 
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <SectionHeading
@@ -76,29 +136,6 @@ export default function Home() {
           />
           <div className="mt-10">
             <DownloadsSection />
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-line bg-ink-2/20">
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-          <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-            <SectionHeading
-              eyebrow="The stack"
-              title="Fluent fast, on whatever the next problem requires."
-              description="The skill that compounds isn't permanent expertise in one tool — it's the process for becoming fluent in the next one quickly enough that the tool stops being the bottleneck."
-            />
-            <Reveal delay={0.1} className="hidden overflow-hidden rounded-xl border border-line bg-ink-3/40 lg:block">
-              <div className="h-44">
-                <Scene3D variant="network" className="h-full w-full" />
-              </div>
-              <p className="border-t border-line px-4 py-2.5 font-mono text-[11px] text-muted">
-                13 projects, one connected practice
-              </p>
-            </Reveal>
-          </div>
-          <div className="mt-12">
-            <SkillsIndex />
           </div>
         </div>
       </section>
@@ -131,40 +168,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-ink-2/20">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
-          <Eyebrow>Certifications & recognition</Eyebrow>
-          <CertificationsStrip />
-        </div>
-      </section>
+      <KineticMarquee lineA="Let's build something" lineB="Say hello" className="border-t-0" />
 
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-8 sm:pt-28">
-          <SectionHeading
-            eyebrow="The finale"
-            title="Three products. Three different reasons they exist. Scroll."
-            description="One built inside a company, one built entirely alone, one built purely on weekends because a customer shouldn't wait two days for something that simple."
-            align="center"
-          />
+      <section id="contact" className="scroll-mt-24 border-t border-line bg-ink-2/20 px-5 py-20 sm:px-8 sm:py-28">
+        <div className="mx-auto max-w-6xl">
+          <ContactCTA />
         </div>
-        <ProjectShowcase projects={flagship} />
-        {/* `relative z-10` is load-bearing: ProjectShowcase's panels use
-            position:sticky, which paints above later *static* siblings
-            regardless of DOM order, so without this the last panel silently
-            eats clicks on the button below it. */}
-        <div className="relative z-10 mx-auto -mt-16 max-w-6xl px-5 pb-20 text-center sm:px-8 sm:pb-28">
-          <Link
-            href="/projects"
-            className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold"
-          >
-            See all 13 projects
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-        <ContactCTA />
       </section>
     </>
   );

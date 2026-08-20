@@ -6,6 +6,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import FloatingContactCard from "@/components/FloatingContactCard";
 import JsonLd from "@/components/JsonLd";
 import { profile } from "@/data/profile";
 
@@ -120,6 +121,7 @@ export default function RootLayout({
           <main className="relative z-10">{children}</main>
           <Footer />
         </SmoothScroll>
+        <FloatingContactCard />
         <Analytics />
         <SpeedInsights />
       </body>

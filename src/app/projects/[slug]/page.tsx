@@ -110,23 +110,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <Reveal delay={0.1}>
           <ProjectHeroFrame>
             {project.images?.length ? (
-              <ProjectGallery
-                images={project.images}
-                name={project.name}
-                url={project.url}
-                frame={project.frame}
-                big
-                showThumbnails
-              />
+              <ProjectGallery images={project.images} name={project.name} url={project.url} frame={project.frame} big />
             ) : (
               <ProjectFrame motif={project.motif} accent={accent} url={project.url} big />
             )}
           </ProjectHeroFrame>
-          {project.images && project.images.length > 1 && (
-            <p className="mt-3 text-center font-mono text-[11px] text-muted sm:text-left">
-              {project.images.length} screenshots — hover to pause, use the arrows or dots, or tap a thumbnail
-            </p>
-          )}
         </Reveal>
       </section>
 
