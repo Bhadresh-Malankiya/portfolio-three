@@ -14,6 +14,7 @@ import KineticMarquee from "@/components/KineticMarquee";
 import Scene3D from "@/components/Scene3D";
 import ContactCTA from "@/components/ContactCTA";
 import CertificationsStrip from "@/components/CertificationsStrip";
+import UpworkSection from "@/components/UpworkSection";
 import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import { projects, flagshipSlugs } from "@/data/projects";
@@ -111,6 +112,19 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
           <Eyebrow>Certifications & recognition</Eyebrow>
           <CertificationsStrip />
+        </div>
+      </section>
+
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+          <SectionHeading
+            eyebrow="Client trust, not adjectives"
+            title="Twelve jobs on Upwork. Five stars on every one that left a rating."
+            description="Real clients, paying out of pocket, with no team or account manager standing between the work and the review. Click through — the profile is live."
+          />
+          <div className="mt-14">
+            <UpworkSection />
+          </div>
         </div>
       </section>
 
