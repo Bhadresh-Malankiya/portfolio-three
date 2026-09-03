@@ -19,7 +19,7 @@ export const upwork = {
   stats: [
     { value: 10, prefix: "$", suffix: "K+", label: "total earnings" },
     { value: 12, suffix: "", label: "jobs completed" },
-    { value: 1157, suffix: "", label: "hours logged" },
+    { value: 1, suffix: ".2K", label: "hours logged" },
     { value: 5, suffix: ".0", label: "avg. rating, every rated job" },
   ],
 

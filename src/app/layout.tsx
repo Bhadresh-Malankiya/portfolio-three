@@ -7,6 +7,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import FloatingContactCard from "@/components/FloatingContactCard";
+import FloatingDownloads from "@/components/FloatingDownloads";
 import VisitorWelcomeModal from "@/components/VisitorWelcomeModal";
 import JsonLd from "@/components/JsonLd";
 import { profile } from "@/data/profile";
@@ -123,6 +124,7 @@ export default function RootLayout({
           <Footer />
         </SmoothScroll>
         <FloatingContactCard />
+        <FloatingDownloads />
         <VisitorWelcomeModal />
         <Analytics />
         <SpeedInsights />

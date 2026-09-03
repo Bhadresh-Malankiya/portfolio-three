@@ -20,10 +20,12 @@ import Eyebrow from "@/components/Eyebrow";
 import { projects, flagshipSlugs } from "@/data/projects";
 import { fieldGuides } from "@/data/fieldGuides";
 
-// Section order is deliberately client-first: hook → proof → the actual work
-// → efficiency/stack/trust signals, and only *then* the deeper memoir/resume
-// material and field notes for whoever scrolls that far. A hiring manager
-// skimming for thirty seconds should hit the work well before the life story.
+// Section order is deliberately client-first: hook → about → outside proof
+// (Upwork, right where a client would look for it) → owned-product proof →
+// the actual work → efficiency/stack/trust signals, and only *then* the
+// deeper memoir/resume material and field notes for whoever scrolls that
+// far. A hiring manager skimming for thirty seconds should hit the work
+// well before the life story.
 export default function Home() {
   const flagship = flagshipSlugs.map((s) => projects.find((p) => p.slug === s)!);
 
@@ -34,6 +36,19 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <AboutSection />
+      </section>
+
+      <section className="border-t border-line bg-ink-2/20">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+          <SectionHeading
+            eyebrow="Client trust, not adjectives"
+            title="Twelve jobs on Upwork. Five stars on every one that left a rating."
+            description="Real clients, paying out of pocket, with no team or account manager standing between the work and the review. Click through — the profile is live."
+          />
+          <div className="mt-14">
+            <UpworkSection />
+          </div>
+        </div>
       </section>
 
       <section className="border-t border-line bg-ink-2/20">
@@ -112,19 +127,6 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
           <Eyebrow>Certifications & recognition</Eyebrow>
           <CertificationsStrip />
-        </div>
-      </section>
-
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-          <SectionHeading
-            eyebrow="Client trust, not adjectives"
-            title="Twelve jobs on Upwork. Five stars on every one that left a rating."
-            description="Real clients, paying out of pocket, with no team or account manager standing between the work and the review. Click through — the profile is live."
-          />
-          <div className="mt-14">
-            <UpworkSection />
-          </div>
         </div>
       </section>
 
