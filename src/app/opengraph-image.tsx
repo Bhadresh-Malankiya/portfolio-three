@@ -22,7 +22,7 @@ export default function Image() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 12, height: 12, borderRadius: 3, background: "#e3a857" }} />
           <div style={{ display: "flex", fontSize: 22, color: "#8f8f95", letterSpacing: 4, textTransform: "uppercase" }}>
-            {profile.location} · sole owner, 2 SaaS products
+            {profile.location} · sole owner
           </div>
         </div>
 

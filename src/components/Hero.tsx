@@ -81,7 +81,7 @@ export default function Hero() {
             >
               <span>{profile.location}</span>
               <span className="text-muted">·</span>
-              <span>sole owner, 2 SaaS products</span>
+              <span>sole owner</span>
               <span className="text-muted">·</span>
               <span>{profile.yearsExperience}+ years</span>
             </motion.p>
