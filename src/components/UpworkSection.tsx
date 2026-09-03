@@ -72,7 +72,7 @@ export default function UpworkSection() {
           </a>
         </Reveal>
 
-        <Reveal delay={0.12} className="mx-auto w-full max-w-[300px]">
+        <Reveal delay={0.12} className="mx-auto w-full max-w-[460px] lg:max-w-none">
           <a
             href={upwork.profileUrl}
             target="_blank"
@@ -80,17 +80,18 @@ export default function UpworkSection() {
             aria-label="Open the verified Upwork profile in a new tab"
             className="group block"
           >
-            <div className="relative overflow-hidden rounded-[1.8rem] border-[6px] border-ink-2 bg-ink-3/70 shadow-[0_30px_80px_-25px_rgba(0,0,0,0.65)] transition-transform duration-500 group-hover:-translate-y-1.5">
-              <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
-                <div className="h-1 w-10 rounded-full bg-white/25" />
-              </div>
+            {/* No frame/bezel here on purpose — it's a real screenshot with
+                small text (stats, bio), so it stays biggest and most legible
+                as close to full-bleed as the layout allows. */}
+            <div className="relative overflow-hidden rounded-2xl shadow-[0_30px_80px_-25px_rgba(0,0,0,0.65)] transition-transform duration-500 group-hover:-translate-y-1.5">
               <div className="relative aspect-[1320/1994]">
                 <Image
                   src={upwork.proofImage}
-                  alt="Bhadresh's verified Upwork profile — $10K+ earned, 12 jobs, 1,157 hours logged"
+                  alt="Bhadresh's verified Upwork profile — $10K+ earned, 12 jobs, 1.2K hours logged"
                   fill
-                  sizes="300px"
+                  sizes="(min-width: 1024px) 500px, 90vw"
                   className="object-cover"
+                  priority
                 />
               </div>
             </div>
