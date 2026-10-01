@@ -1,3 +1,4 @@
+import { capturedScreens } from "@/data/captured-screens";
 import { projects as archive, type Project } from "@/data/projects";
 import { profile } from "@/data/profile";
 
@@ -98,6 +99,17 @@ export const portfolioProjects: PortfolioProject[] = [
   })),
   vocalxi,
 ];
+
+// Apply captured public screens while retaining existing product screenshots.
+for (const project of portfolioProjects) {
+  const publicScreens = capturedScreens[project.slug];
+  if (publicScreens) {
+    const originalImages = project.images ?? [];
+    const originalCaptions = originalImages.map((_, index) => project.imageCaptions?.[index] ?? project.name + " — existing product screen " + (index + 1) + ".");
+    project.images = [...originalImages, ...publicScreens.images];
+    project.imageCaptions = [...originalCaptions, ...publicScreens.imageCaptions];
+  }
+}
 
 export const selectedWork = ["extendedforms-io", "vocalxi", "quzo-ai", "zwopr"].map((slug) => portfolioProjects.find((p) => p.slug === slug)!);
 

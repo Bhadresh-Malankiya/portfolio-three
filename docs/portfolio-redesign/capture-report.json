@@ -1,0 +1,42 @@
+[
+  {
+    "project": "vocalxi",
+    "source": "https://vocalxi.com/",
+    "capturedAt": "2026-10-01T21:28:48.134Z",
+    "width": 1440,
+    "height": 960,
+    "path": "/images/captured/vocalxi-desktop.webp",
+    "visibility": "anonymous public page",
+    "type": "marketing-page screenshot",
+    "consent": "optional analytics declined when offered",
+    "title": "No-code AI voice agents for forms & customer feedback — VocalXI",
+    "status": "captured"
+  },
+  {
+    "project": "vocalxi",
+    "source": "https://vocalxi.com/",
+    "capturedAt": "2026-10-01T21:28:49.279Z",
+    "width": 390,
+    "height": 844,
+    "path": "/images/captured/vocalxi-mobile.webp",
+    "visibility": "anonymous public page",
+    "type": "marketing-page screenshot",
+    "consent": "optional analytics declined when offered",
+    "title": "No-code AI voice agents for forms & customer feedback — VocalXI",
+    "status": "captured"
+  },
+  {
+    "project": "extendedforms-io",
+    "source": "https://extendedforms.io",
+    "viewport": "desktop",
+    "status": "not captured",
+    "reason": "Public page must load successfully"
+  },
+  {
+    "project": "extendedforms-io",
+    "source": "https://extendedforms.io",
+    "viewport": "mobile",
+    "status": "not captured",
+    "reason": "Public page must load successfully"
+  }
+]
