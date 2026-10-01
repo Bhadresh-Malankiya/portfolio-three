@@ -1,46 +1,12 @@
 import type { Metadata } from "next";
-import SectionHeading from "@/components/SectionHeading";
-import ProjectCard from "@/components/ProjectCard";
-import ContactCTA from "@/components/ContactCTA";
-import { projects } from "@/data/projects";
+import Image from "next/image";
+import Link from "next/link";
+import { identity, portfolioProjects, selectedWork } from "@/data/portfolio";
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description:
-    "Thirteen products and platforms — two owned solo end to end, one built purely on weekends, the rest delivered for employers and clients across fintech, medtech, logistics, and legal.",
-  alternates: { canonical: "/projects" },
-  openGraph: {
-    title: "Projects — The Weekend Builder",
-    description: "Thirteen products, one habit: see something worth doing, and begin.",
-    type: "website",
-    url: "/projects",
-  },
-};
+export const metadata: Metadata = { title: "Projects & case studies", description: "Full-stack, AI, SaaS, enterprise and mobile engineering. Explore project context, technical contributions and product screens.", alternates: { canonical: "/projects" } };
 
 export default function ProjectsPage() {
-  return (
-    <>
-      <section className="pt-32 pb-14 sm:pt-40 sm:pb-16">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <SectionHeading
-            eyebrow={`${projects.length} projects, one habit`}
-            title="Different budgets, different owners, the same instinct: see something worth doing, and begin."
-            description="Two products owned outright. One built purely on weekends. The rest shipped for employers and clients across edtech, fintech, medtech, logistics, and legal — real users, real numbers, no highlight-reel editing."
-          />
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.slug} project={p} index={i} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-        <ContactCTA />
-      </section>
-    </>
-  );
+  const selectedSlugs = new Set(selectedWork.map((p) => p.slug));
+  const ordered = [...selectedWork, ...portfolioProjects.filter((p) => !selectedSlugs.has(p.slug))];
+  return <div className="pf-page"><header className="pf-shell pf-page-header"><p className="pf-eyebrow">The project archive / {ordered.length} projects</p><h1>Different products.<br /><em>One engineering practice.</em></h1><p className="pf-lead">Employer products, client delivery and founder-led work—clearly separated. Open a case study for the problem, my contribution and the available product screens.</p></header><section className="pf-shell pf-project-grid" aria-label="Project case studies">{ordered.map((project, i) => <article className="pf-project-card" key={project.slug}><span className="pf-work-number">{String(i + 1).padStart(2, "0")} / {project.category} · {project.kind}</span><Link className="pf-card-preview" href={`/projects/${project.slug}`} aria-label={`Read ${project.name} case study`}>{project.images?.length ? <Image src={project.images[0]} alt={`${project.name} product preview`} fill sizes="(min-width: 1280px) 590px, (min-width: 768px) 46vw, 92vw" /> : <div className="pf-card-abstract"><strong>{project.name}</strong><small>{project.slug === "vocalxi" ? "Form → Voice conversation → Reviewed answers" : project.category}</small><small>Project overview · no product screenshot shown</small></div>}</Link><h2><Link href={`/projects/${project.slug}`}>{project.name}</Link></h2><p>{project.oneLiner}</p><div className="pf-tags">{project.tech.slice(0, 4).map((tech) => <span key={tech}>{tech}</span>)}</div><Link className="pf-text-link" href={`/projects/${project.slug}`}>Read case study ↗</Link></article>)}</section><section className="pf-contact pf-section"><div className="pf-shell"><p className="pf-eyebrow">Looking for a relevant engineering background?</p><h2>Let’s talk about<br /><em>your next product challenge.</em></h2><div className="pf-actions"><a className="pf-button pf-button-primary" href={`mailto:${identity.email}?subject=Engineering%20opportunity`}>Discuss a role ↗</a><a className="pf-button" href={identity.resume} download>Download résumé ↓</a></div></div></section></div>;
 }

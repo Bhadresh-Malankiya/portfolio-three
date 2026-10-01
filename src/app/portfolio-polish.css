@@ -1,0 +1,19 @@
+/* Progressive motion affects decoration, never access to text or actions. */
+.pf-page h1,.pf-page h2,.pf-page h3{overflow-wrap:anywhere}
+.pf-work-entry>div{min-width:0}
+.pf-gallery:has(dialog[open]){position:relative;z-index:80}
+/* Portrait screens need height, not a short landscape thumbnail box. */
+.pf-gallery-media.is-phone,.pf-gallery-media:has(img[src*="mobile.webp"]){aspect-ratio:auto;height:clamp(360px,62svh,540px)}
+.pf-gallery-media.is-phone img{padding:16px}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@supports(animation-timeline:scroll()){
+ .pf-nav::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--pf-accent);transform-origin:left;animation:pf-document-progress linear both;animation-timeline:scroll(root);pointer-events:none}
+}
+@supports(animation-timeline:view()){
+ @media(min-width:768px) and (prefers-reduced-motion:no-preference){
+  .pf-work-entry>div:nth-child(2){animation:pf-media-reveal linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+ }
+}
+@keyframes pf-document-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pf-media-reveal{from{clip-path:inset(0 2% round 16px)}to{clip-path:inset(0 0 round 12px)}}
+@media(prefers-reduced-motion:reduce){.pf-nav::after{animation:none!important;transform:none!important}html{scroll-behavior:auto!important}}

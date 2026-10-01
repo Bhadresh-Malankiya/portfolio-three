@@ -1,56 +1,11 @@
 import { ImageResponse } from "next/og";
-import { projects } from "@/data/projects";
-
+import { portfolioProjects } from "@/data/portfolio";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
-}
-
+export const alt = "Project case study by Bhadresh Malankiya";
+export function generateStaticParams() { return portfolioProjects.map((p) => ({ slug: p.slug })); }
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug) ?? projects[0];
-
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          background: "#09090a",
-          padding: 80,
-          fontFamily: "sans-serif",
-        }}
-      >
-        <div style={{ display: "flex", gap: 8, fontSize: 22, color: "#e3a857", letterSpacing: 4, textTransform: "uppercase" }}>
-          <span>{project.category}</span>
-          <span>·</span>
-          <span>{project.kind}</span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 88, color: "#f2f1ee", lineHeight: 1.05, fontWeight: 600, maxWidth: 1000 }}>
-            {project.name}
-          </div>
-          <div style={{ fontSize: 28, color: "#8f8f95", marginTop: 24, maxWidth: 900 }}>{project.oneLiner}</div>
-        </div>
-
-        <div style={{ display: "flex", gap: 40 }}>
-          {project.metrics.slice(0, 3).map((m) => (
-            <div key={m.label} style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ fontSize: 34, color: "#f4c572" }}>{m.value}</div>
-              <div style={{ fontSize: 18, color: "#8f8f95", textTransform: "uppercase", letterSpacing: 2 }}>
-                {m.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-    { ...size }
-  );
+  const project = portfolioProjects.find((p) => p.slug === slug) ?? portfolioProjects[0];
+  return new ImageResponse(<div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#f6f3ee", color: "#18202b", padding: 72, fontFamily: "sans-serif" }}><div style={{ display: "flex", fontSize: 22, color: "#76531b" }}>{project.category} / {project.kind}</div><div style={{ display: "flex", flexDirection: "column" }}><div style={{ display: "flex", fontSize: project.name.length > 28 ? 56 : 76, fontWeight: 600, letterSpacing: -3, lineHeight: 1.1, maxWidth: 1030 }}>{project.name}</div><div style={{ display: "flex", fontSize: 28, lineHeight: 1.45, color: "#525c65", marginTop: 25, maxWidth: 940 }}>{project.oneLiner}</div></div><div style={{ display: "flex", fontSize: 22, color: "#76531b" }}>Engineering case study / Bhadresh Malankiya</div></div>, size);
 }
