@@ -27,6 +27,11 @@ try {
         assert.equal(hiddenContent, false, `${route}: main heading is visible`);
       }
       if ([390, 1440].includes(width) && ['/', '/projects', '/projects/quzo-ai', '/projects/hey-buddy'].includes(route)) {
+        // A full-page capture otherwise misses lazy images below the viewport.
+        await page.locator('img').evaluateAll(images => images.forEach(image => { image.loading = 'eager'; }));
+        await page.waitForFunction(() => Array.from(document.images).every(image => image.complete), { timeout: 30000 });
+        const broken = await page.locator('img').evaluateAll(images => images.filter(image => image.naturalWidth === 0).map(image => image.getAttribute('src')));
+        assert.deepEqual(broken, [], `${route}: all public screenshots and portrait load`);
         const name = route === '/' ? 'home' : route.replaceAll('/', '-').slice(1);
         await page.screenshot({ path: `test-results/${name}-${width}.png`, fullPage: true });
       }

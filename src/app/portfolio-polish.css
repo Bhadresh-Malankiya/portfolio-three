@@ -2,6 +2,9 @@
 .pf-page h1,.pf-page h2,.pf-page h3{overflow-wrap:anywhere}
 .pf-work-entry>div{min-width:0}
 .pf-gallery:has(dialog[open]){position:relative;z-index:80}
+/* Portrait screens need height, not a short landscape thumbnail box. */
+.pf-gallery-media.is-phone,.pf-gallery-media:has(img[src*="mobile.webp"]){aspect-ratio:auto;height:clamp(360px,62svh,540px)}
+.pf-gallery-media.is-phone img{padding:16px}
 @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @supports(animation-timeline:scroll()){
  .pf-nav::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--pf-accent);transform-origin:left;animation:pf-document-progress linear both;animation-timeline:scroll(root);pointer-events:none}
