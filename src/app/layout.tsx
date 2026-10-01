@@ -3,132 +3,31 @@ import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import SmoothScroll from "@/components/SmoothScroll";
+import "./portfolio.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import FloatingContactCard from "@/components/FloatingContactCard";
-import FloatingDownloads from "@/components/FloatingDownloads";
-import VisitorWelcomeModal from "@/components/VisitorWelcomeModal";
 import JsonLd from "@/components/JsonLd";
-import { profile } from "@/data/profile";
+import { identity } from "@/data/portfolio";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  axes: ["opsz", "SOFT", "WONK"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const siteUrl = `https://${profile.site}`;
+const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], axes: ["opsz", "SOFT", "WONK"], weight: "variable", style: ["normal", "italic"], display: "swap" });
+const plexSans = IBM_Plex_Sans({ variable: "--font-plex-sans", subsets: ["latin"], weight: ["400", "500", "600", "700"], display: "swap" });
+const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
+const siteUrl = `https://${identity.site}`;
+const title = "Bhadresh Malankiya — Senior Full-Stack & AI Engineer";
+const description = "Senior full-stack and AI engineer with 8+ years of experience. Explore React, Next.js, TypeScript, Node.js, production SaaS and voice AI projects, technical contributions and case studies.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "The Weekend Builder — Bhadreshkumar Malankiya",
-    template: "%s — The Weekend Builder",
-  },
-  description:
-    "Senior Full Stack Engineer & Technical Lead. Sole owner of ExtendedForms.io (401K+ users) and Quzo.ai (400K+ exams). Eight years of shipping, one startup that didn't survive, and a habit of building on weekends anyway.",
-  keywords: [
-    "Bhadreshkumar Malankiya",
-    "Full Stack Engineer",
-    "Technical Lead",
-    "Software Architect",
-    "ExtendedForms.io",
-    "Quzo.ai",
-    "HelpDesk AI",
-    "Next.js developer portfolio",
-    "AI product engineer Surat",
-  ],
-  authors: [{ name: profile.name, url: siteUrl }],
-  creator: profile.name,
+  title: { default: title, template: "%s — Bhadresh Malankiya" },
+  description,
+  keywords: ["Bhadresh Malankiya", "Senior Full-Stack Engineer", "AI Engineer", "TypeScript", "React", "Next.js", "Node.js", "SaaS", "Backend Architecture", "RAG", "Voice AI", "VocalXI", "Technical Lead"],
+  authors: [{ name: identity.name, url: siteUrl }], creator: identity.name,
   alternates: { canonical: "/" },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  openGraph: {
-    title: "The Weekend Builder — Bhadreshkumar Malankiya",
-    description:
-      "A life in code, ownership, and the habit of starting again. Portfolio & memoir of a Senior Full Stack Engineer and Technical Lead.",
-    type: "website",
-    url: siteUrl,
-    siteName: "The Weekend Builder",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "The Weekend Builder — Bhadreshkumar Malankiya",
-    description: "Sole owner of two live SaaS products. Eight years of shipping, told honestly.",
-  },
+  robots: { index: true, follow: true },
+  openGraph: { title, description, type: "website", url: siteUrl, siteName: "Bhadresh Malankiya / Engineering portfolio" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}>
-      <body className="relative overflow-x-clip">
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "Person",
-            name: profile.name,
-            alternateName: profile.shortName,
-            jobTitle: profile.role,
-            description: profile.summary,
-            url: siteUrl,
-            email: `mailto:${profile.email}`,
-            address: { "@type": "PostalAddress", addressLocality: profile.location },
-            worksFor: { "@type": "Organization", name: "ExpressTech Systems" },
-            knowsAbout: [
-              "Full Stack Development",
-              "Next.js",
-              "React",
-              "Node.js",
-              "AI Integrations",
-              "Software Architecture",
-              "Data Visualization",
-            ],
-            sameAs: [],
-          }}
-        />
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "The Weekend Builder",
-            url: siteUrl,
-            description: profile.summary,
-            author: { "@type": "Person", name: profile.name },
-          }}
-        />
-        <div className="grain" aria-hidden="true" />
-        <SmoothScroll>
-          <Nav />
-          <main className="relative z-10">{children}</main>
-          <Footer />
-        </SmoothScroll>
-        <FloatingContactCard />
-        <FloatingDownloads />
-        <VisitorWelcomeModal />
-        <Analytics />
-        <SpeedInsights />
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="en" className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}><body className="relative overflow-x-clip"><a className="pf-skip" href="#main-content">Skip to main content</a><JsonLd data={{ "@context": "https://schema.org", "@type": "Person", name: identity.name, jobTitle: identity.role, description: identity.summary, url: siteUrl, email: `mailto:${identity.email}`, knowsAbout: ["TypeScript", "React", "Next.js", "Node.js", "Software Architecture", "SaaS", "Applied AI", "Voice AI"] }} /><JsonLd data={{ "@context": "https://schema.org", "@type": "WebSite", name: "Bhadresh Malankiya / Engineering portfolio", url: siteUrl, description, author: { "@type": "Person", name: identity.name } }} /><Nav /><main id="main-content" tabIndex={-1} className="relative z-10">{children}</main><Footer /><Analytics /><SpeedInsights /></body></html>;
 }
