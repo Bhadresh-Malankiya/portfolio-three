@@ -1,0 +1,50 @@
+name: Capture public portfolio screens
+on:
+  push:
+    branches: ['portfolio-refresh/recruiter-first']
+    paths: ['scripts/capture-public.mjs', '.github/workflows/portfolio-capture.yml']
+permissions:
+  contents: read
+jobs:
+  capture:
+    if: github.repository == 'Bhadresh-Malankiya/portfolio-three' && github.ref == 'refs/heads/portfolio-refresh/recruiter-first'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: portfolio-refresh/recruiter-first
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Record dependency advisories
+        run: npm audit --json > /tmp/portfolio-audit.json || true
+      - run: cat /tmp/portfolio-audit.json
+      - run: npm install --no-save --package-lock=false playwright sharp
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/capture-public.mjs
+      - run: npm run lint && npx tsc --noEmit && npm run build
+      - name: Test captured assets in the real app
+        run: |
+          npm run start > /tmp/portfolio-server.log 2>&1 &
+          for i in $(seq 1 45); do curl -sf http://localhost:3000 > /dev/null && break; sleep 2; done
+          node scripts/portfolio-smoke.mjs
+      - name: Save only reviewed-scope public assets and their manifest
+        run: |
+          git add public/images/captured src/data/captured-screens.ts src/data/portfolio.ts docs/portfolio-redesign/capture-report.json
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'assets: capture public VocalXI and ExtendedForms screens with provenance'
+            git push origin HEAD:portfolio-refresh/recruiter-first
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portfolio-capture-and-browser-evidence
+          path: |
+            test-results/
+            docs/portfolio-redesign/capture-report.json
+          if-no-files-found: ignore
