@@ -21,10 +21,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Record dependency advisories
-        run: npm audit --json > /tmp/portfolio-audit.json || true
-      - run: cat /tmp/portfolio-audit.json
-      - run: npm install --no-save --package-lock=false playwright sharp
+      - name: Apply audited dependency updates and lock browser tooling
+        run: |
+          npm install --save-exact next@16.3.8 nodemailer@10.0.13
+          npm install --save-dev --save-exact eslint-config-next@16.3.8 playwright sharp
+          npm audit fix
+          mkdir -p docs/portfolio-redesign
+          npm audit --json > docs/portfolio-redesign/dependency-audit.json
+          node --input-type=module -e 'import nodemailer from "nodemailer"; import assert from "node:assert/strict"; const result = await nodemailer.createTransport({jsonTransport:true}).sendMail({from:"test@example.invalid",to:"review@example.invalid",subject:"Local compatibility test",text:"No message leaves this process."}); assert.ok(result.message); console.log("Nodemailer JSON transport compatibility passed; no email sent.");'
       - run: npx playwright install --with-deps chromium
       - run: node scripts/capture-public.mjs
       - run: npm run lint && npx tsc --noEmit && npm run build
@@ -33,11 +37,15 @@ jobs:
           npm run start > /tmp/portfolio-server.log 2>&1 &
           for i in $(seq 1 45); do curl -sf http://localhost:3000 > /dev/null && break; sleep 2; done
           node scripts/portfolio-smoke.mjs
-      - name: Save only reviewed-scope public assets and their manifest
+      - name: Save tested assets, dependencies and review evidence
         run: |
-          git add public/images/captured src/data/captured-screens.ts src/data/portfolio.ts docs/portfolio-redesign/capture-report.json
+          mkdir -p docs/portfolio-redesign/screenshots
+          cp test-results/*.png docs/portfolio-redesign/screenshots/
+          cp test-results/report.json docs/portfolio-redesign/browser-report.json
+          node --input-type=module -e 'import sharp from "sharp"; for (const w of [390,1440]) { await sharp(`test-results/home-${w}.png`).resize({width:w===1440?900:390}).webp({quality:75}).toFile(`docs/portfolio-redesign/screenshots/home-${w}.webp`); }'
+          git add package.json package-lock.json public/images/captured src/data/captured-screens.ts src/data/portfolio.ts docs/portfolio-redesign/
           if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'assets: capture public VocalXI and ExtendedForms screens with provenance'
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: patch audited dependencies and add tested public product screenshots'
             git push origin HEAD:portfolio-refresh/recruiter-first
           fi
       - uses: actions/upload-artifact@v4
@@ -46,5 +54,6 @@ jobs:
           name: portfolio-capture-and-browser-evidence
           path: |
             test-results/
-            docs/portfolio-redesign/capture-report.json
+            docs/portfolio-redesign/
+            public/images/captured/
           if-no-files-found: ignore
