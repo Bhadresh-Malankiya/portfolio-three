@@ -13,7 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/field-guide" },
   openGraph: {
     title: "Field Guide — The Weekend Builder",
-    description: "Written directly to you, not about him — DSA/interview prep and landing a first job.",
+    description:
+      "Written directly to you, not about him — DSA/interview prep and landing a first job.",
     type: "website",
     url: "/field-guide",
   },
@@ -25,9 +26,10 @@ export default function FieldGuideIndexPage() {
       <section className="pt-32 pb-14 sm:pt-40 sm:pb-16">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <SectionHeading
+            as="h1"
             eyebrow="Chapters XIV & XV"
-            title="Written directly to you, not about him."
-            description="Where the rest of the book tells the story of what happened to him, these two chapters talk straight to whoever's reading this while preparing for their own interviews or first job search — the exact things he wishes someone had told him, without the vague encouragement that fills most advice on this topic."
+            title="Field guides for your engineering journey."
+            description="Two chapters from The Weekend Builder, focused on technical interviews and finding your first role. Explore the ideas, then adapt them to your own situation."
           />
         </div>
       </section>
@@ -42,13 +44,22 @@ export default function FieldGuideIndexPage() {
               >
                 <div>
                   <Eyebrow className="text-[10px]">{g.eyebrow}</Eyebrow>
-                  <h2 className="mt-4 font-display text-3xl leading-snug text-fg">{g.title}</h2>
-                  <p className="mt-4 font-display text-lg italic leading-snug text-muted">&ldquo;{g.quote}&rdquo;</p>
-                  <p className="mt-4 text-sm leading-relaxed text-muted">{g.intro}</p>
+                  <h2 className="mt-4 font-display text-3xl leading-snug text-fg">
+                    {g.title}
+                  </h2>
+                  <p className="mt-4 font-display text-lg italic leading-snug text-muted">
+                    &ldquo;{g.quote}&rdquo;
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-muted">
+                    {g.intro}
+                  </p>
                 </div>
                 <div className="mt-8 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-gold">
                   {g.sections.length} sections
-                  <ArrowUpRight size={14} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight
+                    size={14}
+                    className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
                 </div>
               </Link>
             </Reveal>

@@ -1,0 +1,39 @@
+name: Portfolio quality
+on:
+  push:
+    branches: [main, 'portfolio-refresh/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Audit installed dependency tree
+        run: npm audit --audit-level=high
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run build
+      - name: Browser regression checks
+        run: |
+          npx playwright install --with-deps chromium
+          npm run start > /tmp/portfolio-server.log 2>&1 &
+          for i in $(seq 1 45); do curl -sf http://localhost:3000 > /dev/null && break; sleep 2; done
+          node scripts/portfolio-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portfolio-browser-evidence
+          path: test-results/
+          if-no-files-found: ignore

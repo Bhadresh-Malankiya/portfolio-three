@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
-import { projects } from "@/data/projects";
+import { portfolioProjects as projects } from "@/data/portfolio";
 
 export default function WeekendBuilds() {
   return (

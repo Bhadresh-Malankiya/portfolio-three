@@ -3,14 +3,14 @@
 import dynamic from "next/dynamic";
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion, type MotionValue } from "framer-motion";
-import { Layers, Pause, Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 
 function Fallback() {
   return (
-    <div className="stack-fallback" aria-hidden="true">
-      <span>interface.tsx</span>
-      <span>api / services</span>
-      <span>data / storage</span>
+    <div className="ribbon-fallback" aria-hidden="true">
+      <i />
+      <i />
+      <i />
     </div>
   );
 }
@@ -38,8 +38,6 @@ export default function ProductObject({
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const [paused, setPaused] = useState(false);
-  const [expanded, setExpanded] = useState(true);
-  const [project, setProject] = useState<"vocalxi" | "jewelxi">("vocalxi");
   const [visible, setVisible] = useState(false);
   const [foreground, setForeground] = useState(true);
   useEffect(() => {
@@ -55,65 +53,37 @@ export default function ProductObject({
     };
   }, []);
   return (
-    <div className="scene-shell" ref={ref}>
-      <div className="scene-toolbar">
-        <span>
-          <i /> product.stack
-        </span>
-        <span>interactive / 3D</span>
-      </div>
+    <div className="ribbon-scene" ref={ref}>
+      <span className="ribbon-watermark" aria-hidden="true">
+        build()
+      </span>
+      <div className="ribbon-halo" aria-hidden="true" />
       <div
-        className="product-object"
-        aria-label="Interactive exploded view of an application: interface, services, and data"
+        className="ribbon-canvas"
+        role="img"
+        aria-label="A continuous gold ribbon twisting in three dimensions, rotating with your pointer and scroll"
       >
-        <div className="scene-grid" />
-        <div className="object-canvas" aria-hidden="true">
-          <SceneBoundary>
-            <Core
-              active={visible && foreground && !paused && !reduced}
-              expanded={expanded}
-              project={project}
-              progress={progress}
-            />
-          </SceneBoundary>
-        </div>
-        <span className="stack-label stack-ui">01 / interface</span>
-        <span className="stack-label stack-api">02 / services</span>
-        <span className="stack-label stack-data">03 / data</span>
+        <SceneBoundary>
+          <Core
+            active={visible && foreground && !paused && !reduced}
+            progress={progress}
+          />
+        </SceneBoundary>
       </div>
-      <div
-        className="scene-projects"
-        role="group"
-        aria-label="Choose a project for the 3D preview"
-      >
-        {(["vocalxi", "jewelxi"] as const).map((name) => (
-          <button
-            key={name}
-            aria-pressed={project === name}
-            onClick={() => setProject(name)}
-          >
-            {name}
-            <span>.{name === "vocalxi" ? "com" : "app"}</span>
-          </button>
-        ))}
-      </div>
-      <div className="scene-controls">
-        <button onClick={() => setExpanded(!expanded)} aria-pressed={expanded}>
-          <Layers size={14} />
-          {expanded ? "collapse layers" : "inspect layers"}
-        </button>
+      <span className="ribbon-coordinate" aria-hidden="true">
+        01 — ideas in motion
+      </span>
+      <div className="ribbon-footnote">
+        <span>{"// a continuous work in progress"}</span>
         <button
           onClick={() => setPaused(!paused)}
           disabled={!!reduced}
           aria-label={paused ? "Resume 3D motion" : "Pause 3D motion"}
         >
-          {paused || reduced ? <Play size={13} /> : <Pause size={13} />}
-          {reduced ? "static" : paused ? "paused" : "pause"}
+          {paused || reduced ? <Play size={14} /> : <Pause size={14} />}
+          {reduced ? "static" : paused ? "play" : "pause"}
         </button>
       </div>
-      <p className="scene-note">
-        {"// Move your pointer. Inspect the layers. Scroll to rotate."}
-      </p>
     </div>
   );
 }

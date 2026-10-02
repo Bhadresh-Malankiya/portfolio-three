@@ -3,6 +3,12 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 
+export function scrollToPosition(top: number) {
+  window.dispatchEvent(
+    new CustomEvent<number>("portfolio:scroll-to", { detail: top }),
+  );
+}
+
 export default function SmoothScroll({
   children,
 }: {
@@ -28,9 +34,17 @@ export default function SmoothScroll({
       }
       rafId = requestAnimationFrame(raf);
     }
+    const onScrollRequest = (event: Event) => {
+      const top = (event as CustomEvent<number>).detail;
+      if (!Number.isFinite(top)) return;
+      if (lenis) lenis.scrollTo(top, { duration: 1, force: true });
+      else window.scrollTo({ top, behavior: "instant" });
+    };
+    window.addEventListener("portfolio:scroll-to", onScrollRequest);
     syncMotionPreference();
     preference.addEventListener("change", syncMotionPreference);
     return () => {
+      window.removeEventListener("portfolio:scroll-to", onScrollRequest);
       preference.removeEventListener("change", syncMotionPreference);
       cancelAnimationFrame(rafId);
       lenis?.destroy();

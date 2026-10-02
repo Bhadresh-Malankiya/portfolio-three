@@ -28,10 +28,10 @@ export default function CareerTimeline() {
             </span>
             <span className="career-role">{item.role}</span>
             <span className="career-branch">
-              {item.kind === "founder"
-                ? "↳ side venture, alongside my full-time role"
-                : i === 0
-                  ? "● current role"
+              {i === 0
+                ? "● current work"
+                : item.id === "mb-systems"
+                  ? "↳ side venture, alongside my full-time role"
                   : "previous role"}
             </span>
           </summary>

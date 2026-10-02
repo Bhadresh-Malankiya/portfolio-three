@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import ProjectCard from "@/components/ProjectCard";
-import { projects } from "@/data/projects";
+import { portfolioProjects as projects } from "@/data/portfolio";
 
 const filters = [
   "All work",
-  "Product ownership",
+  "Employer products",
   "Client work",
   "Founder ventures",
   "Personal builds",
@@ -16,15 +16,13 @@ export default function ProjectIndex() {
   const visible = projects.filter(
     (project) =>
       filter === "All work" ||
-      (filter === "Product ownership"
-        ? project.kind === "Sole ownership"
+      (filter === "Employer products"
+        ? ["Employer product", "Sole ownership"].includes(project.kind)
         : filter === "Personal builds"
           ? project.kind === "Personal build"
           : filter === "Founder ventures"
             ? project.kind === "Founder venture"
-            : ["Client project", "Employer product", "Freelance"].includes(
-                project.kind,
-              )),
+            : ["Client project", "Freelance"].includes(project.kind)),
   );
   return (
     <>

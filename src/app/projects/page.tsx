@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/SectionHeading";
 import ProjectIndex from "@/components/ProjectIndex";
 import ContactCTA from "@/components/ContactCTA";
-import { projects } from "@/data/projects";
+import { portfolioProjects as projects } from "@/data/portfolio";
 
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Fifteen products and platforms — two owned solo end to end, one built purely on weekends, the rest delivered for employers and clients across fintech, medtech, logistics, and legal.",
+    "Products and platforms built through employer engineering, founder-led work, and client delivery across SaaS, AI, commerce, and enterprise systems.",
   alternates: { canonical: "/projects" },
   openGraph: {
     title: "Projects — The Weekend Builder",

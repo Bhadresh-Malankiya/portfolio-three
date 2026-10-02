@@ -10,10 +10,22 @@ export type ExperienceEntry = {
 
 export const experience: ExperienceEntry[] = [
   {
+    id: "ascendxi",
+    role: "Founder / Product Engineer",
+    org: "AscendXI / VocalXI",
+    period: "Current",
+    kind: "founder",
+    bullets: [
+      "Building VocalXI, a browser voice product for form-based conversations.",
+      "Designing the complete workflow: questions, spoken answers, review, and structured responses.",
+      "Working across product decisions, full-stack engineering, and applied AI.",
+    ],
+  },
+  {
     id: "expresstech",
     role: "Senior Software Engineer / Technical Lead",
     org: "ExpressTech Systems",
-    period: "2022 — Present",
+    period: "June 2022 — September 2026",
     kind: "employment",
     bullets: [
       "Sole technical owner of ExtendedForms.io — 401K+ users, 579K forms, 8.7M respondents; drove 3x revenue growth",

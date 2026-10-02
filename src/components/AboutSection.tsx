@@ -33,13 +33,13 @@ export default function AboutSection() {
         </h2>
         <p>
           I’m a full-stack engineer based in Surat, India. I started building
-          web applications in 2018 and now work as a technical lead at
-          ExpressTech Systems.
+          web applications in 2018. My engineering work at ExpressTech Systems
+          ran from June 2022 to September 2026. I now build through AscendXI.
         </p>
         <p>
-          I own the technical side of ExtendedForms.io: architecture, features,
-          performance, and the work that keeps it running. I also built Quzo.ai
-          and HelpDesk AI, and I’m currently building VocalXI.
+          At ExpressTech, I worked across ExtendedForms.io, Quzo.ai, and
+          HelpDesk AI — from interfaces and AI features to backend performance.
+          VocalXI is my own product: a voice-first way to complete forms.
         </p>
         <p>
           I ran MB Systems for a year alongside my full-time role. The studio
@@ -49,7 +49,7 @@ export default function AboutSection() {
         <dl className="about-details">
           <div>
             <dt>Currently</dt>
-            <dd>Technical Lead · ExpressTech Systems</dd>
+            <dd>Senior Full-Stack & AI Engineer · AscendXI</dd>
           </div>
           <div>
             <dt>My focus</dt>

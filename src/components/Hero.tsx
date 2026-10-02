@@ -21,7 +21,7 @@ export default function Hero() {
   });
   const y = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : 45]);
   return (
-    <section ref={ref} className="hero-section">
+    <section ref={ref} className="hero-section hero-open">
       <div className="page-shell">
         <div className="hero-topline">
           <span>
@@ -33,22 +33,28 @@ export default function Hero() {
           <div className="hero-copy">
             <p className="eyebrow">{"// Bhadreshkumar Malankiya"}</p>
             <h1>
-              Full-stack
-              <br />
-              engineer.
-              <br />
+              <span className="hero-line">
+                <span>Full-stack</span>
+              </span>
+              <span className="hero-line">
+                <span>engineer.</span>
+              </span>
               <em>
-                Weekend
-                <br />
-                builder<span className="code-cursor">_</span>
+                <span className="hero-line">
+                  <span>Weekend</span>
+                </span>
+                <span className="hero-line">
+                  <span>
+                    builder<span className="code-cursor">_</span>
+                  </span>
+                </span>
               </em>
             </h1>
-            <p className="hero-role">
-              Senior Software Engineer / Technical Lead
-            </p>
+            <p className="hero-role">Senior Full-Stack & AI Engineer</p>
             <p className="hero-description">
-              I lead engineering at ExpressTech, build SaaS products, and spend
-              some weekends working on ideas of my own.
+              I build SaaS products and AI experiences. Previously at
+              ExpressTech. Now building VocalXI through AscendXI — and still
+              making things on weekends.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Link href="#work" className="button-primary">
@@ -80,11 +86,11 @@ export default function Hero() {
           </a>
           <div>
             <strong>401K+</strong>
-            <span>ExtendedForms users</span>
+            <span>ExtendedForms users · reported</span>
           </div>
           <div>
             <strong>400K+</strong>
-            <span>Quzo.ai exams</span>
+            <span>Quzo exams · reported</span>
           </div>
           <div>
             <strong>8+ years</strong>

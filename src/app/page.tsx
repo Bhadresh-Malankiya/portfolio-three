@@ -6,7 +6,8 @@ import AboutSection from "@/components/AboutSection";
 import ProjectShowcase from "@/components/ProjectShowcase";
 import ContactCTA from "@/components/ContactCTA";
 import Reveal from "@/components/Reveal";
-import { projects, flagshipSlugs } from "@/data/projects";
+import { flagshipSlugs } from "@/data/projects";
+import { portfolioProjects as projects } from "@/data/portfolio";
 import CareerTimeline from "@/components/CareerTimeline";
 import WeekendBuilds from "@/components/WeekendBuilds";
 import DownloadsSection from "@/components/DownloadsSection";
@@ -30,8 +31,8 @@ const capabilities = [
   },
 ];
 export default function Home() {
-  const flagship = flagshipSlugs.map((slug) =>
-    projects.find((project) => project.slug === slug)!,
+  const flagship = flagshipSlugs.map(
+    (slug) => projects.find((project) => project.slug === slug)!,
   );
   return (
     <>

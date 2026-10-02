@@ -11,7 +11,7 @@ import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import ContactCTA from "@/components/ContactCTA";
 import JsonLd from "@/components/JsonLd";
-import { projects } from "@/data/projects";
+import { portfolioProjects as projects } from "@/data/portfolio";
 import { profile } from "@/data/profile";
 
 export function generateStaticParams() {
@@ -39,7 +39,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const index = projects.findIndex((p) => p.slug === slug);
   if (index === -1) notFound();
@@ -61,9 +65,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           applicationCategory: project.category,
           operatingSystem: "Web",
           url: project.url,
-          creator: { "@type": "Person", name: profile.name, url: `https://${profile.site}` },
+          creator: {
+            "@type": "Person",
+            name: profile.name,
+            url: `https://${profile.site}`,
+          },
           ...(project.metrics.length
-            ? { additionalProperty: project.metrics.map((m) => ({ "@type": "PropertyValue", name: m.label, value: m.value })) }
+            ? {
+                additionalProperty: project.metrics.map((m) => ({
+                  "@type": "PropertyValue",
+                  name: m.label,
+                  value: m.value,
+                })),
+              }
             : {}),
         }}
       />
@@ -86,7 +100,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               <h1 className="mt-4 text-balance font-display text-4xl leading-[1.02] text-fg sm:text-6xl">
                 {project.name}
               </h1>
-              <p className="mt-5 text-pretty text-lg leading-relaxed text-muted">{project.oneLiner}</p>
+              <p className="mt-5 text-pretty text-lg leading-relaxed text-muted">
+                {project.oneLiner}
+              </p>
             </Reveal>
 
             {project.url && (
@@ -98,7 +114,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold"
                 >
                   Visit {project.url.replace("https://", "")}
-                  <ArrowUpRight size={14} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight
+                    size={14}
+                    className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
                 </a>
               </Reveal>
             )}
@@ -110,9 +129,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <Reveal delay={0.1}>
           <ProjectHeroFrame>
             {project.images?.length ? (
-              <ProjectGallery images={project.images} name={project.name} url={project.url} frame={project.frame} big />
+              <ProjectGallery
+                images={project.images}
+                name={project.name}
+                url={project.url}
+                frame={project.frame}
+                big
+              />
             ) : (
-              <ProjectFrame motif={project.motif} accent={accent} url={project.url} big />
+              <ProjectFrame
+                motif={project.motif}
+                accent={accent}
+                url={project.url}
+                big
+              />
             )}
           </ProjectHeroFrame>
         </Reveal>
@@ -122,7 +152,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="grid gap-12 lg:grid-cols-[1fr_320px]">
           <div className="space-y-6">
             <Reveal>
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">The story</p>
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">
+                The story
+              </p>
             </Reveal>
             {project.narrative.map((p, i) => (
               <Reveal key={i} delay={i * 0.06}>
@@ -134,14 +166,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div className="space-y-8">
             {project.metrics.length > 0 && (
               <Reveal>
-                <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">By the numbers</p>
+                <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">
+                  By the numbers
+                </p>
                 <dl className="mt-4 border-t border-line">
                   {project.metrics.map((m) => (
                     <div
                       key={m.label}
                       className="group flex items-baseline justify-between gap-4 border-b border-line px-1 py-3 transition-colors hover:bg-ink-2/50"
                     >
-                      <dt className="text-xs text-muted transition-colors group-hover:text-fg/80">{m.label}</dt>
+                      <dt className="text-xs text-muted transition-colors group-hover:text-fg/80">
+                        {m.label}
+                      </dt>
                       <dd className="font-mono text-lg text-gold-bright transition-transform group-hover:scale-105">
                         {m.value}
                       </dd>
@@ -152,7 +188,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             )}
 
             <Reveal delay={0.05}>
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">Role & status</p>
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">
+                Role & status
+              </p>
               <div className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
                 <p className="text-fg/85">{project.role}</p>
                 <p className="text-muted">{project.status}</p>
@@ -160,10 +198,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </Reveal>
 
             <Reveal delay={0.1}>
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">{project.techLabel ?? "Built with"}</p>
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">
+                {project.techLabel ?? "Built with"}
+              </p>
               <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-4">
                 {project.tech.map((t) => (
-                  <span key={t} className="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-muted">
+                  <span
+                    key={t}
+                    className="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-muted"
+                  >
                     {t}
                   </span>
                 ))}
@@ -189,11 +232,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   className="object-cover"
                 />
               ) : (
-                <ProjectMotif motif={next.motif} accent={nextAccent} className="h-full w-full" />
+                <ProjectMotif
+                  motif={next.motif}
+                  accent={nextAccent}
+                  className="h-full w-full"
+                />
               )}
             </div>
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">Next project</p>
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">
+                Next project
+              </p>
               <p className="mt-2 font-display text-2xl text-fg group-hover:text-gold-bright sm:text-3xl">
                 {next.name}
               </p>

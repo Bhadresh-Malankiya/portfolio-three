@@ -42,8 +42,7 @@ export const metadata: Metadata = {
     default: "Bhadreshkumar Malankiya — Senior Full Stack Engineer",
     template: "%s — The Weekend Builder",
   },
-  description:
-    "Senior Full Stack Engineer & Technical Lead. Sole owner of ExtendedForms.io (401K+ users) and Quzo.ai (400K+ exams). Eight years of shipping, one startup that didn't survive, and a habit of building on weekends anyway.",
+  description: profile.summary,
   keywords: [
     "Bhadreshkumar Malankiya",
     "Full Stack Engineer",
@@ -74,8 +73,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "The Weekend Builder — Bhadreshkumar Malankiya",
-    description:
-      "Sole owner of two live SaaS products. Eight years of shipping, told honestly.",
+    description: profile.summary,
   },
 };
 
@@ -104,7 +102,7 @@ export default function RootLayout({
               "@type": "PostalAddress",
               addressLocality: profile.location,
             },
-            worksFor: { "@type": "Organization", name: "ExpressTech Systems" },
+            worksFor: { "@type": "Organization", name: "AscendXI" },
             knowsAbout: [
               "Full Stack Development",
               "Next.js",
