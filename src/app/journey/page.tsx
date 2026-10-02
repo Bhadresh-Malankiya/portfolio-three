@@ -9,6 +9,7 @@ import Reveal from "@/components/Reveal";
 import Eyebrow from "@/components/Eyebrow";
 import ContactCTA from "@/components/ContactCTA";
 import { chapters, foreword } from "@/data/chapters";
+import { downloads } from "@/data/downloads";
 import { profile } from "@/data/profile";
 
 export const metadata: Metadata = {
@@ -18,7 +19,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/journey" },
   openGraph: {
     title: "The Weekend Builder — The Story",
-    description: "A Life in Code, Ownership, and the Habit of Starting Again, in sixteen chapters.",
+    description:
+      "A Life in Code, Ownership, and the Habit of Starting Again, in sixteen chapters.",
     type: "book",
     url: "/journey",
   },
@@ -32,15 +34,24 @@ export default function JourneyPage() {
           "@context": "https://schema.org",
           "@type": "Book",
           name: "The Weekend Builder",
-          alternateName: "A Life in Code, Ownership, and the Habit of Starting Again",
-          author: { "@type": "Person", name: profile.name, url: `https://${profile.site}` },
+          alternateName:
+            "A Life in Code, Ownership, and the Habit of Starting Again",
+          author: {
+            "@type": "Person",
+            name: profile.name,
+            url: `https://${profile.site}`,
+          },
           numberOfPages: chapters.length,
           bookFormat: "https://schema.org/EBook",
         }}
       />
       <ReadingProgress />
       <section className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-20">
-        <ParticleField className="pointer-events-none absolute inset-0 h-full w-full opacity-50" count={40} goldRatio={0.12} />
+        <ParticleField
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
+          count={40}
+          goldRatio={0.12}
+        />
         <div className="relative mx-auto max-w-4xl px-5 sm:px-8">
           <Reveal>
             <Eyebrow>A memoir, in sixteen chapters</Eyebrow>
@@ -51,12 +62,24 @@ export default function JourneyPage() {
               A Life in Code, Ownership, and the Habit of Starting Again
             </p>
           </Reveal>
-          <Reveal delay={0.1} className="mt-8 max-w-2xl space-y-4 text-pretty leading-relaxed text-muted">
-            <p className="font-display text-lg italic text-gold-bright">&ldquo;{foreword.quote}&rdquo;</p>
+          <Reveal
+            delay={0.1}
+            className="mt-8 max-w-2xl space-y-4 text-pretty leading-relaxed text-muted"
+          >
+            <p className="font-display text-lg italic text-gold-bright">
+              &ldquo;{foreword.quote}&rdquo;
+            </p>
             {foreword.body.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
           </Reveal>
+          <a
+            href={downloads.ebook.file}
+            download={downloads.ebook.filename}
+            className="button-secondary mt-8"
+          >
+            Download the full memoir <ArrowRight size={15} />
+          </a>
         </div>
       </section>
 
@@ -68,15 +91,19 @@ export default function JourneyPage() {
         <Reveal className="mb-8 max-w-2xl">
           <Eyebrow>Two chapters, written for you</Eyebrow>
           <p className="mt-3 text-pretty leading-relaxed text-muted">
-            Chapters XIV and XV break format on purpose — instead of telling the story, they talk directly to
-            whoever is reading this while preparing for their own interviews or first job search.
+            Chapters XIV and XV break format on purpose — instead of telling the
+            story, they talk directly to whoever is reading this while preparing
+            for their own interviews or first job search.
           </p>
           <Link
             href="/field-guide"
             className="group mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-gold"
           >
             Open the field guide
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            <ArrowRight
+              size={14}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
         </Reveal>
         <ContactCTA />

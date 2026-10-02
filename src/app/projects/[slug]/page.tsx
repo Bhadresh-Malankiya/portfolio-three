@@ -160,7 +160,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </Reveal>
 
             <Reveal delay={0.1}>
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">Built with</p>
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold">{project.techLabel ?? "Built with"}</p>
               <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-4">
                 {project.tech.map((t) => (
                   <span key={t} className="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-muted">

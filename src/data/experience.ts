@@ -34,7 +34,7 @@ export const experience: ExperienceEntry[] = [
     location: "Surat, India",
     kind: "founder",
     bullets: [
-      "Founded and ran a startup studio for about a year — alongside the full-time role above; the venture did not survive, but it changed how he leads and scopes work today",
+      "Ran a startup studio alongside my full-time role. The studio closed after about a year; the work included client delivery, hiring, and team management.",
       "Delivered client and Shopify e-commerce projects for local businesses in Surat",
       "Built the BPS crypto trading platform under the studio, reaching 10K+ users and $2M+ in trading volume",
       "Trained 6–7 interns, all now well-settled in their careers",

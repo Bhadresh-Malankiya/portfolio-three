@@ -1,7 +1,14 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
 /**
  * Wraps the project screenshot frame with two independent interactions:
@@ -9,18 +16,31 @@ import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTran
  * scroll-linked scale-in + parallax drift as the block passes through the
  * viewport. Both are inert under prefers-reduced-motion.
  */
-export default function ProjectHeroFrame({ children }: { children: React.ReactNode }) {
+export default function ProjectHeroFrame({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
 
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(my, [0, 1], [5, -5]), { stiffness: 220, damping: 22 });
-  const rotateY = useSpring(useTransform(mx, [0, 1], [-6, 6]), { stiffness: 220, damping: 22 });
+  const rotateX = useSpring(useTransform(my, [0, 1], [1.5, -1.5]), {
+    stiffness: 220,
+    damping: 22,
+  });
+  const rotateY = useSpring(useTransform(mx, [0, 1], [-2, 2]), {
+    stiffness: 220,
+    damping: 22,
+  });
 
-  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ["start end", "end start"],
+  });
   const scale = useTransform(scrollYProgress, [0, 0.35], [0.95, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [26, -26]);
+  const y = useTransform(scrollYProgress, [0, 1], [12, -12]);
 
   function handleMove(e: React.MouseEvent<HTMLDivElement>) {
     if (reduced) return;
@@ -36,7 +56,12 @@ export default function ProjectHeroFrame({ children }: { children: React.ReactNo
   }
 
   return (
-    <div ref={wrapRef} style={{ perspective: 1400 }} onMouseMove={handleMove} onMouseLeave={handleLeave}>
+    <div
+      ref={wrapRef}
+      style={{ perspective: 1400 }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+    >
       <motion.div
         style={
           reduced

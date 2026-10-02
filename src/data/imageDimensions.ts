@@ -1,6 +1,11 @@
 // Auto-generated real pixel dimensions for every project screenshot —
 // lets the gallery size each frame to its own photo instead of a fixed box.
 export const imageDimensions: Record<string, { w: number; h: number }> = {
+  "/images/vocalxi-review.jpg": { w: 1265, h: 712 },
+  "/images/vocalxi-home.jpg": { w: 1265, h: 712 },
+  "/images/jewelxi-shop.jpg": { w: 1274, h: 717 },
+  "/images/jewelxi-home.jpg": { w: 1274, h: 717 },
+  "/images/extendedforms-live.jpg": { w: 1275, h: 717 },
   "/images/bps_1.png": { w: 330, h: 746 },
   "/images/bps_10.png": { w: 342, h: 756 },
   "/images/bps_11.png": { w: 272, h: 588 },

@@ -20,11 +20,12 @@ export type Project = {
   name: string;
   url?: string;
   category: string;
-  kind: "Sole ownership" | "Employer product" | "Founder venture" | "Client project" | "Freelance";
+  kind: "Sole ownership" | "Employer product" | "Founder venture" | "Client project" | "Freelance" | "Personal build";
   oneLiner: string;
   motif: Motif;
   featured: boolean;
   tech: string[];
+  techLabel?: string;
   metrics: Metric[];
   narrative: string[];
   role: string;
@@ -37,12 +38,54 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "jewelxi",
+    name: "Jewelxi",
+    url: "https://jewelxi.vercel.app/",
+    category: "E-commerce",
+    kind: "Personal build",
+    oneLiner: "A jewellery storefront with a filterable catalog, custom design enquiries, and an interactive 3D product study.",
+    motif: "freelance",
+    featured: true,
+    techLabel: "Features",
+    tech: ["E-commerce", "3D interfaces", "Catalog filtering", "Test checkout"],
+    metrics: [],
+    narrative: [
+      "Jewelxi brings the storefront, product catalog, and custom design enquiry into one jewellery shopping experience. The public preview includes category and material filters, product search, multiple display currencies, and detailed product pages.",
+      "The visual work includes a scroll-driven 3D pendant study and a separate inspiration gallery. The catalog includes search, category filters, material filters, and sorting.",
+      "The site is currently in public preview, with an illustrative collection and test checkout."
+    ],
+    role: "E-commerce development and interactive product presentation",
+    status: "Public preview — test checkout",
+    images: ["/images/jewelxi-home.jpg", "/images/jewelxi-shop.jpg"],
+  },
+  {
+    slug: "vocalxi",
+    name: "VocalXI",
+    url: "https://vocalxi.com",
+    category: "Voice AI / Personal product",
+    kind: "Personal build",
+    oneLiner: "My voice-form product: share a browser link, collect spoken answers, and let respondents review before submitting.",
+    motif: "proctor",
+    featured: true,
+    techLabel: "Features",
+    tech: ["Browser voice agents", "Form builder", "Google Forms", "Response review"],
+    metrics: [],
+    narrative: [
+      "VocalXI is a product I am building personally. It turns a set of form questions into a browser voice conversation, so respondents can speak their answers instead of filling every field by hand.",
+      "The workflow starts with native forms or a Google Forms connection, continues through a shareable respondent link, and ends with an answer review before submission. The product also includes a workspace for forms and responses.",
+      "Browser voice is available and the product is onboarding its first users. The Google Forms connector has limited staging access. Phone calling is planned, not a released feature."
+    ],
+    role: "Personal product — building and developing VocalXI",
+    status: "Early release — browser voice; Google Forms connector in staging",
+    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
+  },
+  {
     slug: "quzo-ai",
     name: "Quzo.ai",
     url: "https://quzo.ai",
     category: "AI SaaS",
     kind: "Sole ownership",
-    oneLiner: "AI-first exam and quiz platform with proctoring — built from a blank folder, on his own terms.",
+    oneLiner: "AI-powered quizzes and proctored exams, built from idea to production.",
     motif: "proctor",
     featured: false,
     tech: ["Next.js", "React", "Node.js", "OpenAI", "Claude", "Gemini", "PostgreSQL", "pgvector", "Stripe"],
@@ -52,9 +95,9 @@ export const projects: Project[] = [
       { value: "3", label: "AI providers, one credit system" },
     ],
     narrative: [
-      "There was no point in Quzo.ai's history where someone else's budget was the reason it existed. It exists because he decided it should, and then built it — no employer's roadmap, no committee to justify a feature to before the technology had proven itself.",
-      "It runs on a credit management and optimization system that lets the underlying AI model be picked by task and cost — OpenAI, Claude, or Gemini — rather than locking the whole product to one provider's pricing curve. A retrieval-augmented generation pipeline on pgvector powers AI-generated question banks, cutting what used to take an educator thirty minutes down to about thirty seconds.",
-      "Beyond the core exam experience: AI Watchers-style proctoring, AI photo-based conversation, AI video animation, and AI video conversation features — each one a smaller experiment first, not a line item on a roadmap planned months in advance.",
+      "I built Quzo.ai from scratch as an AI-powered quiz and exam platform. My work covers the application, the AI integrations, the credit system, and deployment.",
+      "The credit system routes tasks across OpenAI, Claude, and Gemini based on the task and its cost. A retrieval pipeline using pgvector supports question-bank generation, reducing the recorded authoring time from around 30 minutes to 30 seconds.",
+      "The exam workflow includes proctoring and response reporting. I have also developed photo, video, and conversation features as smaller experiments within the product.",
     ],
     role: "Founder, sole engineer, architecture, AI systems, growth & SEO",
     status: "Live — growing every term",
@@ -84,13 +127,14 @@ export const projects: Project[] = [
       { value: "3x", label: "revenue growth" },
     ],
     narrative: [
-      "Sole technical owner — architecture, performance, and where engineering effort goes next all start with him. No handed-down roadmap, no ambiguity about whose judgment is being questioned when something breaks.",
-      "Rebuilt performance-critical paths, taking page load from 3.2s to 1.2s, then cutting the highest-traffic page from a painful 30–35 seconds down to 5–6 using smarter caching and TanStack Query. Nobody filed a ticket for it — he noticed it was costing real users at the exact moment they were trying to trust the product.",
-      "Proudest feature: AI Watchers with face detection, protecting exam integrity — built with real care about false positives, and about what happens to a real student in a real moment of academic stress if the system gets it wrong.",
+      "At ExpressTech, I own the technical side of ExtendedForms.io: architecture, feature delivery, performance, and production support.",
+      "I rebuilt performance-critical paths to reduce page load from 3.2 seconds to 1.2 seconds. On a separate high-traffic page, caching and TanStack Query reduced loading from 30–35 seconds to around 5–6 seconds.",
+      "I also developed AI Watchers with face detection for exam proctoring. The implementation needed to account for false positives as well as suspicious activity.",
     ],
     role: "Sole technical owner — architecture, performance, AI features, growth",
     status: "Live — 401K+ users and growing",
-    images: ["/images/extendedforms.png"],
+    // Public landing page captured from extendedforms.io on 2026-10-02.
+    images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
   },
   {
     slug: "helpdesk-ai",
@@ -169,7 +213,7 @@ export const projects: Project[] = [
   {
     slug: "webstack",
     name: "WebStack",
-    url: "https://thewebstack.com",
+    // Public site returned 404 on 2026-10-02; omit the broken live-site link.
     category: "SaaS",
     kind: "Client project",
     oneLiner: "Multi-tenant project management and CRM built for agencies.",
@@ -184,7 +228,7 @@ export const projects: Project[] = [
       "Subdomain-based tenant isolation via JWT and RFC-compliant security standards — the same isolation discipline that shows up in HelpDesk AI, applied to a project-management product now running 500K+ tasks across 100+ agencies.",
     ],
     role: "Full-stack architecture and delivery",
-    status: "Live",
+    status: "Delivered — public demo currently unavailable",
   },
   {
     slug: "bps-trading",
@@ -354,4 +398,4 @@ export const projects: Project[] = [
   },
 ];
 
-export const flagshipSlugs = ["extendedforms-io", "zwopr", "bps-trading"];
+export const flagshipSlugs = ["extendedforms-io", "quzo-ai", "zwopr"];

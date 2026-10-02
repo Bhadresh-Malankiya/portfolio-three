@@ -4,11 +4,10 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
 import FloatingContactCard from "@/components/FloatingContactCard";
 import FloatingDownloads from "@/components/FloatingDownloads";
-import VisitorWelcomeModal from "@/components/VisitorWelcomeModal";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { profile } from "@/data/profile";
 
@@ -40,7 +39,7 @@ const siteUrl = `https://${profile.site}`;
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "The Weekend Builder — Bhadreshkumar Malankiya",
+    default: "Bhadreshkumar Malankiya — Senior Full Stack Engineer",
     template: "%s — The Weekend Builder",
   },
   description:
@@ -59,7 +58,11 @@ export const metadata: Metadata = {
   authors: [{ name: profile.name, url: siteUrl }],
   creator: profile.name,
   alternates: { canonical: "/" },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   openGraph: {
     title: "The Weekend Builder — Bhadreshkumar Malankiya",
     description:
@@ -71,7 +74,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "The Weekend Builder — Bhadreshkumar Malankiya",
-    description: "Sole owner of two live SaaS products. Eight years of shipping, told honestly.",
+    description:
+      "Sole owner of two live SaaS products. Eight years of shipping, told honestly.",
   },
 };
 
@@ -81,8 +85,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}>
-      <body className="relative overflow-x-clip">
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}
+    >
+      <body className="relative overflow-x-clip developer-theme">
         <JsonLd
           data={{
             "@context": "https://schema.org",
@@ -93,7 +100,10 @@ export default function RootLayout({
             description: profile.summary,
             url: siteUrl,
             email: `mailto:${profile.email}`,
-            address: { "@type": "PostalAddress", addressLocality: profile.location },
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: profile.location,
+            },
             worksFor: { "@type": "Organization", name: "ExpressTech Systems" },
             knowsAbout: [
               "Full Stack Development",
@@ -119,13 +129,19 @@ export default function RootLayout({
         />
         <div className="grain" aria-hidden="true" />
         <SmoothScroll>
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
           <Nav />
-          <main className="relative z-10">{children}</main>
+          <main id="main-content" className="relative z-10">
+            {children}
+          </main>
           <Footer />
         </SmoothScroll>
-        <FloatingContactCard />
-        <FloatingDownloads />
-        <VisitorWelcomeModal />
+        <div className="original-artifacts">
+          <FloatingContactCard />
+          <FloatingDownloads />
+        </div>
         <Analytics />
         <SpeedInsights />
       </body>

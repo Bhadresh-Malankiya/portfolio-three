@@ -7,7 +7,13 @@ import Reveal from "@/components/Reveal";
 
 const ACCENTS = ["text-gold", "text-silver"];
 
-export default function ProjectCard({ project, index = 0 }: { project: Project; index?: number }) {
+export default function ProjectCard({
+  project,
+  index = 0,
+}: {
+  project: Project;
+  index?: number;
+}) {
   const accent = ACCENTS[index % ACCENTS.length];
   const hasImages = !!project.images?.length;
 
@@ -18,7 +24,7 @@ export default function ProjectCard({ project, index = 0 }: { project: Project; 
         className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-line bg-ink-2/40 transition-all duration-300 hover:-translate-y-1 hover:border-line-strong hover:shadow-[0_20px_50px_-25px_rgba(0,0,0,0.7)]"
       >
         <div className="overflow-hidden">
-          <div className="transition-transform duration-500 ease-out group-hover:scale-[1.06]">
+          <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02]">
             {hasImages ? (
               <ProjectGallery
                 images={project.images!.slice(0, 1)}
@@ -30,22 +36,35 @@ export default function ProjectCard({ project, index = 0 }: { project: Project; 
                 className="rounded-none border-0"
               />
             ) : (
-              <ProjectFrame motif={project.motif} accent={accent} url={project.url} bare className="rounded-none border-0" />
+              <ProjectFrame
+                mediaClassName="aspect-[16/10]"
+                motif={project.motif}
+                accent={accent}
+                url={project.url}
+                bare
+                className="rounded-none border-0"
+              />
             )}
           </div>
         </div>
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col p-6 sm:p-8">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">{project.category}</p>
-              <h3 className="mt-1 font-display text-xl text-fg">{project.name}</h3>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                {project.category}
+              </p>
+              <h3 className="mt-1 font-display text-2xl text-fg">
+                {project.name}
+              </h3>
             </div>
             <ArrowUpRight
               size={18}
               className="mt-1 shrink-0 text-muted transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-gold"
             />
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{project.oneLiner}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            {project.oneLiner}
+          </p>
 
           {project.metrics.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-gold-bright">

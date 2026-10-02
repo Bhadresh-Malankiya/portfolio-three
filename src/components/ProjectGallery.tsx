@@ -1,9 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
+import { imageDimensions } from "@/data/imageDimensions";
+
+const captions: Record<string, string> = {
+  "/images/extendedforms.png": "Product overview",
+  "/images/extendedforms-live.jpg": "Live website",
+  "/images/quzo_landing_page.png": "Product overview",
+  "/images/quzo_dashboard.png": "Quiz dashboard",
+  "/images/quzo_exam_screen.png": "Exam experience",
+  "/images/quzo_form_screen.png": "Quiz builder",
+  "/images/quzo_in_app_billing.png": "In-app billing",
+  "/images/quzo_response_report.png": "Response report",
+  "/images/vocalxi-home.jpg": "Live website",
+  "/images/vocalxi-review.jpg": "Answer review preview",
+  "/images/jewelxi-home.jpg": "Storefront",
+  "/images/jewelxi-shop.jpg": "Jewellery catalog",
+};
+const caption = (src: string, index: number) =>
+  captions[src] ?? `Product view ${index + 1}`;
 
 type Props = {
   images: string[];
@@ -13,124 +39,130 @@ type Props = {
   big?: boolean;
   bare?: boolean;
   className?: string;
-  /** Overrides the height classes on the frame (the default `className`
-   * only styles the outer track — border, radius, etc). */
   mediaClassName?: string;
-  /** Stretch the (single) image to fill the track's box with object-cover —
-   * for fixed-width slots like the project grid cards. Skips all carousel
-   * behavior; only makes sense with one image. */
   fill?: boolean;
 };
 
-const PHONE_RATIO = 9 / 19.5;
-const BROWSER_RATIO = 16 / 10;
-const AUTO_MS = 4000;
-
-function Chrome({ url }: { url?: string }) {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-1.5 bg-gradient-to-b from-ink/85 via-ink/40 to-transparent px-3 py-2.5">
-      <span className="h-2 w-2 rounded-full bg-white/25" />
-      <span className="h-2 w-2 rounded-full bg-white/25" />
-      <span className="h-2 w-2 rounded-full bg-white/25" />
-      {url && (
-        <div className="ml-1 flex-1 truncate rounded-full bg-ink/60 px-3 py-0.5 text-center font-mono text-[10px] text-fg/70 backdrop-blur-sm">
-          {url.replace("https://", "")}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
- * One slide in the coverflow: sized by a fixed HEIGHT (100% of the track),
- * with width auto-derived from its own aspect ratio — never the other way
- * around. (An earlier version sized by width % + aspect-ratio, which let
- * height run away unconstrained; a tall phone screenshot ended up several
- * times taller than the track and just got clipped top and bottom, losing
- * its bezel entirely.) Positioned by `left` in real measured pixels — CSS
- * transform percentages resolve against the element's *own* box, not the
- * parent's, so getting the peek offset right needs actual container width,
- * not a percentage trick.
- */
-function Slide({
-  src,
+function ScreenshotViewer({
+  images,
   name,
   index,
-  total,
-  url,
-  frame,
-  offset,
-  leftPx,
-  onSelect,
+  go,
+  onDismiss,
 }: {
-  src: string;
+  images: string[];
   name: string;
   index: number;
-  total: number;
-  url?: string;
-  frame: "browser" | "phone";
-  offset: number;
-  leftPx: number;
-  onSelect: () => void;
+  go: (step: number) => void;
+  onDismiss: () => void;
 }) {
-  const abs = Math.abs(offset);
-  const visible = abs <= 1;
-  const alt = `${name} — screenshot ${index + 1} of ${total}`;
-
-  return (
-    <motion.div
-      className={`absolute top-1/2 h-[86%] ${offset === 0 ? "cursor-default" : "cursor-pointer"}`}
-      style={{ aspectRatio: frame === "phone" ? PHONE_RATIO : BROWSER_RATIO, zIndex: 10 - abs }}
-      animate={{
-        left: leftPx,
-        x: "-50%",
-        y: "-50%",
-        scale: offset === 0 ? 1 : 0.82,
-        opacity: visible ? (offset === 0 ? 1 : 0.4) : 0,
-        pointerEvents: visible ? "auto" : "none",
+  const dialog = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const [zoomed, setZoomed] = useState(false);
+  const selected = images[index];
+  const dimensions = imageDimensions[selected] ?? { w: 1600, h: 1000 };
+  useEffect(() => {
+    const element = dialog.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    element?.showModal();
+    return () => {
+      element?.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+  return createPortal(
+    <dialog
+      ref={dialog}
+      className="screenshot-viewer"
+      aria-labelledby={titleId}
+      data-lenis-prevent
+      onClose={() => {
+        if (!dialog.current?.open) onDismiss();
       }}
-      transition={{ type: "spring", stiffness: 260, damping: 32 }}
-      onClick={offset !== 0 ? onSelect : undefined}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) dialog.current?.close();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+          event.preventDefault();
+          setZoomed(false);
+          go(event.key === "ArrowRight" ? 1 : -1);
+        }
+      }}
     >
-      <div
-        className={`relative h-full w-full overflow-hidden bg-ink-3/70 ${
-          frame === "phone" ? "rounded-[1.8rem] border-[6px] border-ink-2 shadow-xl" : "rounded-lg border border-line-strong"
-        }`}
-      >
-        {frame === "phone" && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
-            <div className="h-1 w-10 rounded-full bg-white/25" />
+      <div className="viewer-shell">
+        <div className="viewer-toolbar">
+          <div>
+            <p id={titleId}>{name}</p>
+            <span aria-live="polite">
+              {String(index + 1).padStart(2, "0")} /{" "}
+              {String(images.length).padStart(2, "0")} ·{" "}
+              {caption(selected, index)}
+            </span>
           </div>
-        )}
-        {frame === "browser" && <Chrome url={url} />}
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(min-width: 1024px) 900px, 90vw"
-          className="object-contain"
-          draggable={false}
-          priority={index === 0}
-        />
-        {/* the dimming "overlay" on non-active slides */}
-        {offset !== 0 && <div className="absolute inset-0 bg-ink/55" />}
+          <button
+            onClick={() => dialog.current?.close()}
+            aria-label="Close screenshot viewer"
+            autoFocus
+          >
+            <X size={22} />
+          </button>
+        </div>
+        <div
+          className={`viewer-media ${zoomed ? "is-zoomed" : ""}`}
+          key={`${selected}-${zoomed}`}
+        >
+          <Image
+            src={selected}
+            alt={`${name} — ${caption(selected, index)}`}
+            width={dimensions.w}
+            height={dimensions.h}
+            unoptimized
+          />
+        </div>
+        <div className="viewer-footer">
+          <button onClick={() => setZoomed(!zoomed)} aria-pressed={zoomed}>
+            {zoomed ? <ZoomOut size={17} /> : <ZoomIn size={17} />}
+            {zoomed ? "Fit to screen" : "Actual size"}
+          </button>
+          <a
+            href={selected}
+            target="_blank"
+            rel="noreferrer"
+            className="viewer-original"
+          >
+            Original <ArrowUpRight size={16} />
+          </a>
+          <div className="viewer-pagination">
+            <button
+              onClick={() => {
+                setZoomed(false);
+                go(-1);
+              }}
+              disabled={images.length < 2}
+              aria-label={`Previous ${name} screenshot`}
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span>
+              {index + 1} / {images.length}
+            </span>
+            <button
+              onClick={() => {
+                setZoomed(false);
+                go(1);
+              }}
+              disabled={images.length < 2}
+              aria-label={`Next ${name} screenshot`}
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
       </div>
-    </motion.div>
-  );
-}
-
-function Arrow({ dir, onClick }: { dir: "left" | "right"; onClick: () => void }) {
-  const Icon = dir === "left" ? ChevronLeft : ChevronRight;
-  return (
-    <button
-      onClick={onClick}
-      aria-label={dir === "left" ? "Previous screenshot" : "Next screenshot"}
-      className={`pointer-events-auto absolute top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-line-strong bg-ink/80 text-fg backdrop-blur transition-all hover:border-gold hover:text-gold ${
-        dir === "left" ? "left-1 sm:left-3" : "right-1 sm:right-3"
-      }`}
-    >
-      <Icon size={16} />
-    </button>
+    </dialog>,
+    document.body,
   );
 }
 
@@ -145,145 +177,131 @@ export default function ProjectGallery({
   mediaClassName,
   fill = false,
 }: Props) {
-  const heightClass = mediaClassName ?? (big ? "h-[42vh] sm:h-[50vh]" : "h-72 sm:h-80");
-  const multi = images.length > 1;
-  const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [trackWidth, setTrackWidth] = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const dragStartX = useRef<number | null>(null);
-  const dragMoved = useRef(false);
-
-  useEffect(() => {
-    if (!multi || fill || reduced || paused) return;
-    intervalRef.current = setInterval(() => setIndex((i) => (i + 1) % images.length), AUTO_MS);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [multi, fill, reduced, paused, images.length]);
-
-  useEffect(() => {
-    if (fill || !trackRef.current) return;
-    const el = trackRef.current;
-    const ro = new ResizeObserver(([entry]) => setTrackWidth(entry.contentRect.width));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [fill]);
-
-  function go(dir: 1 | -1) {
-    setIndex((i) => (i + dir + images.length) % images.length);
-  }
-
-  function onPointerDown(e: React.PointerEvent) {
-    if (!multi) return;
-    dragStartX.current = e.clientX;
-    dragMoved.current = false;
-  }
-  function onPointerMove(e: React.PointerEvent) {
-    if (dragStartX.current === null) return;
-    if (Math.abs(e.clientX - dragStartX.current) > 6) dragMoved.current = true;
-  }
-  function onPointerUp(e: React.PointerEvent) {
-    if (dragStartX.current === null) return;
-    const dx = e.clientX - dragStartX.current;
-    dragStartX.current = null;
-    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-  }
-
-  if (fill) {
-    const src = images[0];
-    if (frame === "phone") {
-      return (
-        <div className={`relative flex items-center justify-center overflow-hidden bg-ink-3/70 ${bare ? "" : "rounded-lg border border-line-strong"} ${heightClass} ${className}`}>
-          <div className="relative my-2 aspect-[9/19.5] h-[92%] overflow-hidden rounded-[1.8rem] border-[6px] border-ink-2 bg-ink shadow-xl">
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center pt-1.5">
-              <div className="h-1 w-10 rounded-full bg-white/25" />
-            </div>
-            <Image
-              src={src}
-              alt={`${name} screenshot`}
-              fill
-              sizes="280px"
-              className="object-cover"
-              draggable={false}
-              priority
-            />
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className={`relative overflow-hidden bg-ink-3/70 ${bare ? "" : "rounded-lg border border-line-strong"} ${heightClass} ${className}`}>
-        <Chrome url={url} />
-        <Image
-          src={src}
-          alt={`${name} screenshot`}
-          fill
-          sizes="(min-width: 1024px) 900px, 100vw"
-          className="object-cover"
-          draggable={false}
-          priority
-        />
-      </div>
-    );
-  }
-
-  // How far apart (in px) each slot sits, as a fraction of the measured
-  // track width — phone slides are much narrower than the track, so they
-  // need a smaller step to still overlap/peek instead of floating apart.
-  const stepPx = trackWidth * (frame === "phone" ? 0.24 : 0.36);
-  const centerPx = trackWidth / 2;
-
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  if (!images.length)
+    return <div className="gallery-empty">Project imagery coming soon</div>;
+  const selected = images[index] ?? images[0];
+  const dimensions = imageDimensions[images[0]];
+  const go = (step: number) =>
+    setIndex((current) => (current + step + images.length) % images.length);
   return (
-    <div className={`group/gallery relative ${className}`}>
-      <div
-        ref={trackRef}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        className={`relative overflow-hidden ${heightClass} ${multi ? "cursor-grab active:cursor-grabbing touch-pan-y" : ""}`}
-      >
-        {trackWidth > 0 &&
-          images.map((src, i) => {
-            let offset = i - index;
-            if (offset > images.length / 2) offset -= images.length;
-            if (offset < -images.length / 2) offset += images.length;
-            return (
-              <Slide
-                key={src}
-                src={src}
-                name={name}
-                index={i}
-                total={images.length}
-                url={url}
-                frame={frame}
-                offset={offset}
-                leftPx={centerPx + offset * stepPx}
-                onSelect={() => {
-                  if (!dragMoved.current) setIndex(i);
-                }}
-              />
-            );
-          })}
+    <div
+      className={`project-gallery ${big ? "gallery-large" : ""} ${bare ? "gallery-bare" : ""} ${className}`}
+    >
+      <div className="gallery-chrome" aria-hidden="true">
+        <div>
+          <i />
+          <i />
+          <i />
+        </div>
+        <span>{url ? url.replace(/^https?:\/\//, "") : name}</span>
+        <span>↗</span>
       </div>
-
-      {multi && !bare && (
-        <>
-          <Arrow dir="left" onClick={() => go(-1)} />
-          <Arrow dir="right" onClick={() => go(1)} />
-          <div className="pointer-events-none mt-3 flex justify-center gap-1.5">
-            {images.map((_, i) => (
-              <span
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-gold" : "w-1.5 bg-fg/25"}`}
-              />
+      <div
+        className={`gallery-stage ${frame === "phone" ? "gallery-phone" : ""} ${mediaClassName ?? ""}`}
+        style={
+          !fill && frame !== "phone" && dimensions
+            ? { aspectRatio: `${dimensions.w} / ${dimensions.h}` }
+            : undefined
+        }
+      >
+        <Image
+          key={selected}
+          src={selected}
+          alt={`${name} — ${caption(selected, index)}`}
+          fill
+          sizes={
+            fill
+              ? "(min-width: 768px) 50vw, 100vw"
+              : "(min-width: 1024px) 850px, 100vw"
+          }
+          className="object-contain"
+        />
+        {!fill && (
+          <button
+            className="gallery-inspect"
+            aria-label={`Enlarge ${name} screenshot`}
+            onClick={(event) => {
+              opener.current = event.currentTarget;
+              setViewerOpen(true);
+            }}
+          >
+            <Maximize2 size={17} />
+            <span>inspect()</span>
+          </button>
+        )}
+      </div>
+      {!fill && (
+        <div className="gallery-bottom">
+          <p aria-live="polite">
+            <span className="text-gold">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="gallery-count">
+              {" "}
+              / {String(images.length).padStart(2, "0")}
+            </span>
+            <span className="gallery-caption">{caption(selected, index)}</span>
+          </p>
+          {images.length > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => go(-1)}
+                aria-label={`Previous ${name} screenshot`}
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => go(1)}
+                aria-label={`Next ${name} screenshot`}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {!fill && images.length > 1 && (
+        <details className="gallery-contact-sheet">
+          <summary>
+            Browse all {images.length} screenshots <span>+</span>
+          </summary>
+          <div
+            className="gallery-thumbnails"
+            aria-label={`${name} screenshots`}
+          >
+            {images.map((src, i) => (
+              <button
+                key={src}
+                onClick={() => setIndex(i)}
+                aria-label={`Show ${name} screenshot ${i + 1}: ${caption(src, i)}`}
+                aria-pressed={index === i}
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="88px"
+                  className="object-contain"
+                />
+              </button>
             ))}
           </div>
-        </>
+        </details>
+      )}
+      {viewerOpen && (
+        <ScreenshotViewer
+          images={images}
+          name={name}
+          index={index}
+          go={go}
+          onDismiss={() => {
+            setViewerOpen(false);
+            opener.current?.focus({ preventScroll: true });
+          }}
+        />
       )}
     </div>
   );

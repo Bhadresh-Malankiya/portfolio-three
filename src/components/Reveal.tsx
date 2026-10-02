@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 type RevealProps = {
   children: React.ReactNode;
@@ -19,12 +19,17 @@ export default function Reveal({
   as = "div",
   once = true,
 }: RevealProps) {
+  const reduced = useReducedMotion();
   const variants: Variants = {
-    hidden: { opacity: 0, y },
+    hidden: { opacity: 1, y: reduced ? 0 : y },
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] },
+      transition: {
+        duration: reduced ? 0 : 0.7,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      },
     },
   };
 
@@ -35,7 +40,7 @@ export default function Reveal({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, margin: "-80px" }}
+      viewport={{ once, margin: "-30px" }}
       variants={variants}
     >
       {children}
@@ -54,10 +59,11 @@ export function RevealGroup({
   stagger?: number;
   once?: boolean;
 }) {
+  const reduced = useReducedMotion();
   const variants: Variants = {
     hidden: {},
     show: {
-      transition: { staggerChildren: stagger },
+      transition: { staggerChildren: reduced ? 0 : stagger },
     },
   };
 
@@ -66,7 +72,7 @@ export function RevealGroup({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, margin: "-80px" }}
+      viewport={{ once, margin: "-30px" }}
       variants={variants}
     >
       {children}
@@ -76,5 +82,9 @@ export function RevealGroup({
 
 export const revealItem: Variants = {
   hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
 };
