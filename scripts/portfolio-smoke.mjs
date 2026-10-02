@@ -181,6 +181,13 @@ try {
         .querySelector(".featured-pagination button:nth-child(2)")
         ?.getAttribute("aria-pressed") === "true",
   );
+  await page.waitForFunction(() => {
+    const track = document.querySelector(".featured-track");
+    const card = track?.children[1];
+    if (!track || !card) return false;
+    const target = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    return track.scrollLeft > 0 && Math.abs(track.scrollLeft - target) < 2;
+  });
   assert.ok(
     await page.locator(".featured-track").evaluate((el) => el.scrollLeft > 0),
     "mobile carousel scrolls horizontally",
