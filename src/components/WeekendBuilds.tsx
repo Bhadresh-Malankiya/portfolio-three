@@ -34,11 +34,15 @@ export default function WeekendBuilds() {
                   {project.name}
                   <span>↗</span>
                 </h3>
-                <p>{project.oneLiner}</p>
+                <p>
+                  {slug === "vocalxi"
+                    ? "What if answering a form felt like a conversation? I’m building that with VocalXI."
+                    : "A jewellery storefront built around browsing, filtering and a closer look at the details."}
+                </p>
                 <p className="weekend-status">{project.status}</p>
                 <div className="flex flex-wrap gap-6">
                   <Link href={`/projects/${slug}`} className="text-link">
-                    project.readme <ArrowUpRight size={15} />
+                    Explore the build <ArrowUpRight size={15} />
                   </Link>
                   <a
                     href={project.url}
@@ -46,7 +50,7 @@ export default function WeekendBuilds() {
                     rel="noreferrer"
                     className="text-link"
                   >
-                    open live site <ArrowUpRight size={15} />
+                    Visit the site <ArrowUpRight size={15} />
                   </a>
                 </div>
               </div>

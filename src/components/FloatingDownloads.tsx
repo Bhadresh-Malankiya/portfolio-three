@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Download, FileText } from "lucide-react";
 import { downloads } from "@/data/downloads";
@@ -43,14 +44,35 @@ function DownloadRow({
 
 /**
  * A persistent take-home dock — reachable from every page and every scroll
- * position, not just the "paper trail" section further down the homepage,
+ * position except when it would overlap the homepage’s own actions or gallery,
  * so a recruiter who never scrolls that far can still grab the résumé or
  * the book. The labeled button works with mouse, touch, or keyboard.
  */
 export default function FloatingDownloads() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [contextControlsVisible, setContextControlsVisible] = useState(true);
   const dock = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  useEffect(() => {
+    const controls = document.querySelectorAll(
+      ".builder-actions, #work, #mobile-work",
+    );
+    if (!controls.length) return;
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        });
+        setContextControlsVisible(visible.size > 0);
+      },
+      { rootMargin: "40px 0px" },
+    );
+    controls.forEach((control) => observer.observe(control));
+    return () => observer.disconnect();
+  }, [pathname]);
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => {
@@ -68,7 +90,11 @@ export default function FloatingDownloads() {
   }, [open]);
 
   return (
-    <motion.div className="fixed bottom-5 left-5 z-40" ref={dock}>
+    <motion.div
+      className="fixed bottom-5 left-5 z-40"
+      ref={dock}
+      hidden={pathname === "/" && contextControlsVisible && !open}
+    >
       <AnimatePresence>
         {open && (
           <motion.div

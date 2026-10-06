@@ -12,11 +12,7 @@ export default function ContactCTA() {
         <br />
         <em>in mind?</em>
       </h2>
-      <p>
-        Hiring a senior full-stack engineer, or need help with a product?
-        <br className="hidden sm:block" /> Send me a little context. I read and
-        reply to my own email.
-      </p>
+      <p>A role, a product, or an idea. Let’s talk.</p>
       <div className="flex flex-wrap gap-3 mt-8">
         <a href={`mailto:${profile.email}`} className="button-primary">
           sendMessage() <ArrowUpRight size={17} />

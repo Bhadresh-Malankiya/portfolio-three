@@ -42,11 +42,11 @@ export const experience: ExperienceEntry[] = [
     id: "mb-systems",
     role: "Founder",
     org: "MB Systems",
-    period: "2023 — 2024 (about 1 year)",
+    period: "2020 — 2022",
     location: "Surat, India",
     kind: "founder",
     bullets: [
-      "Ran a startup studio alongside my full-time role. The studio closed after about a year; the work included client delivery, hiring, and team management.",
+      "Ran a startup studio alongside my full-time role. The studio later closed; the work included client delivery, hiring, and team management.",
       "Delivered client and Shopify e-commerce projects for local businesses in Surat",
       "Built the BPS crypto trading platform under the studio, reaching 10K+ users and $2M+ in trading volume",
       "Trained 6–7 interns, all now well-settled in their careers",

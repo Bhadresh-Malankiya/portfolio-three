@@ -18,7 +18,7 @@ export default function CareerTimeline() {
         <motion.div style={{ scaleY: reduced ? 1 : scrollYProgress }} />
       </div>
       {experience.map((item, i) => (
-        <details key={item.id} open={i === 0} className="career-entry">
+        <details key={item.id} className="career-entry">
           <summary>
             <span className="career-dot" />
             <span className="career-date">{item.period}</span>

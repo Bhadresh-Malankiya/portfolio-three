@@ -32,9 +32,7 @@ const ROWS: Row[] = [
     name: "helpdesk-ai",
     status: "weekend",
     detail: "solo, weekends only · AI support agent",
-    metrics: [
-      { value: 90, suffix: "%", label: "less support time" },
-    ],
+    metrics: [{ value: 90, suffix: "%", label: "less support time" }],
   },
   {
     name: "expresstech systems",
@@ -48,7 +46,7 @@ const ROWS: Row[] = [
   {
     name: "mb systems",
     status: "closed",
-    detail: "founder, 2023–2024 · startup studio",
+    detail: "founder, 2020–2022 · startup studio",
     metrics: [
       { value: 10, suffix: "K+", label: "users on BPS trading" },
       { value: 7, suffix: "", label: "interns trained, all placed" },
@@ -76,7 +74,8 @@ export default function StatusBoard() {
           system status — things he owns
         </span>
         <span className="flex items-center gap-1.5 font-mono text-[11px] text-fg/80">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg" /> live read-out
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg" /> live
+          read-out
         </span>
       </div>
       <ul>
@@ -84,7 +83,9 @@ export default function StatusBoard() {
           <Reveal as="li" key={row.name} delay={i * 0.06}>
             <div className="flex flex-col gap-3 border-b border-line px-4 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div className="flex items-center gap-3">
-                <span className={`h-2 w-2 shrink-0 rounded-full ${DOT[row.status]}`} />
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${DOT[row.status]}`}
+                />
                 <div>
                   <p className="font-mono text-sm text-fg">
                     {row.name}
@@ -101,7 +102,9 @@ export default function StatusBoard() {
                     <p className="font-mono text-base text-gold-bright sm:text-lg">
                       <Counter value={m.value} suffix={m.suffix} />
                     </p>
-                    <p className="font-mono text-[10px] uppercase tracking-wide text-muted">{m.label}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-wide text-muted">
+                      {m.label}
+                    </p>
                   </div>
                 ))}
               </div>

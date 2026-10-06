@@ -27,10 +27,9 @@ export type Chapter = {
 
 export const foreword = {
   title: "Why I'm Writing This Down",
-  quote:
-    "Close enough to be true, far enough to be useful.",
+  quote: "Close enough to be true, far enough to be useful.",
   body: [
-    "I have spent most of my adult life building things that other people use without ever thinking about the person who built them. A form loads in under a second, an exam runs without a single glitch, a support ticket gets answered before the customer has finished their coffee, and nobody claps. That is what \"it works\" means. The absence of complaint is the applause, and you learn, slowly, to hear it that way.",
+    'I have spent most of my adult life building things that other people use without ever thinking about the person who built them. A form loads in under a second, an exam runs without a single glitch, a support ticket gets answered before the customer has finished their coffee, and nobody claps. That is what "it works" means. The absence of complaint is the applause, and you learn, slowly, to hear it that way.',
     "This is not a story about a straight line. There is a college placement season that went better than I expected, a first job that taught me more than any course did, a pandemic that became an opening instead of a setback, a genuine detour into cybersecurity that never became my career but shaped how I think about every system I've built since, a leadership role I grew into rather than arrived in fully formed, two products I built and own outside of anyone else's permission, and one startup that did not survive a year. I'm including that startup in as much detail as the ones that worked, because leaving it out would make this a highlight reel instead of a record.",
   ],
 };
@@ -42,7 +41,8 @@ export const chapters: Chapter[] = [
     number: "I",
     title: "Roots — Growing Up in Surat",
     era: "Childhood · Surat",
-    quote: "Surat never taught me that a good product sells itself. It taught me the opposite, every single day.",
+    quote:
+      "Surat never taught me that a good product sells itself. It taught me the opposite, every single day.",
     summary:
       "Surat's business instinct — build it, sell it, improve it, build the next thing — was the air I grew up in. I didn't come from a family of engineers. I had ordinary access to a computer and an unreasonable amount of patience for staring at a broken thing until it worked.",
     body: [
@@ -57,7 +57,8 @@ export const chapters: Chapter[] = [
     number: "II",
     title: "The Distinction Years — College and the Placement Season",
     era: "2014 – 2018 · GTU, SSGEC",
-    quote: "A 9.0 CGPA didn't make me employable. Four straight years of refusing to cut corners did.",
+    quote:
+      "A 9.0 CGPA didn't make me employable. Four straight years of refusing to cut corners did.",
     summary:
       "B.E. in Information Technology, CGPA 9.0/10, First Class with Distinction — and the highest placement package offered in my batch. Not from one brilliant semester, but from treating consistency, quietly, as a competitive advantage.",
     body: [
@@ -75,7 +76,7 @@ export const chapters: Chapter[] = [
     quote:
       "I didn't beat my first interview with talent. I beat it with the same handful of problems, solved two hundred times, until none of them looked new anymore.",
     summary:
-      "DSA prep was repetition with attention — pattern recognition across arrays, trees, graphs, and dynamic programming until a \"novel\" problem was just a familiar shape in a different costume. Landed the first offer at HQ Infosystem.",
+      'DSA prep was repetition with attention — pattern recognition across arrays, trees, graphs, and dynamic programming until a "novel" problem was just a familiar shape in a different costume. Landed the first offer at HQ Infosystem.',
     body: [
       "A large percentage of the DSA you grind through for interviews will not appear in your daily work in anything like the form you studied it. It still matters enormously, because it's testing whether you can hold a problem in your head, break it into smaller correct pieces, and reason clearly under mild pressure.",
       "I made a habit, well before my real interviews, of talking through problems out loud to an empty room. It felt strange the first several times. By the time I was doing it in front of an actual person, the strangeness had already been spent safely, where nothing was at stake.",
@@ -104,7 +105,8 @@ export const chapters: Chapter[] = [
     number: "V",
     title: "The Corona Advantage",
     era: "2020 – 2021 · The slow period",
-    quote: "A crisis doesn't ask if you're ready. It only asks what you do next.",
+    quote:
+      "A crisis doesn't ask if you're ready. It only asks what you do next.",
     summary:
       "Instead of waiting out one of the worst hiring environments in recent memory, I went deeper into frameworks and tools I'd only used at a surface level — no deadline, no client, just depth. The difference showed up later, when the market recovered.",
     body: [
@@ -119,7 +121,8 @@ export const chapters: Chapter[] = [
     number: "VI",
     title: "Kali Linux Nights — A Cybersecurity Detour",
     era: "2021 – 2022 · Nights and weekends",
-    quote: "I fell in love with breaking things a full year before it occurred to me that someone might pay me to do it.",
+    quote:
+      "I fell in love with breaking things a full year before it occurred to me that someone might pay me to do it.",
     summary:
       "A self-directed pull toward understanding how systems fail. Top 6% Global Rank on TryHackMe in 2021, Advent of Cyber certified in 2022. Never became the career — became a permanent second lens underneath every architecture decision since.",
     body: [
@@ -150,7 +153,8 @@ export const chapters: Chapter[] = [
     number: "VIII",
     title: "Owning ExtendedForms.io",
     era: "2022 – Present · Sole technical owner",
-    quote: "401,000 users don't know or care that I own this product. They only notice when the page loads in 1.2 seconds instead of 3.2.",
+    quote:
+      "401,000 users don't know or care that I own this product. They only notice when the page loads in 1.2 seconds instead of 3.2.",
     summary:
       "A Google Forms analytics and AI extension platform, now at 401K+ users, 579K forms, 8.7M respondents, 3x revenue growth. Every architecture, performance, and roadmap decision starts and ends with me.",
     body: [
@@ -181,7 +185,8 @@ export const chapters: Chapter[] = [
     number: "X",
     title: "Weekends That Mattered — HelpDesk AI and the Side-Project Habit",
     era: "Weekends · Alongside the full-time role",
-    quote: "Nobody assigned me a support ticket problem. I just couldn't stand watching a customer wait two days for something a weekend could fix.",
+    quote:
+      "Nobody assigned me a support ticket problem. I just couldn't stand watching a customer wait two days for something a weekend could fix.",
     summary:
       "A multi-tenant AI support agent platform, built entirely on weekends for no reason except curiosity. Cuts support engineer time by ~90%; tickets resolved in hours instead of one to two days.",
     body: [
@@ -195,14 +200,15 @@ export const chapters: Chapter[] = [
     icon: "flame",
     number: "XI",
     title: "MB Systems — Founding, Failing, and What It Taught Me",
-    era: "2023 – 2024 · Founder, ~1 year",
-    quote: "A startup doesn't fail in one dramatic moment. It fails the same quiet way it almost succeeds: one ordinary week at a time.",
+    era: "2020 – 2022 · Founder",
+    quote:
+      "A startup doesn't fail in one dramatic moment. It fails the same quiet way it almost succeeds: one ordinary week at a time.",
     summary:
-      "A startup studio in Surat, run alongside the full-time role at ExpressTech. Built the BPS crypto trading platform (10K+ users, $2M+ volume) and trained 6–7 interns, all now well-settled. The studio closed after about a year. It did not survive — and I'm not going to pretend otherwise.",
+      "A startup studio in Surat, run alongside my full-time development work. Built the BPS crypto trading platform (10K+ users, $2M+ volume) and trained 6–7 interns, all now well-settled. The studio later closed. It did not survive — and I'm not going to pretend otherwise.",
     body: [
       "As an employee, even a technical lead, you're shielded from a lot of market reality by the structure around you. As a founder, there's no structure between you and the market's actual response to what you built. Demand does not arrive because you worked hard.",
       "I took on data and security decisions personally, as the person ultimately accountable. That single shift, from shared accountability to personal accountability, changed how carefully I thought about every technical decision — and it's stayed with me since.",
-      "The studio closed because cash runway, the time I could realistically devote alongside a demanding full-time role, and market timing didn't line up. No single dramatic mistake explains it better than that unglamorous combination. I don't regret the year. I'd be lying if I said the ending didn't sting. Both are true.",
+      "The studio closed because cash runway, the time I could realistically devote alongside a demanding full-time role, and market timing didn't line up. No single dramatic mistake explains it better than that unglamorous combination. I don't regret that period. I'd be lying if I said the ending didn't sting. Both are true.",
     ],
   },
   {
@@ -211,13 +217,14 @@ export const chapters: Chapter[] = [
     number: "XII",
     title: "The Craft — Charts, Maps, and Chasing New Tools",
     era: "Ongoing",
-    quote: "A chart that lags is the only kind of slow database a user can actually see with their own eyes.",
+    quote:
+      "A chart that lags is the only kind of slow database a user can actually see with their own eyes.",
     summary:
       "Years with Highcharts rendering millions of points without grinding to a halt, Mapbox geofencing and live tracking, Three.js for embedded 3D, Framer Motion and Lenis for interface feel. The skill that compounds isn't any one tool — it's becoming fluent in the next one, fast.",
     body: [
       "A database can be slow in ways a user never sees. A chart's performance is the user's direct, visible experience of whether your engineering is any good — there's nowhere to hide a slow chart.",
       "Building a reliable geofencing system sounds like comparing coordinates. In practice it means accounting for GPS drift, debouncing a signal that flickers across a boundary, and making sure a temporary loss of signal doesn't silently break the whole feature.",
-      "The willingness to treat \"I don't know this tool yet\" as a temporary and uninteresting fact, rather than a real barrier, is one of the more important instincts in this entire book.",
+      'The willingness to treat "I don\'t know this tool yet" as a temporary and uninteresting fact, rather than a real barrier, is one of the more important instincts in this entire book.',
     ],
   },
   {
@@ -226,7 +233,8 @@ export const chapters: Chapter[] = [
     number: "XIII",
     title: "Leading Without a Title — Mentorship Lessons",
     era: "Ongoing · 12+ engineers mentored",
-    quote: "The fastest way to help someone is to hand them the answer. The only way to actually help them is to resist that urge.",
+    quote:
+      "The fastest way to help someone is to hand them the answer. The only way to actually help them is to resist that urge.",
     summary:
       "Good mentorship isn't transferring your own solution to someone else's problem. It's building the muscle in someone else to arrive at solutions like it on their own — even when, especially when, it would be faster to just tell them.",
     body: [
@@ -241,7 +249,8 @@ export const chapters: Chapter[] = [
     number: "XVI",
     title: "What's Next",
     era: "Now",
-    quote: "I don't know what I'm building next. I know exactly how I'll start: badly, immediately, and without waiting to feel ready.",
+    quote:
+      "I don't know what I'm building next. I know exactly how I'll start: badly, immediately, and without waiting to feel ready.",
     summary:
       "ExtendedForms.io keeps growing. Quzo.ai keeps handling more exams every term. MB Systems is closed, and its lessons are still being processed with each new decision. No tidy resolution — just a clear statement of what comes next.",
     body: [

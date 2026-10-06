@@ -27,24 +27,17 @@ export default function AboutSection() {
       <Reveal className="about-copy">
         <p className="eyebrow">03 // about_me</p>
         <h2>
-          Hello, I’m
+          Still curious.
           <br />
-          <em>Bhadresh.</em>
+          <em>Still building.</em>
         </h2>
         <p>
-          I’m a full-stack engineer based in Surat, India. I started building
-          web applications in 2018. My engineering work at ExpressTech Systems
-          ran from June 2022 to September 2026. I now build through AscendXI.
+          I’m Bhadresh, an engineer from Surat. Since 2018, I’ve moved from
+          building web apps to leading product engineering at ExpressTech.
         </p>
         <p>
-          At ExpressTech, I worked across ExtendedForms.io, Quzo.ai, and
-          HelpDesk AI — from interfaces and AI features to backend performance.
-          VocalXI is my own product: a voice-first way to complete forms.
-        </p>
-        <p>
-          I ran MB Systems for a year alongside my full-time role. The studio
-          closed. The experience changed how I estimate work, manage a team, and
-          talk to clients.
+          Now I’m building VocalXI through AscendXI. The weekend habit stuck:
+          see an idea, open the editor, find out.
         </p>
         <dl className="about-details">
           <div>

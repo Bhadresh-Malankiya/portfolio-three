@@ -141,24 +141,65 @@ try {
     "true",
   );
   await page.goto(base, { waitUntil: "networkidle" });
-  await page
-    .getByRole("button", {
-      name: "Show featured project 2: Quzo.ai",
-      exact: true,
-    })
-    .click();
+  await page.getByRole("button", { name: "02 Quzo.ai", exact: true }).click();
   await page.waitForFunction(
     () =>
       document
-        .querySelector(".featured-pagination button:nth-child(2)")
+        .querySelector("#work .chapter-selector button:nth-child(2)")
         ?.getAttribute("aria-pressed") === "true",
   );
-  assert.equal(
-    await page.locator(".featured-card:not([inert]) h3").innerText(),
-    "Quzo.ai",
-    "desktop carousel centers the selected project",
+  const quzoScreens = page.getByRole("group", {
+    name: "Quzo.ai screenshots",
+    exact: true,
+  });
+  await quzoScreens
+    .getByRole("button", { name: "Screen 2", exact: true })
+    .click();
+  assert.ok(
+    (await page
+      .getByRole("button", { name: "Screen 2", exact: true })
+      .getAttribute("aria-pressed")) === "true",
+    "laptop screen selector works",
+  );
+  await page
+    .getByRole("button", { name: "Enlarge Quzo.ai screenshot", exact: true })
+    .click();
+  assert.ok(
+    await page
+      .getByRole("dialog", { name: "Quzo.ai screenshot viewer" })
+      .isVisible(),
+  );
+  await page.keyboard.press("Escape");
+  assert.equal(await page.locator("dialog[open]").count(), 0);
+  // Switching to the non-scroll layout must clear the desktop exit transform.
+  await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
+  await page
+    .getByRole("button", { name: "02 Health records", exact: true })
+    .click();
+  await page.waitForFunction(
+    () =>
+      document.querySelector("#mobile-work .device-canvas")?.dataset.ready ===
+      "true",
+  );
+  await page.getByRole("button", { name: "02 Quzo.ai", exact: true }).click();
+  await page.waitForFunction(
+    () =>
+      document.querySelector("#mobile-work .device-canvas")?.style.opacity ===
+      "0",
   );
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForFunction(() =>
+    Array.from(document.querySelectorAll(".device-canvas")).every(
+      (el) =>
+        getComputedStyle(el).opacity === "1" &&
+        getComputedStyle(el).transform === "none",
+    ),
+  );
+  assert.equal(
+    await page.locator(".device-canvas canvas").count(),
+    2,
+    "both visited scenes remain mounted",
+  );
   await page.goto(base, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Open menu", exact: true }).click();
   await page
@@ -172,26 +213,29 @@ try {
     "false",
     "mobile anchor closes navigation",
   );
+  await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "Next featured project", exact: true })
+    .getByRole("button", { name: "02 Health records", exact: true })
     .click();
-  await page.waitForFunction(
-    () =>
-      document
-        .querySelector(".featured-pagination button:nth-child(2)")
-        ?.getAttribute("aria-pressed") === "true",
-  );
-  await page.waitForFunction(() => {
-    const track = document.querySelector(".featured-track");
-    const card = track?.children[1];
-    if (!track || !card) return false;
-    const target = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
-    return track.scrollLeft > 0 && Math.abs(track.scrollLeft - target) < 2;
-  });
+  await page
+    .getByRole("heading", { name: "Their health, in one place.", exact: true })
+    .waitFor();
   assert.ok(
-    await page.locator(".featured-track").evaluate((el) => el.scrollLeft > 0),
-    "mobile carousel scrolls horizontally",
+    await page
+      .getByRole("region", { name: "Mobile project showcase" })
+      .isVisible(),
+    "phone has a separate section",
   );
+  await page
+    .getByRole("button", { name: "Enlarge Hey Buddy screenshot", exact: true })
+    .click();
+  assert.ok(
+    await page
+      .getByRole("dialog", { name: "Hey Buddy screenshot viewer" })
+      .isVisible(),
+    "phone screenshot opens",
+  );
+  await page.keyboard.press("Escape");
   const resume = await context.request.get(
     base + "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
   );
@@ -217,7 +261,7 @@ try {
       "heading works without motion/JavaScript",
     );
     assert.ok(
-      await p.getByRole("link", { name: "viewProjects()" }).isVisible(),
+      await p.getByRole("link", { name: "View all 15 projects" }).isVisible(),
       "CTA works without motion/JavaScript",
     );
     await p.goto(base + "/projects/quzo-ai", { waitUntil: "networkidle" });

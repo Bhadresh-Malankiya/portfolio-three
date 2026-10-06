@@ -3,6 +3,7 @@ import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
+import "./portfolio-theme.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingContactCard from "@/components/FloatingContactCard";
 import FloatingDownloads from "@/components/FloatingDownloads";
@@ -87,7 +88,7 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
-      <body className="relative overflow-x-clip developer-theme">
+      <body className="relative overflow-x-clip portfolio-theme">
         <JsonLd
           data={{
             "@context": "https://schema.org",

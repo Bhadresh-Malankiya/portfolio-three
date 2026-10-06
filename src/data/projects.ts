@@ -20,7 +20,13 @@ export type Project = {
   name: string;
   url?: string;
   category: string;
-  kind: "Sole ownership" | "Employer product" | "Founder venture" | "Client project" | "Freelance" | "Personal build";
+  kind:
+    | "Sole ownership"
+    | "Employer product"
+    | "Founder venture"
+    | "Client project"
+    | "Freelance"
+    | "Personal build";
   oneLiner: string;
   motif: Motif;
   featured: boolean;
@@ -43,7 +49,8 @@ export const projects: Project[] = [
     url: "https://jewelxi.vercel.app/",
     category: "E-commerce",
     kind: "Personal build",
-    oneLiner: "A jewellery storefront with a filterable catalog, custom design enquiries, and an interactive 3D product study.",
+    oneLiner:
+      "A jewellery storefront with a filterable catalog, custom design enquiries, and an interactive 3D product study.",
     motif: "freelance",
     featured: true,
     techLabel: "Features",
@@ -52,7 +59,7 @@ export const projects: Project[] = [
     narrative: [
       "Jewelxi brings the storefront, product catalog, and custom design enquiry into one jewellery shopping experience. The public preview includes category and material filters, product search, multiple display currencies, and detailed product pages.",
       "The visual work includes a scroll-driven 3D pendant study and a separate inspiration gallery. The catalog includes search, category filters, material filters, and sorting.",
-      "The site is currently in public preview, with an illustrative collection and test checkout."
+      "The site is currently in public preview, with an illustrative collection and test checkout.",
     ],
     role: "E-commerce development and interactive product presentation",
     status: "Public preview — test checkout",
@@ -64,16 +71,22 @@ export const projects: Project[] = [
     url: "https://vocalxi.com",
     category: "Voice AI / Personal product",
     kind: "Personal build",
-    oneLiner: "My voice-form product: share a browser link, collect spoken answers, and let respondents review before submitting.",
+    oneLiner:
+      "My voice-form product: share a browser link, collect spoken answers, and let respondents review before submitting.",
     motif: "proctor",
     featured: true,
     techLabel: "Features",
-    tech: ["Browser voice agents", "Form builder", "Google Forms", "Response review"],
+    tech: [
+      "Browser voice agents",
+      "Form builder",
+      "Google Forms",
+      "Response review",
+    ],
     metrics: [],
     narrative: [
       "VocalXI is a product I am building personally. It turns a set of form questions into a browser voice conversation, so respondents can speak their answers instead of filling every field by hand.",
       "The workflow starts with native forms or a Google Forms connection, continues through a shareable respondent link, and ends with an answer review before submission. The product also includes a workspace for forms and responses.",
-      "Browser voice is available and the product is onboarding its first users. The Google Forms connector has limited staging access. Phone calling is planned, not a released feature."
+      "Browser voice is available and the product is onboarding its first users. The Google Forms connector has limited staging access. Phone calling is planned, not a released feature.",
     ],
     role: "Personal product — building and developing VocalXI",
     status: "Early release — browser voice; Google Forms connector in staging",
@@ -85,10 +98,21 @@ export const projects: Project[] = [
     url: "https://quzo.ai",
     category: "AI SaaS",
     kind: "Sole ownership",
-    oneLiner: "AI-powered quizzes and proctored exams, built from idea to production.",
+    oneLiner:
+      "AI-powered quizzes and proctored exams, built from idea to production.",
     motif: "proctor",
     featured: false,
-    tech: ["Next.js", "React", "Node.js", "OpenAI", "Claude", "Gemini", "PostgreSQL", "pgvector", "Stripe"],
+    tech: [
+      "Next.js",
+      "React",
+      "Node.js",
+      "OpenAI",
+      "Claude",
+      "Gemini",
+      "PostgreSQL",
+      "pgvector",
+      "Stripe",
+    ],
     metrics: [
       { value: "400K+", label: "student exams handled" },
       { value: "30s", label: "question creation, down from 30 min" },
@@ -116,10 +140,21 @@ export const projects: Project[] = [
     url: "https://extendedforms.io",
     category: "B2B SaaS",
     kind: "Sole ownership",
-    oneLiner: "Google Forms analytics and AI extension platform, inside the Google Workspace ecosystem.",
+    oneLiner:
+      "Google Forms analytics and AI extension platform, inside the Google Workspace ecosystem.",
     motif: "forms",
     featured: true,
-    tech: ["Laravel", "Vue.js", "Next.js", "Node.js", "PostgreSQL", "MongoDB", "Redis", "Stripe", "AWS"],
+    tech: [
+      "Laravel",
+      "Vue.js",
+      "Next.js",
+      "Node.js",
+      "PostgreSQL",
+      "MongoDB",
+      "Redis",
+      "Stripe",
+      "AWS",
+    ],
     metrics: [
       { value: "401K+", label: "users" },
       { value: "579K", label: "forms analyzed" },
@@ -141,7 +176,8 @@ export const projects: Project[] = [
     name: "HelpDesk AI",
     category: "AI SaaS",
     kind: "Sole ownership",
-    oneLiner: "Multi-tenant AI support agent platform with threshold-based auto-reply — built solo, on weekends.",
+    oneLiner:
+      "Multi-tenant AI support agent platform with threshold-based auto-reply — built solo, on weekends.",
     motif: "inbox",
     featured: false,
     tech: ["Node.js", "IMAP IDLE", "AES-256", "JWT", "PostgreSQL"],
@@ -157,7 +193,12 @@ export const projects: Project[] = [
     ],
     role: "Solo build — architecture, security, backend, on weekends",
     status: "Live — weekend project turned real platform",
-    images: ["/images/helpdesk_1.png", "/images/helpdesk_2.png", "/images/helpdesk_3.png", "/images/helpdesk_4.png"],
+    images: [
+      "/images/helpdesk_1.png",
+      "/images/helpdesk_2.png",
+      "/images/helpdesk_3.png",
+      "/images/helpdesk_4.png",
+    ],
   },
   {
     slug: "zwopr",
@@ -165,7 +206,8 @@ export const projects: Project[] = [
     url: "https://app.zwopr.com",
     category: "B2B SaaS",
     kind: "Client project",
-    oneLiner: "AI-powered social content management system, built for a German company.",
+    oneLiner:
+      "AI-powered social content management system, built for a German company.",
     motif: "cms",
     featured: true,
     tech: ["Next.js", "NestJS", "GraphQL", "Hasura Cloud", "PostgreSQL"],
@@ -194,7 +236,8 @@ export const projects: Project[] = [
     name: "eBaggageDrop",
     category: "IoT / AI",
     kind: "Client project",
-    oneLiner: "AI kiosk for automated baggage measurement, deployed across 15+ airports.",
+    oneLiner:
+      "AI kiosk for automated baggage measurement, deployed across 15+ airports.",
     motif: "kiosk",
     featured: false,
     tech: ["React.js", "TensorFlow", "OpenCV", "Node.js", "Socket.io", "AWS"],
@@ -245,10 +288,10 @@ export const projects: Project[] = [
       { value: "1000+", label: "concurrent WebSocket connections" },
     ],
     narrative: [
-      "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections — built during the MB Systems year, the technical high point of a venture that ultimately didn't survive the studio around it.",
+      "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections — built during the MB Systems period, the technical high point of a venture that ultimately didn't survive the studio around it.",
     ],
     role: "Founder & lead engineer",
-    status: "Built under MB Systems (2023–24)",
+    status: "Built under MB Systems (2020–2022)",
     frame: "phone",
     images: [
       "/images/bps_1.png",
@@ -290,7 +333,11 @@ export const projects: Project[] = [
     ],
     role: "Frontend dashboard engineering",
     status: "Live worldwide",
-    images: ["/images/intuitive.png", "/images/intuitive_dashboard.png", "/images/intuitive_dashboard_1.png"],
+    images: [
+      "/images/intuitive.png",
+      "/images/intuitive_dashboard.png",
+      "/images/intuitive_dashboard_1.png",
+    ],
   },
   {
     slug: "kexy-restaurants",
@@ -298,7 +345,8 @@ export const projects: Project[] = [
     url: "https://getkexy.com",
     category: "SaaS",
     kind: "Client project",
-    oneLiner: "Restaurant management platform with ads and multi-vendor payouts.",
+    oneLiner:
+      "Restaurant management platform with ads and multi-vendor payouts.",
     motif: "restaurant",
     featured: false,
     tech: ["CakePHP", "MySQL", "Redis", "Stripe Connect", "Twilio", "AWS"],
@@ -349,7 +397,8 @@ export const projects: Project[] = [
     url: "https://rightful.com.au",
     category: "Legal Tech",
     kind: "Client project",
-    oneLiner: "Australia's legal services platform, with real-time video consultation.",
+    oneLiner:
+      "Australia's legal services platform, with real-time video consultation.",
     motif: "legal",
     featured: false,
     tech: ["React.js", "TypeScript", "Python", "WebSocket", "Stripe"],
@@ -369,11 +418,14 @@ export const projects: Project[] = [
     name: "Collahead — Truck Driver Tracking",
     category: "Logistics / Mobility",
     kind: "Client project",
-    oneLiner: "React Native driver app with live GPS tracking, discontinued before launch.",
+    oneLiner:
+      "React Native driver app with live GPS tracking, discontinued before launch.",
     motif: "map",
     featured: false,
     tech: ["React Native", "Mapbox Directions API", "Node.js"],
-    metrics: [{ value: "0", label: "shipped — client discontinued it before launch" }],
+    metrics: [
+      { value: "0", label: "shipped — client discontinued it before launch" },
+    ],
     narrative: [
       "Custom Mapbox geofenced triggers for live GPS driver tracking, modeled on Zomato/Blinkit-style delivery tracking, for a New York-based client. The project was discontinued before launch — included here deliberately, because the geofencing engineering was real and the lessons about signal debouncing and GPS drift still apply everywhere else.",
     ],
@@ -385,7 +437,8 @@ export const projects: Project[] = [
     name: "Freelance / Agency Client Work",
     category: "Freelance",
     kind: "Freelance",
-    oneLiner: "Independent client work outside the full-time role — e-commerce and AI agent builds.",
+    oneLiner:
+      "Independent client work outside the full-time role — e-commerce and AI agent builds.",
     motif: "freelance",
     featured: false,
     tech: ["Shopify", "Next.js", "Node.js", "AI Agents"],
