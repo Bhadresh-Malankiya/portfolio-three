@@ -33,7 +33,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "cloud",
     label: "Cloud & DevOps",
-    items: ["AWS", "Google Cloud", "Azure", "Vercel", "Docker", "Kubernetes", "Load Balancing", "Auto-Scaling"],
+    items: ["AWS", "Google Cloud", "Azure", "Vercel", "Docker", "Kafka", "Kubernetes", "Load Balancing", "Auto-Scaling"],
   },
   {
     id: "testing",
@@ -57,8 +57,8 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     id: "ai",
-    label: "AI Integrations",
-    items: ["OpenAI", "Claude (Anthropic)", "Gemini", "RAG pipelines with pgvector"],
+    label: "Applied AI & Adoption",
+    items: ["OpenAI", "Claude (Anthropic)", "Gemini", "LLM integration", "RAG pipelines with pgvector", "Prompt engineering", "AI workflow adoption"],
   },
   {
     id: "business",
@@ -70,4 +70,14 @@ export const skillGroups: SkillGroup[] = [
     label: "Security & Auth",
     items: ["SSO", "JWT-based auth", "AES-256 encryption", "RFC-compliant security standards"],
   },
+];
+
+// A concise view of the capabilities used across customer-facing delivery.
+export const deliveryExpertise = [
+  { code: "01 / UI", title: "Frontend", detail: "Clear interfaces for real workflows.", tools: "JavaScript · TypeScript · React · Next.js" },
+  { code: "02 / API", title: "Backend", detail: "APIs, business logic and integrations.", tools: "PHP · Laravel · Node.js · PostgreSQL" },
+  { code: "03 / AI", title: "AI integration", detail: "Connect models to product context.", tools: "LLMs · RAG · OpenAI · pgvector" },
+  { code: "04 / ADOPT", title: "AI adoption", detail: "Make AI useful in day-to-day work.", tools: "Prompt engineering · AI workflows · Claude" },
+  { code: "05 / SHIP", title: "Systems & deployment", detail: "Design for traffic, reliability and growth.", tools: "System design · AWS · Kafka · Docker" },
+  { code: "06 / LEAD", title: "Technical leadership", detail: "Managed 10+ developers, with delivery ownership.", tools: "Team management · Mentoring · Product scope" },
 ];

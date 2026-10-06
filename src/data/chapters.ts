@@ -136,11 +136,11 @@ export const chapters: Chapter[] = [
     icon: "trending-up",
     number: "VII",
     title: "The Jump — Becoming a Tech Lead at ExpressTech",
-    era: "2022 – Present · Senior Software Engineer / Technical Lead",
+    era: "2022 – 2026 · Senior Software Engineer / Technical Lead",
     quote:
       "Nobody promoted me into leadership. I just started making the decisions nobody else wanted to own, and the title eventually agreed with me.",
     summary:
-      "The shift from developer to lead isn't a shift in code difficulty — it's a shift in how many decisions other people are waiting on you to make, and how far a wrong one travels. Mentored 5+ engineers, scaled systems to 100K concurrent users at 99.8% uptime.",
+      "The shift from developer to lead isn't a shift in code difficulty — it's a shift in how many decisions other people are waiting on you to make, and how far a wrong one travels. Managed 10+ developers and helped scale products from 10 to 100,000 users.",
     body: [
       "As an individual contributor, a bad choice mostly costs you time. As a technical lead, a bad choice can cost your whole team time, and if it reaches production, real money and real trust with customers.",
       "I pushed Jest coverage above 90% and layered in Cypress end-to-end tests — not because coverage numbers are inherently meaningful, but because getting a team to care about coverage is really getting them to care about whoever maintains this code next. That cut our bug escape rate by 75%.",
@@ -152,11 +152,11 @@ export const chapters: Chapter[] = [
     icon: "sheet",
     number: "VIII",
     title: "Owning ExtendedForms.io",
-    era: "2022 – Present · Sole technical owner",
+    era: "2022 – 2026 · Technical owner at ExpressTech Systems",
     quote:
-      "401,000 users don't know or care that I own this product. They only notice when the page loads in 1.2 seconds instead of 3.2.",
+      "400,000+ users experience the work through the product. They only notice when the page loads in 1.2 seconds instead of 3.2.",
     summary:
-      "A Google Forms analytics and AI extension platform, now at 401K+ users, 579K forms, 8.7M respondents, 3x revenue growth. Every architecture, performance, and roadmap decision starts and ends with me.",
+      "ExtendedForms brings timed assessments, proctoring and reporting to Google Forms. At ExpressTech Systems, I led engineering on a platform serving 400K+ users and supporting 10M+ online exams, with responsibility across architecture, performance and delivery.",
     body: [
       "When I say I own this product technically, decisions about architecture, performance, and where engineering effort goes next do not get handed to me from someone else's roadmap. They start with me.",
       "I rebuilt performance-critical paths, taking page load from 3.2s to 1.2s, and later cut our highest-traffic page from 30–35 seconds down to 5–6 using smarter caching and TanStack Query. Nobody filed a ticket demanding it. I noticed it, and treated it as urgent because I was the one who'd live with the consequences of ignoring it.",
@@ -168,11 +168,11 @@ export const chapters: Chapter[] = [
     icon: "sparkles",
     number: "IX",
     title: "Building Quzo.ai From Nothing",
-    era: "2022 – Present · Built solo, from scratch",
+    era: "2022 – 2026 · Full-stack and AI engineering at ExpressTech",
     quote:
       "I gave a machine the job of writing exam questions. It took thirty seconds. It used to take thirty minutes, and none of those minutes were mine to spare.",
     summary:
-      "An AI-first exam and quiz platform with proctoring, now handling 400K+ student exams. No employer's budget, no one else's decision — it exists because I decided it should, and then built it, model-agnostic across OpenAI, Claude, and Gemini.",
+      "An AI-first exam and quiz platform with proctoring, now handling 400K+ student exams. My work at ExpressTech connected the assessment workflow with model-agnostic AI integration across OpenAI, Claude and Gemini.",
     body: [
       "I built a credit management and optimization system that lets the underlying AI model be selected based on task and cost — rather than locking the whole product to a single provider's pricing curve. I didn't fully appreciate how important that decision was until later.",
       "A retrieval-augmented generation pipeline on pgvector powers AI-generated question banks: what used to take an educator thirty minutes now takes about thirty seconds.",

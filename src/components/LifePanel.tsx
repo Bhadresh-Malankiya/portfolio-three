@@ -5,34 +5,35 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { deliveryExpertise } from "@/data/skills";
 
-const tabs = ["Journey", "Expertise", "Beyond work"];
+const tabs = ["Journey", "Expertise", "Founder mindset"];
 const journey = [
   {
     year: "Now",
     title: "AscendXI / VocalXI",
     role: "Founder & product engineer",
-    detail: "Building a voice-first way to complete forms.",
+    detail: "Building VocalXI solo: product decisions, frontend, backend, voice AI and deployment. From the first idea to a working product.",
   },
   {
     year: "2022–2026",
     title: "ExpressTech Systems",
     role: "Senior engineer / Technical lead",
-    detail: "Product engineering across ExtendedForms, Quzo and HelpDesk AI.",
+    detail: "Led engineering across ExtendedForms and Quzo. ExtendedForms serves 400K+ users and has supported 10M+ online exams.",
   },
   {
     year: "2020–2022",
     title: "MB Systems",
     role: "Founder · side venture",
     detail:
-      "Client delivery, a small team, and first-hand lessons in running a studio.",
+      "Founded a studio alongside my engineering role. Owned client relationships, hiring and delivery; closed it in 2022 and carried the lessons forward.",
   },
   {
     year: "2018–2022",
     title: "HQ Infosystem",
     role: "Full-stack developer",
     detail:
-      "Web applications, APIs, payments and the foundations of my engineering work.",
+      "Built web applications, APIs and payment integrations with JavaScript, PHP and Laravel. The foundation for taking a problem from discovery to production.",
   },
 ];
 export default function LifePanel() {
@@ -69,7 +70,7 @@ export default function LifePanel() {
       <span className="life-anchor" id="experience" />
       <span className="life-anchor" id="expertise" />
       <div className="life-heading">
-        <p className="eyebrow">{"// the person behind the pixels"}</p>
+        <p className="eyebrow">{"// engineer. technical lead. founder."}</p>
         <h2>
           One person.
           <br />
@@ -91,6 +92,10 @@ export default function LifePanel() {
           </div>
         </div>
         <div className="life-content">
+          <div className="life-intro">
+            <p className="eyebrow">Forward Deployed Engineer</p>
+            <p>I work from the customer problem through to production — across frontend, backend and AI, with a founder’s eye for what matters.</p>
+          </div>
           <div role="tablist" aria-label="My background" className="life-tabs">
             {tabs.map((name, i) => (
               <button
@@ -158,48 +163,27 @@ export default function LifePanel() {
                   </>
                 )}
                 {tab === 1 && (
-                  <div className="expertise-map">
-                    {[
-                      {
-                        title: "Interfaces",
-                        code: "< />",
-                        tools: "React · Next.js · TypeScript · React Native",
-                      },
-                      {
-                        title: "Systems",
-                        code: "{ }",
-                        tools: "Node.js · NestJS · PostgreSQL · Redis",
-                      },
-                      {
-                        title: "Applied AI",
-                        code: "✳",
-                        tools: "OpenAI · Claude · Gemini · pgvector",
-                      },
-                    ].map((item) => (
+                  <div className="delivery-expertise">
+                    {deliveryExpertise.map((item) => (
                       <div key={item.title}>
-                        <span aria-hidden="true">{item.code}</span>
-                        <h3>
-                          {item.title}
-                          <small>{item.tools}</small>
-                        </h3>
+                        <span className="expertise-index" aria-hidden="true">{item.code}</span>
+                        <h3>{item.title}</h3>
+                        <p>{item.detail}</p>
+                        <small>{item.tools}</small>
                       </div>
                     ))}
                   </div>
                 )}
                 {tab === 2 && (
-                  <div className="life-beyond">
-                    <span className="life-large" aria-hidden="true">
-                      2018 →
-                    </span>
-                    <h3>The weekend habit stuck.</h3>
-                    <p>See an idea. Open the editor. Find out.</p>
-                    <p>
-                      I write about the work, the mistakes, and starting again
-                      in <em>The Weekend Builder.</em>
-                    </p>
-                    <a href="#downloads" className="text-link">
-                      Read the book <ArrowUpRight size={15} />
-                    </a>
+                  <div className="life-beyond life-founder">
+                    <span className="life-large" aria-hidden="true">idea → live</span>
+                    <h3>I’ve been on both sides of the brief.</h3>
+                    <p>At MB Systems, I ran the business as well as the build. Today, I’m building VocalXI solo — a voice-first way to complete forms.</p>
+                    <p>That changes how I work: understand the customer, choose the scope, ship, and stay accountable after launch.</p>
+                    <div className="life-founder-links">
+                      <a href="https://vocalxi.com" target="_blank" rel="noopener noreferrer" className="text-link">Explore VocalXI <ArrowUpRight size={15} /></a>
+                      <a href="#downloads" className="text-link">The Weekend Builder <ArrowUpRight size={15} /></a>
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -210,6 +194,12 @@ export default function LifePanel() {
           </Link>
         </div>
       </div>
+      <dl className="life-impact" aria-label="Experience and product impact">
+        <div><dt>400K+</dt><dd>ExtendedForms users</dd></div>
+        <div><dt>10M+</dt><dd>Online exams on ExtendedForms</dd></div>
+        <div><dt>10+</dt><dd>Developers managed</dd></div>
+        <div><dt>10 → 100K</dt><dd>Users · experience scaling products</dd></div>
+      </dl>
     </section>
   );
 }

@@ -14,15 +14,15 @@ const ROWS: Row[] = [
     status: "live",
     detail: "sole technical owner · Google Forms analytics + AI",
     metrics: [
-      { value: 401, suffix: "K+", label: "users" },
-      { value: 8, suffix: ".7M", label: "respondents" },
+      { value: 400, suffix: "K+", label: "users" },
+      { value: 10, suffix: "M+", label: "online exams" },
       { value: 99, suffix: ".8%", label: "uptime" },
     ],
   },
   {
     name: "quzo.ai",
     status: "live",
-    detail: "founder, built solo · AI exams & proctoring",
+    detail: "engineering at ExpressTech · AI exams & proctoring",
     metrics: [
       { value: 400, suffix: "K+", label: "exams run" },
       { value: 30, suffix: "s", label: "per question, was 30 min" },
@@ -37,9 +37,9 @@ const ROWS: Row[] = [
   {
     name: "expresstech systems",
     status: "live",
-    detail: "technical lead since 2022 · platform engineering",
+    detail: "technical lead, 2022–2026 · platform engineering",
     metrics: [
-      { value: 100, suffix: "K", label: "concurrent users" },
+      { value: 10, suffix: "+", label: "developers managed" },
       { value: 3, suffix: "x", label: "revenue growth" },
     ],
   },
@@ -71,7 +71,7 @@ export default function StatusBoard() {
     <div className="overflow-hidden rounded-lg border border-line bg-ink-2/50">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5 sm:px-6">
         <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
-          system status — things he owns
+          product work & leadership
         </span>
         <span className="flex items-center gap-1.5 font-mono text-[11px] text-fg/80">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg" /> live

@@ -6,16 +6,16 @@ export default function Hero() {
   return (
     <section className="intro-hero page-shell">
       <div className="intro-heading">
-        <p className="eyebrow">Bhadresh Malankiya / Full-stack & AI engineer</p>
+        <p className="eyebrow">Bhadresh Malankiya / Forward Deployed Engineer</p>
         <h1>
           Engineer by trade.
           <br />
           <em>Builder by habit.</em>
         </h1>
         <p className="intro-description">
-          Eight years turning ideas into software.
+          From customer problems to production.
           <br />
-          Still curious about what comes next.
+          Full stack. Applied AI. Eight years of building.
         </p>
         <div className="builder-actions">
           <Link href="#work" className="button-primary glow-border">

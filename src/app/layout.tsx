@@ -40,13 +40,16 @@ const siteUrl = `https://${profile.site}`;
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Bhadreshkumar Malankiya — Senior Full Stack Engineer",
+    default: "Bhadreshkumar Malankiya — Forward Deployed Engineer",
     template: "%s — The Weekend Builder",
   },
   description: profile.summary,
   keywords: [
     "Bhadreshkumar Malankiya",
+    "Forward Deployed Engineer",
     "Full Stack Engineer",
+    "AI integration and adoption",
+    "RAG and LLM engineering",
     "Technical Lead",
     "Software Architect",
     "ExtendedForms.io",
@@ -66,7 +69,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The Weekend Builder — Bhadreshkumar Malankiya",
     description:
-      "A life in code, ownership, and the habit of starting again. Portfolio & memoir of a Senior Full Stack Engineer and Technical Lead.",
+      "Forward Deployed Engineer with 8+ years in full-stack development, applied AI, system design and technical leadership.",
     type: "website",
     url: siteUrl,
     siteName: "The Weekend Builder",

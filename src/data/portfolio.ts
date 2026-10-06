@@ -4,9 +4,9 @@ import { profile } from "@/data/profile";
 
 export const identity = {
   name: "Bhadresh Malankiya",
-  role: "Senior Full-Stack & AI Engineer",
+  role: "Forward Deployed Engineer",
   summary:
-    "I build production SaaS, thoughtful interfaces and applied AI systems. My work connects React and Next.js experiences with Node.js services, data and reliable delivery.",
+    "I turn customer problems into production software: frontend, backend, AI integration and deployment. My experience spans technical leadership, scaling SaaS and building VocalXI solo.",
   email: profile.email,
   site: profile.site,
   location: profile.location,
@@ -50,8 +50,8 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "The work connected customer-facing assessment features with backend reliability, subscriptions and operational support.",
     ],
     metrics: [
-      { value: "401K+", label: "users · portfolio-reported scale" },
-      { value: "8.7M+", label: "respondents · portfolio-reported scale" },
+      { value: "400K+", label: "users" },
+      { value: "10M+", label: "online exams held" },
     ],
     imageCaptions: [
       "ExtendedForms product screen from the existing portfolio assets.",

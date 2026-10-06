@@ -156,9 +156,9 @@ export const projects: Project[] = [
       "AWS",
     ],
     metrics: [
-      { value: "401K+", label: "users" },
+      { value: "400K+", label: "users" },
       { value: "579K", label: "forms analyzed" },
-      { value: "8.7M", label: "respondents" },
+      { value: "10M+", label: "online exams held" },
       { value: "3x", label: "revenue growth" },
     ],
     narrative: [
@@ -167,7 +167,7 @@ export const projects: Project[] = [
       "I also developed AI Watchers with face detection for exam proctoring. The implementation needed to account for false positives as well as suspicious activity.",
     ],
     role: "Sole technical owner — architecture, performance, AI features, growth",
-    status: "Live — 401K+ users and growing",
+    status: "Live — 400K+ users and growing",
     // Public landing page captured from extendedforms.io on 2026-10-02.
     images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
   },
