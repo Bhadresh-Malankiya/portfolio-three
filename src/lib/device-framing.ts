@@ -1,5 +1,7 @@
 import { MathUtils, PerspectiveCamera, Vector3 } from "three";
 
+export const DEVICE_MAX_SCALE = 1.08;
+
 /** Reserve room for the complete device through its hinge/turn animation. */
 export function fitDeviceCamera(
   camera: PerspectiveCamera,
@@ -8,8 +10,8 @@ export function fitDeviceCamera(
   height: number,
 ) {
   const aspect = Math.max(0.1, width / Math.max(1, height));
-  const halfHeight = kind === "phone" ? 2.24 : 2.08;
-  const halfWidth = kind === "phone" ? 1.24 : 2.48;
+  const halfHeight = 2.24 * DEVICE_MAX_SCALE;
+  const halfWidth = (kind === "phone" ? 1.24 : 2.48) * DEVICE_MAX_SCALE;
   const distance =
     Math.max(halfHeight, halfWidth / aspect) /
     Math.tan(MathUtils.degToRad(camera.fov / 2));

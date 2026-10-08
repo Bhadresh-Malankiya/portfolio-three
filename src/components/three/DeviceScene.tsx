@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Environment,
@@ -12,13 +12,13 @@ import {
   CanvasTexture,
   Group,
   SRGBColorSpace,
-  MathUtils,
   PerspectiveCamera,
   Shape,
   ShapeGeometry,
   ExtrudeGeometry,
 } from "three";
 import type { MotionValue } from "framer-motion";
+import { devicePose } from "@/lib/device-choreography";
 import { fitDeviceCamera } from "@/lib/device-framing";
 
 type Props = {
@@ -31,13 +31,8 @@ type Props = {
   onReady: () => void;
   onUnavailable: () => void;
 };
-const clamp = (n: number) => MathUtils.clamp(n, 0, 1);
-const ease = (n: number) => {
-  const t = clamp(n);
-  return t * t * (3 - 2 * t);
-};
 const metal = {
-  color: "#9da5b0",
+  color: "#c3c6cb",
   metalness: 0.85,
   roughness: 0.36,
   envMapIntensity: 1.15,
@@ -151,8 +146,9 @@ function Screen({
   position: [number, number, number];
   rounded?: boolean;
 }) {
+  const deferredSrc = useDeferredValue(src);
   const original = useTexture(
-    `/_next/image?url=${encodeURIComponent(src)}&w=${width < 2 ? 640 : 1200}&q=75`,
+    `/_next/image?url=${encodeURIComponent(deferredSrc)}&w=${width < 2 ? 640 : 1200}&q=75`,
   );
   const texture = useMemo(() => {
     const t = original.clone();
@@ -252,6 +248,27 @@ function Keyboard() {
   );
 }
 
+function AppleMark({ position, scale }: { position: [number, number, number]; scale: number }) {
+  const geometry = useMemo(() => {
+    const shape = new Shape();
+    shape.moveTo(0, 0.46);
+    shape.bezierCurveTo(-0.8, 0.85, -1.05, -0.15, -0.52, -0.82);
+    shape.bezierCurveTo(-0.22, -1.1, -0.2, -0.76, 0, -0.83);
+    shape.bezierCurveTo(0.3, -1.05, 0.58, -0.72, 0.77, -0.31);
+    shape.bezierCurveTo(0.3, -0.14, 0.33, 0.3, 0.69, 0.46);
+    shape.bezierCurveTo(0.4, 0.78, 0.2, 0.54, 0, 0.46);
+    const leaf = new Shape();
+    leaf.moveTo(0.02, 0.64);
+    leaf.bezierCurveTo(-0.02, 0.93, 0.23, 1.09, 0.46, 1.08);
+    leaf.bezierCurveTo(0.45, 0.8, 0.22, 0.61, 0.02, 0.64);
+    return new ShapeGeometry([shape, leaf], 24);
+  }, []);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh geometry={geometry} position={position} rotation={[0, Math.PI, 0]} scale={scale}>
+    <meshStandardMaterial color="#3d4248" metalness={0.95} roughness={0.2} />
+  </mesh>;
+}
+
 function Laptop({
   image,
   hinge,
@@ -261,30 +278,30 @@ function Laptop({
 }) {
   return (
     <group position={[0, -0.63, 0]}>
-      <Body args={[3.8, 0.13, 2.32]} position={[0, 0, 0]} radius={0.064} />
+      <Body args={[3.8, 0.13, 2.5]} position={[0, 0, 0.15]} radius={0.064} />
       <Body
-        args={[3.68, 0.04, 2.21]}
-        position={[0, -0.074, 0]}
+        args={[3.68, 0.04, 2.4]}
+        position={[0, -0.074, 0.15]}
         radius={0.018}
         color="#4b515b"
       />
       <Keyboard />
       <Body
         args={[1.29, 0.01, 0.64]}
-        position={[0, 0.069, 0.67]}
+        position={[0, 0.069, 0.82]}
         radius={0.005}
         color="#596572"
       />
       <Body
         args={[1.27, 0.009, 0.62]}
-        position={[0, 0.075, 0.67]}
+        position={[0, 0.075, 0.82]}
         radius={0.004}
         color="#a9b0b9"
         dark
       />
       <Body
         args={[0.42, 0.02, 0.055]}
-        position={[0, 0.06, 1.145]}
+        position={[0, 0.06, 1.389]}
         radius={0.008}
         dark
       />
@@ -321,25 +338,26 @@ function Laptop({
       </mesh>
       <group ref={hinge} position={[0, 0.11, -1.06]}>
         <Body
-          args={[3.8, 2.23, 0.085]}
-          position={[0, 1.115, 0]}
+          args={[3.8, 2.42, 0.085]}
+          position={[0, 1.21, 0]}
           radius={0.04}
         />
         <Body
-          args={[3.69, 2.12, 0.018]}
-          position={[0, 1.115, 0.051]}
+          args={[3.71, 2.33, 0.018]}
+          position={[0, 1.21, 0.051]}
           radius={0.008}
           color="#080b10"
         />
         <Suspense fallback={null}>
           <Screen
             src={image}
-            width={3.49}
-            height={1.964}
-            position={[0, 1.12, 0.063]}
+            width={3.58}
+            height={2.2375}
+            position={[0, 1.21, 0.063]}
           />
         </Suspense>
-        <mesh position={[0, 2.155, 0.068]}>
+        <Body args={[0.38, 0.105, 0.014]} position={[0, 2.305, 0.078]} radius={0.008} dark />
+        <mesh position={[0, 2.32, 0.09]}>
           <circleGeometry args={[0.013, 20]} />
           <meshPhysicalMaterial
             color="#163448"
@@ -348,10 +366,7 @@ function Laptop({
             clearcoat={1}
           />
         </mesh>
-        <mesh position={[0, 1.16, -0.045]} rotation={[0, Math.PI, 0]}>
-          <ringGeometry args={[0.072, 0.085, 48]} />
-          <meshStandardMaterial color="#626e7b" metalness={1} roughness={0.2} />
-        </mesh>
+        <AppleMark position={[0, 1.24, -0.047]} scale={0.28} />
       </group>
     </group>
   );
@@ -438,6 +453,15 @@ function Phone({ image }: { image: string }) {
         color="#656e7a"
         glass
       />
+      <AppleMark position={[0, -0.05, -0.13]} scale={0.2} />
+      {[-1.15, 1.15].map((y) => [-1, 1].map((side) => (
+        <Body key={`${side}-${y}`} args={[0.014, 0.026, 0.16]} position={[side * 0.824, y, 0]} radius={0.003} color="#54575b" dark />
+      )))}
+      <Body args={[0.22, 0.014, 0.06]} position={[0, -1.705, 0]} radius={0.004} dark />
+      <Body args={[0.032, 0.12, 0.08]} position={[-0.83, 0.82, 0]} radius={0.01} />
+      <mesh position={[-0.1, 1.43, -0.198]} rotation={[0, Math.PI, 0]}>
+        <circleGeometry args={[0.054, 24]} /><meshStandardMaterial color="#eee3c8" roughness={0.25} />
+      </mesh>
       <Body
         args={[0.77, 0.83, 0.07]}
         position={[-0.3, 1.09, -0.15]}
@@ -510,24 +534,15 @@ function Scene({
   }, [gl, onUnavailable]);
   useFrame(() => {
     if (!group.current) return;
-    const p = animated ? progress.get() : 0.4;
-    const enter = animated ? ease(p / 0.16) : 1;
+    const pose = devicePose(progress.get(), kind === "phone", animated);
     if (!ready.current) {
       ready.current = true;
       requestAnimationFrame(onReady);
     }
-    group.current.rotation.y =
-      kind === "phone" ? Math.PI * (1 - enter) - 0.16 : -0.18 + 0.1 * enter;
-    group.current.rotation.z = kind === "phone" ? -0.07 : 0;
-    if (hinge.current) {
-      const open = animated ? ease((p - 0.13) / 0.13) : 1;
-      const close = animated ? ease((p - 0.84) / 0.09) : 0;
-      hinge.current.rotation.x = MathUtils.lerp(
-        Math.PI / 2,
-        -0.13,
-        open * (1 - close),
-      );
-    }
+    group.current.rotation.y = pose.rotationY;
+    group.current.rotation.z = pose.rotationZ;
+    group.current.scale.setScalar(pose.scale);
+    if (hinge.current) hinge.current.rotation.x = pose.hinge;
   });
   return (
     <>

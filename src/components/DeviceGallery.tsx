@@ -21,6 +21,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
+import { PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
 import { scrollToPosition } from "@/components/SmoothScroll";
 
 const DeviceScene = dynamic(() => import("@/components/three/DeviceScene"), {
@@ -151,24 +152,24 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const [active, setActive] = useState(0);
   const [screen, setScreen] = useState(0);
   const [inspect, setInspect] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [closing, setClosing] = useState(true);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 80%", "end end"],
+    offset: ["start 70px", "end end"],
   });
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.08, 0.84, 0.94, 1],
-    [1, 1, 1, 0, 0],
+    [0, 0.13, 0.22, 0.84, 0.92, 1],
+    [0, 0, 1, 1, 0, 0],
   );
   const deviceX = useTransform(
     scrollYProgress,
-    [0, 0.16, 0.94, 1],
-    ["-70%", "0%", "0%", "70%"],
+    [0, 0.1, 0.94, 1],
+    mobile ? ["70%", "0%", "0%", "-70%"] : ["-70%", "0%", "0%", "70%"],
   );
   const deviceOpacity = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.94, 1],
+    [0, 0.055, 0.96, 1],
     [0, 1, 1, 0],
   );
   const p = mobile ? projects[3] : projects[active];
@@ -176,12 +177,12 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const image = p.images[imageIndex];
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     if (!animated || inspect) return;
-    const next = value < 0.44 ? 0 : value < 0.66 ? 1 : 2;
+    const next = value < PROJECT_BREAKS[0] ? 0 : value < PROJECT_BREAKS[1] ? 1 : 2;
     if (next !== active) {
       setActive(next);
       setScreen(0);
     }
-    const exiting = value > 0.92;
+    const exiting = value < 0.16 || value > 0.9;
     if (exiting !== closing) setClosing(exiting);
   });
   function select(index: number) {
@@ -196,10 +197,8 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     }
     const top = ref.current.getBoundingClientRect().top + window.scrollY;
     scrollToPosition(
-      top -
-        window.innerHeight * 0.8 +
-        (ref.current.offsetHeight - window.innerHeight * 0.2) *
-          [0.32, 0.54, 0.75][index],
+      top - 70 +
+        (ref.current.offsetHeight - window.innerHeight + 70) * PROJECT_STOPS[index],
     );
   }
   function inspectImage() {
@@ -228,7 +227,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       <div className="chapter-sticky">
         <div className="chapter-topline page-shell">
           <span>
-            {mobile ? "02 / MOBILE EXPERIENCES" : "01 / WEB EXPERIENCES"}
+            {mobile ? "02 / MOBILE — iPhone Pro" : "01 / WEB — MacBook Pro"}
           </span>
           <span>
             {animated
@@ -244,10 +243,10 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             <div
               className="model-viewport"
               role="img"
-              aria-label={`${p.name} on a ${mobile ? "titanium phone" : "silver laptop"}`}
+              aria-label={`${p.name} on a ${mobile ? "titanium iPhone Pro" : "silver MacBook Pro"}`}
             >
               {(!modelReady || modelFailed) && (
-                <div className="model-loading-poster">{fallback}</div>
+                <motion.div className="model-loading-poster" style={animated ? { x: deviceX, opacity: deviceOpacity } : { x: 0, opacity: 1 }}>{fallback}</motion.div>
               )}
               {entered && !modelFailed && (
                 <motion.div
