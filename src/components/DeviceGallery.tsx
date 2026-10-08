@@ -155,26 +155,13 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const [active, setActive] = useState(0);
   const [screen, setScreen] = useState(0);
   const [inspect, setInspect] = useState(false);
-  const [closing, setClosing] = useState(true);
+  const [closing, setClosing] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 85%", "end end"],
+    offset: ["start start", "end end"],
   });
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.06, 0.18, 0.87, 0.95, 1],
-    [0, 0, 1, 1, 0, 0],
-  );
-  const deviceX = useTransform(
-    scrollYProgress,
-    [0, 0.16, 0.96, 1],
-    mobile ? ["22%", "0%", "0%", "-20%"] : ["-22%", "0%", "0%", "20%"],
-  );
-  const deviceOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.12, 0.97, 1],
-    [0, 1, 1, 0],
-  );
+  const opacity = useTransform(scrollYProgress, [0, 0.92, 0.99, 1], [1, 1, 0, 0]);
+  const deviceOpacity = useTransform(scrollYProgress, [0, 0.97, 1], [1, 1, 0]);
   const p = mobile ? projects[3] : projects[active];
   const imageIndex = mobile ? active : screen;
   const image = p.images[imageIndex];
@@ -185,7 +172,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       setActive(next);
       setScreen(0);
     }
-    const exiting = value < 0.1 || value > 0.94;
+    const exiting = value > 0.96;
     if (exiting !== closing) setClosing(exiting);
   });
   function select(index: number) {
@@ -200,8 +187,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     }
     const top = ref.current.getBoundingClientRect().top + window.scrollY;
     scrollToPosition(
-      top - window.innerHeight * 0.85 +
-        (ref.current.offsetHeight - window.innerHeight * 0.15) * PROJECT_STOPS[index],
+      top + (ref.current.offsetHeight - window.innerHeight) * PROJECT_STOPS[index],
     );
   }
   function inspectImage() {
@@ -223,7 +209,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     <section
       ref={ref}
       id={mobile ? "mobile-work" : "work"}
-      className={`device-chapter ${mobile ? "phone-chapter" : "web-chapter"}`}
+      className={`device-chapter center-stage ${mobile ? "phone-chapter" : "web-chapter"}`}
       data-scroll={animated}
       aria-label={mobile ? "Mobile project showcase" : "Web project showcase"}
     >
@@ -261,8 +247,8 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                   data-ready={modelReady}
                   style={
                     animated && modelReady
-                      ? { x: deviceX, opacity: deviceOpacity }
-                      : { x: 0, opacity: 1 }
+                      ? { opacity: deviceOpacity }
+                      : { opacity: 1 }
                   }
                 >
                   <ModelBoundary fallback={fallback} onError={loseModel}>
@@ -312,38 +298,23 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             style={{ opacity: animated ? opacity : 1 }}
             inert={animated && closing}
           >
-            {mobile && (
-              <p className="chapter-product-name">
-                Hey Buddy <span>Mobile · client project</span>
-              </p>
-            )}
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 16 }}
+              <motion.div className="chapter-caption" key={active}
+                initial={{ opacity: 0, y: reduced ? 0 : 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: reduced ? 0 : 0.2 }}
-              >
-                <p className="eyebrow">
-                  {mobile
-                    ? `0${active + 1} / ${mobileStories[active].label}`
-                    : p.kind}
-                </p>
+                exit={{ opacity: 0, y: reduced ? 0 : -8 }}
+                transition={{ duration: reduced ? 0 : 0.18 }}>
+                <p className="eyebrow">{mobile ? `Hey Buddy / 0${active + 1}` : p.kind}</p>
                 <h3>{mobile ? mobileStories[active].title : p.name}</h3>
-                <p className="chapter-description">
-                  {mobile ? mobileStories[active].description : p.caption}
-                </p>
-                {!mobile && (
-                  <div className="feature-pills">
-                    {p.features.map((feature) => (
-                      <span key={feature}>{feature}</span>
-                    ))}
-                  </div>
-                )}
+                <p className="chapter-description">{mobile ? mobileStories[active].description : p.caption}</p>
               </motion.div>
             </AnimatePresence>
-            <p className="cinema-role">{p.role}</p>
+            <div className="chapter-evidence">
+              <div className="feature-pills">
+                {(mobile ? [mobileStories[active].label, "React Native"] : p.features).map((feature) => <span key={feature}>{feature}</span>)}
+              </div>
+              <p className="cinema-role">{p.role}</p>
+            </div>
             <div className="cinema-links">
               <Link className="button-primary" href={`/projects/${p.slug}`}>
                 Inside the build <ArrowUpRight size={16} />

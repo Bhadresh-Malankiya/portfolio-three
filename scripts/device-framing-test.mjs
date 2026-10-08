@@ -11,10 +11,12 @@ for (const [width, height] of [
   [440, 520],
   [760, 520],
   [1024, 390],
+  [1189, 570],
+  [1354, 720],
 ]) {
   for (const kind of ["laptop", "phone"]) {
     const camera = new PerspectiveCamera(
-      kind === "phone" ? 35 : 34,
+      kind === "phone" ? 35 : 12,
       width / height,
       0.1,
       100,
@@ -36,7 +38,7 @@ for (const [width, height] of [
                   .applyEuler(new Euler(hinge, 0, 0))
                   .add(new Vector3(0, -0.52, -1.06)),
               );
-        points.forEach((p) => p.multiplyScalar(pose.scale).applyEuler(new Euler(0, pose.rotationY, pose.rotationZ)));
+        points.forEach((p) => p.multiplyScalar(pose.scale).applyEuler(new Euler(0, pose.rotationY, pose.rotationZ)).add(new Vector3(0, pose.lift, 0)));
       } else {
         for (const x of [-0.86, 0.86])
           for (const y of [-1.72, 1.72])
@@ -52,6 +54,20 @@ for (const [width, height] of [
         const filledWidth = (Math.max(...bounds.map(p => p.x)) - Math.min(...bounds.map(p => p.x))) / 2;
         const filledHeight = (Math.max(...bounds.map(p => p.y)) - Math.min(...bounds.map(p => p.y))) / 2;
         assert.ok(Math.max(filledWidth, filledHeight) > 0.72, `${kind} is too small at ${width}×${height}`);
+        if (kind === "laptop" && width >= 1000) {
+          const screen = [];
+          for (const x of [-1.79, 1.79]) for (const y of [-1.11875, 1.11875]) {
+            screen.push(new Vector3(x, y + 1.21, 0.063)
+              .applyEuler(new Euler(pose.hinge, 0, 0))
+              .add(new Vector3(0, -0.52, -1.06)).multiplyScalar(pose.scale)
+              .applyEuler(new Euler(0, pose.rotationY, pose.rotationZ))
+              .add(new Vector3(0, pose.lift, 0)).project(camera));
+          }
+          const screenWidth = (Math.max(...screen.map(p => p.x)) - Math.min(...screen.map(p => p.x))) * width / 2;
+          const screenBottom = (1 - Math.min(...screen.map(p => p.y))) * height / 2;
+          assert.ok(screenWidth > height * 0.9, "Desktop screenshot must be large enough to read");
+          assert.ok(screenBottom < height - 100, "Project caption must not overlap the laptop screen");
+        }
       }
       for (const point of points) {
         const projected = point.project(camera);
@@ -65,7 +81,7 @@ for (const [width, height] of [
   }
 }
 console.log(
-  `Passed: ${samples} projected device corners remain inside the frame across six viewport ratios and 101 scroll poses.`,
+  `Passed: ${samples} projected device corners remain inside the frame across eight viewport ratios and 101 scroll poses.`,
 );
 
 for (const stop of PROJECT_STOPS) {

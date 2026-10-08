@@ -10,8 +10,8 @@ export function fitDeviceCamera(
   height: number,
 ) {
   camera.aspect = Math.max(0.1, width / Math.max(1, height));
-  const target = new Vector3(0, kind === "phone" ? 0 : 0.3, 0);
-  const direction = new Vector3(0, kind === "phone" ? 0.015 : 0.22, 1).normalize();
+  const target = new Vector3(0, kind === "phone" ? 0 : 0.6, 0);
+  const direction = new Vector3(0, kind === "phone" ? 0.015 : 0.13, 1).normalize();
   const points: Vector3[] = [];
   for (let step = 0; step <= 24; step++) {
     if (kind === "phone") {
@@ -21,18 +21,19 @@ export function fitDeviceCamera(
             points.push(new Vector3(x, y, z).multiplyScalar(DEVICE_MAX_SCALE)
               .applyEuler(new Euler(0, Math.PI * step / 24 - 0.6, -0.045)));
     } else {
+      const lift = 0.85 * (1 - step / 24);
       const hinge = MathUtils.lerp(Math.PI / 2, -0.13, step / 24);
       for (const yaw of [-0.24, 0.14]) {
         const rotation = new Euler(0, yaw, 0);
         for (const x of [-1.94, 1.94])
           for (const y of [-0.74, -0.49])
             for (const z of [-1.2, 1.46])
-              points.push(new Vector3(x, y, z).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation));
+              points.push(new Vector3(x, y, z).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation).add(new Vector3(0, lift, 0)));
         for (const x of [-1.94, 1.94])
           for (const y of [0, 2.46])
             for (const z of [-0.05, 0.1])
               points.push(new Vector3(x, y, z).applyEuler(new Euler(hinge, 0, 0))
-                .add(new Vector3(0, -0.52, -1.06)).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation));
+                .add(new Vector3(0, -0.52, -1.06)).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation).add(new Vector3(0, lift, 0)));
       }
     }
   }
@@ -50,7 +51,7 @@ export function fitDeviceCamera(
     place(distance);
     const fits = points.every((point) => {
       projected.copy(point).project(camera);
-      return Math.abs(projected.x) <= 0.93 && Math.abs(projected.y) <= 0.93 && projected.z < 1;
+      return Math.abs(projected.x) <= 0.95 && Math.abs(projected.y) <= 0.95 && projected.z < 1;
     });
     if (fits) far = distance;
     else near = distance;

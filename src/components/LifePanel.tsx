@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import AchievementMark from "@/components/AchievementMark";
 import Reveal from "@/components/Reveal";
 import { deliveryExpertise } from "@/data/skills";
 
@@ -198,10 +199,10 @@ export default function LifePanel() {
         </div>
       </div>
       <dl className="life-impact" aria-label="Experience and product impact">
-        <div><dt>400K+</dt><dd>ExtendedForms users</dd></div>
-        <div><dt>10M+</dt><dd>Online exams on ExtendedForms</dd></div>
-        <div><dt>10+</dt><dd>Developers managed</dd></div>
-        <div><dt>10 → 100K</dt><dd>Users · experience scaling products</dd></div>
+        <div><dt><Link href="/projects/extendedforms-io" aria-label="400K+ users — explore ExtendedForms"><AchievementMark kind="reach" /><span>400K+</span><ArrowUpRight size={15} /></Link></dt><dd>ExtendedForms users</dd></div>
+        <div><dt><Link href="/projects/extendedforms-io" aria-label="10M+ exams — explore ExtendedForms"><AchievementMark kind="exams" /><span>10M+</span><ArrowUpRight size={15} /></Link></dt><dd>Online exams on ExtendedForms</dd></div>
+        <div><dt><a href="#experience" aria-label="10+ developers managed — see my experience"><AchievementMark kind="team" /><span>10+</span><ArrowUpRight size={15} /></a></dt><dd>Developers managed</dd></div>
+        <div><dt><Link href="/projects" aria-label="From 10 to 100,000 users — explore my projects"><AchievementMark kind="growth" /><span>10 → 100K</span><ArrowUpRight size={15} /></Link></dt><dd>Users · experience scaling products</dd></div>
       </dl>
     </section>
   );

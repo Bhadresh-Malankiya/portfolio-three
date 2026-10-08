@@ -8,7 +8,7 @@ export const smoothStep = (value: number) => {
 export function devicePose(progress: number, phone: boolean, animated = true) {
   const p = animated ? progress : 0.29;
   const enter = animated ? smoothStep(p / 0.16) : 1;
-  const open = animated ? smoothStep((p - 0.04) / 0.14) : 1;
+  const open = animated ? smoothStep((p - 0.015) / 0.145) : 1;
   const close = animated ? smoothStep((p - 0.88) / 0.07) : 0;
   const exit = animated ? smoothStep((p - 0.96) / 0.04) : 0;
   // Ease back a little for each new project, then push into its screen.
@@ -16,6 +16,7 @@ export function devicePose(progress: number, phone: boolean, animated = true) {
     sum + Math.exp(-Math.pow((p - stop) / 0.035, 2)), 0);
   const focus = smoothStep((p - 0.2) / 0.1) * (1 - close);
   return {
+    lift: phone ? 0 : 0.85 * (1 - open * (1 - close)),
     hinge: Math.PI / 2 + (-0.13 - Math.PI / 2) * open * (1 - close),
     scale: 1 + (0.075 - 0.045 * transition) * focus,
     rotationY: phone

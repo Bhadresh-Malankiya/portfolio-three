@@ -544,6 +544,7 @@ function Scene({
   useFrame(() => {
     if (!group.current) return;
     const pose = devicePose(progress.get(), kind === "phone", animated);
+    group.current.position.y = pose.lift;
     group.current.rotation.y = pose.rotationY;
     group.current.rotation.z = pose.rotationZ;
     group.current.scale.setScalar(pose.scale);
@@ -611,7 +612,7 @@ export default function DeviceScene(props: Props) {
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       camera={{
         position: phone ? [0, 0.2, 6.4] : [0, 2.45, 5.8],
-        fov: phone ? 35 : 34,
+        fov: phone ? 35 : 12,
       }}
       onCreated={({ camera }) => camera.lookAt(0, phone ? 0 : 0.35, 0)}
     >
