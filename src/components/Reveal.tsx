@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, useMotionValue, useSpring, useReducedMotion, type Variants } from "framer-motion";
 
 type RevealProps = {
   children: React.ReactNode;
@@ -9,6 +9,7 @@ type RevealProps = {
   y?: number;
   as?: "div" | "span" | "li";
   once?: boolean;
+  tilt?: boolean;
 };
 
 export default function Reveal({
@@ -18,8 +19,13 @@ export default function Reveal({
   y = 22,
   as = "div",
   once = true,
+  tilt = false,
 }: RevealProps) {
   const reduced = useReducedMotion();
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const rotateX = useSpring(pointerX, { stiffness: 150, damping: 25 });
+  const rotateY = useSpring(pointerY, { stiffness: 150, damping: 25 });
   const variants: Variants = {
     hidden: { opacity: 1, y: reduced ? 0 : y },
     show: {
@@ -37,7 +43,15 @@ export default function Reveal({
 
   return (
     <MotionTag
-      className={className}
+      className={`${className ?? ""}${tilt ? " depth-surface" : ""}`}
+      style={tilt && !reduced ? { rotateX, rotateY, transformPerspective: 1000 } : undefined}
+      onPointerMove={(event) => {
+        if (!tilt || reduced || event.pointerType !== "mouse") return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        pointerX.set(-((event.clientY - bounds.top) / bounds.height - 0.5) * 5);
+        pointerY.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 5);
+      }}
+      onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }}
       initial="hidden"
       whileInView="show"
       viewport={{ once, margin: "-30px" }}

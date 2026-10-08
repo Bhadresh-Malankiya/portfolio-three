@@ -139,12 +139,14 @@ function Screen({
   height,
   position,
   rounded = false,
+  onReady,
 }: {
   src: string;
   width: number;
   height: number;
   position: [number, number, number];
   rounded?: boolean;
+  onReady: () => void;
 }) {
   const deferredSrc = useDeferredValue(src);
   const original = useTexture(
@@ -158,6 +160,10 @@ function Screen({
     return t;
   }, [original]);
   useEffect(() => () => texture.dispose(), [texture]);
+  useEffect(() => {
+    const frame = requestAnimationFrame(onReady);
+    return () => cancelAnimationFrame(frame);
+  }, [original, onReady]);
   const source = original.image as HTMLImageElement;
   const ratio = source.width / source.height;
   const frameRatio = width / height;
@@ -272,9 +278,11 @@ function AppleMark({ position, scale }: { position: [number, number, number]; sc
 function Laptop({
   image,
   hinge,
+  onReady,
 }: {
   image: string;
   hinge: React.RefObject<Group | null>;
+  onReady: () => void;
 }) {
   return (
     <group position={[0, -0.63, 0]}>
@@ -351,6 +359,7 @@ function Laptop({
         <Suspense fallback={null}>
           <Screen
             src={image}
+            onReady={onReady}
             width={3.58}
             height={2.2375}
             position={[0, 1.21, 0.063]}
@@ -372,7 +381,7 @@ function Laptop({
   );
 }
 
-function Phone({ image }: { image: string }) {
+function Phone({ image, onReady }: { image: string; onReady: () => void }) {
   return (
     <group>
       <PhoneShell
@@ -400,6 +409,7 @@ function Phone({ image }: { image: string }) {
       <Suspense fallback={null}>
         <Screen
           src={image}
+          onReady={onReady}
           rounded
           width={1.43}
           height={3.12}
@@ -512,7 +522,6 @@ function Scene({
   const camera = useThree((s) => s.camera);
   const size = useThree((s) => s.size);
   const gl = useThree((s) => s.gl);
-  const ready = useRef(false);
   useEffect(() => {
     if (!(camera instanceof PerspectiveCamera)) return;
     fitDeviceCamera(camera, kind, size.width, size.height);
@@ -535,10 +544,6 @@ function Scene({
   useFrame(() => {
     if (!group.current) return;
     const pose = devicePose(progress.get(), kind === "phone", animated);
-    if (!ready.current) {
-      ready.current = true;
-      requestAnimationFrame(onReady);
-    }
     group.current.rotation.y = pose.rotationY;
     group.current.rotation.z = pose.rotationZ;
     group.current.scale.setScalar(pose.scale);
@@ -581,9 +586,9 @@ function Scene({
       </Environment>
       <group ref={group}>
         {kind === "laptop" ? (
-          <Laptop image={image} hinge={hinge} />
+          <Laptop image={image} hinge={hinge} onReady={onReady} />
         ) : (
-          <Phone image={image} />
+          <Phone image={image} onReady={onReady} />
         )}
       </group>
     </>

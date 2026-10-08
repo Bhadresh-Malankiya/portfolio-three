@@ -29,6 +29,7 @@ export default function ClientReviews() {
             <Reveal
               key={review.job}
               delay={i * 0.07}
+              tilt
               className={`review-card glass-panel ${i === 0 ? "review-featured glow-border" : ""}`}
             >
               <div className="review-rating">

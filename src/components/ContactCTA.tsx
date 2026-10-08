@@ -6,6 +6,7 @@ import Reveal from "@/components/Reveal";
 export default function ContactCTA() {
   return (
     <Reveal className="contact-panel">
+      <div className="contact-signal" aria-hidden="true"><i /><i /><span>↗</span></div>
       <p className="eyebrow">08 // contact</p>
       <h2>
         Have something

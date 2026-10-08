@@ -125,12 +125,15 @@ const mobileStories = [
 ];
 
 class ModelBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
+  { children: ReactNode; fallback: ReactNode; onError: () => void },
   { failed: boolean }
 > {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
   }
   render() {
     return this.state.failed ? this.props.fallback : this.props.children;
@@ -141,7 +144,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
-  const entered = useInView(stage, { margin: "600px 0px", once: true });
+  const entered = useInView(stage, { margin: "1200px 0px", once: true });
   const visible = useInView(stage, { margin: "150px 0px" });
   const [modelReady, setModelReady] = useState(false);
   const [modelFailed, setModelFailed] = useState(false);
@@ -155,21 +158,21 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const [closing, setClosing] = useState(true);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 70px", "end end"],
+    offset: ["start 85%", "end end"],
   });
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.13, 0.22, 0.84, 0.92, 1],
+    [0, 0.06, 0.18, 0.87, 0.95, 1],
     [0, 0, 1, 1, 0, 0],
   );
   const deviceX = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.94, 1],
-    mobile ? ["70%", "0%", "0%", "-70%"] : ["-70%", "0%", "0%", "70%"],
+    [0, 0.16, 0.96, 1],
+    mobile ? ["22%", "0%", "0%", "-20%"] : ["-22%", "0%", "0%", "20%"],
   );
   const deviceOpacity = useTransform(
     scrollYProgress,
-    [0, 0.055, 0.96, 1],
+    [0, 0.12, 0.97, 1],
     [0, 1, 1, 0],
   );
   const p = mobile ? projects[3] : projects[active];
@@ -182,7 +185,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       setActive(next);
       setScreen(0);
     }
-    const exiting = value < 0.16 || value > 0.9;
+    const exiting = value < 0.1 || value > 0.94;
     if (exiting !== closing) setClosing(exiting);
   });
   function select(index: number) {
@@ -197,8 +200,8 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     }
     const top = ref.current.getBoundingClientRect().top + window.scrollY;
     scrollToPosition(
-      top - 70 +
-        (ref.current.offsetHeight - window.innerHeight + 70) * PROJECT_STOPS[index],
+      top - window.innerHeight * 0.85 +
+        (ref.current.offsetHeight - window.innerHeight * 0.15) * PROJECT_STOPS[index],
     );
   }
   function inspectImage() {
@@ -238,16 +241,20 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           </span>
         </div>
         <div className="chapter-layout page-shell">
-          <div className="chapter-device" ref={stage}>
+          <div className="chapter-device" ref={stage} data-ready={modelReady}>
             <div className="studio-halo" aria-hidden="true" />
             <div
               className="model-viewport"
               role="img"
               aria-label={`${p.name} on a ${mobile ? "titanium iPhone Pro" : "silver MacBook Pro"}`}
             >
-              {(!modelReady || modelFailed) && (
-                <motion.div className="model-loading-poster" style={animated ? { x: deviceX, opacity: deviceOpacity } : { x: 0, opacity: 1 }}>{fallback}</motion.div>
+              {!modelReady && !modelFailed && (
+                <div className="model-preparing" role="status">
+                  <span aria-hidden="true" />
+                  <small>Preparing the 3D view</small>
+                </div>
               )}
+              {modelFailed && <div className="model-loading-poster">{fallback}</div>}
               {entered && !modelFailed && (
                 <motion.div
                   className="device-canvas"
@@ -258,7 +265,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                       : { x: 0, opacity: 1 }
                   }
                 >
-                  <ModelBoundary fallback={fallback}>
+                  <ModelBoundary fallback={fallback} onError={loseModel}>
                     <DeviceScene
                       kind={mobile ? "phone" : "laptop"}
                       images={mobile ? phoneScreens : webScreens}
@@ -353,6 +360,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           </motion.div>
         </div>
         <div className="chapter-footer page-shell">
+          {animated && <div className="chapter-progress" aria-hidden="true"><motion.i style={{ scaleX: scrollYProgress }} /></div>}
           <div
             className="chapter-selector"
             role="group"

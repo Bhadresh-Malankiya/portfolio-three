@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import Reveal from "@/components/Reveal";
 import { deliveryExpertise } from "@/data/skills";
 
 const tabs = ["Journey", "Expertise", "Founder mindset"];
@@ -78,7 +79,7 @@ export default function LifePanel() {
         </h2>
       </div>
       <div className="life-board glass-panel">
-        <div className="life-portrait">
+        <Reveal className="life-portrait portrait-depth" tilt y={0}>
           <Image
             src="/images/profile.png"
             alt="Bhadresh Malankiya"
@@ -86,11 +87,13 @@ export default function LifePanel() {
             sizes="(min-width: 900px) 380px, 85vw"
             className="object-contain object-bottom"
           />
+          <span className="portrait-orbit" aria-hidden="true" />
+          <span className="portrait-floating-code" aria-hidden="true">build. ship. learn.</span>
           <div className="life-signature">
             <strong>Bhadresh.</strong>
             <span>Surat, India · Building since 2018</span>
           </div>
-        </div>
+        </Reveal>
         <div className="life-content">
           <div className="life-intro">
             <p className="eyebrow">Forward Deployed Engineer</p>

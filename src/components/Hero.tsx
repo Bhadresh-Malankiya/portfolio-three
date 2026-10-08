@@ -1,3 +1,4 @@
+import StackSculpture from "@/components/StackSculpture";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
 import { downloads } from "@/data/downloads";
@@ -30,16 +31,7 @@ export default function Hero() {
           </a>
         </div>
       </div>
-      <div className="signature-art" aria-hidden="true">
-        <div className="signature-orbit" />
-        <div className="signature-orbit orbit-two" />
-        <div className="signature-glass">
-          <span>b.</span>
-          <i />
-        </div>
-        <span className="signature-coordinates">SURAT, INDIA</span>
-        <span className="signature-note">a life in building / since 2018</span>
-      </div>
+      <StackSculpture />
       <div className="intro-bottom">
         <span>Currently building at AscendXI</span>
         <a href="#work">

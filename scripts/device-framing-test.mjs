@@ -47,6 +47,12 @@ for (const [width, height] of [
                 ),
               );
       }
+      if (step === 52) {
+        const bounds = points.map((point) => point.clone().project(camera));
+        const filledWidth = (Math.max(...bounds.map(p => p.x)) - Math.min(...bounds.map(p => p.x))) / 2;
+        const filledHeight = (Math.max(...bounds.map(p => p.y)) - Math.min(...bounds.map(p => p.y))) / 2;
+        assert.ok(Math.max(filledWidth, filledHeight) > 0.72, `${kind} is too small at ${width}×${height}`);
+      }
       for (const point of points) {
         const projected = point.project(camera);
         assert.ok(
@@ -72,6 +78,6 @@ for (const breakpoint of PROJECT_BREAKS) {
   const after = devicePose(breakpoint + 0.0001, false);
   assert.ok(Math.abs(before.scale - after.scale) < 0.001, "Zoom must not snap at project changes");
 }
-assert.ok(devicePose(0.94, false).hinge > 1.5, "Lid closes before the device exits");
+assert.ok(devicePose(0.96, false).hinge > 1.5, "Lid closes before the device exits");
 assert.equal(devicePose(0, false, false).hinge, devicePose(1, false, false).hinge, "Reduced-motion view stays open");
 console.log("Passed: readable project stops, continuous zoom, close-before-exit and reduced-motion pose.");
