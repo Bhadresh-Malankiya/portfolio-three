@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
@@ -39,13 +39,14 @@ type Props = {
   frame?: "browser" | "phone";
   big?: boolean;
   bare?: boolean;
+  edgeToEdge?: boolean;
   className?: string;
   mediaClassName?: string;
   fill?: boolean;
   imageCaptions?: string[];
 };
 
-function ScreenshotViewer({
+export function ScreenshotViewer({
   images,
   name,
   index,
@@ -61,7 +62,6 @@ function ScreenshotViewer({
   imageCaptions?: string[];
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
   const [zoomed, setZoomed] = useState(false);
   const selected = images[index];
   const dimensions = imageDimensions[selected] ?? { w: 1600, h: 1000 };
@@ -80,7 +80,7 @@ function ScreenshotViewer({
     <dialog
       ref={dialog}
       className="screenshot-viewer"
-      aria-labelledby={titleId}
+      aria-label={`${name} screenshot viewer`}
       data-lenis-prevent
       onClose={() => {
         if (!dialog.current?.open) onDismiss();
@@ -99,7 +99,7 @@ function ScreenshotViewer({
       <div className="viewer-shell">
         <div className="viewer-toolbar">
           <div>
-            <p id={titleId}>{name}</p>
+            <p>{name}</p>
             <span aria-live="polite">
               {String(index + 1).padStart(2, "0")} /{" "}
               {String(images.length).padStart(2, "0")} ·{" "}
@@ -177,6 +177,7 @@ export default function ProjectGallery({
   frame = "browser",
   big = false,
   bare = false,
+  edgeToEdge = false,
   className = "",
   mediaClassName,
   fill = false,
@@ -202,7 +203,7 @@ export default function ProjectGallery({
     setIndex((current) => (current + step + images.length) % images.length);
   return (
     <div
-      className={`project-gallery ${big ? "gallery-large" : ""} ${bare ? "gallery-bare" : ""} ${className}`}
+      className={`project-gallery ${big ? "gallery-large" : ""} ${bare ? "gallery-bare" : ""} ${edgeToEdge ? "gallery-edge" : ""} ${className}`}
     >
       <div className="gallery-chrome" aria-hidden="true">
         <div>
@@ -231,7 +232,7 @@ export default function ProjectGallery({
               alt={imageIndex === index ? `${name} — ${selectedCaption}` : ""}
               aria-hidden={imageIndex !== index}
               fill
-              sizes={fill ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1440px) 1320px, 100vw"}
+              sizes={edgeToEdge ? "100vw" : fill ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1440px) 1320px, 100vw"}
               className="object-contain"
               style={{
                 opacity: incoming && loadedSource !== source ? 0 : 1,

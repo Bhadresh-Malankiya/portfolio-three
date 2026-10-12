@@ -185,10 +185,12 @@ try {
   const openingStory = page.getByRole("group", { name: "Explore the opening story", exact: true });
   await openingStory.getByRole("button", { name: /Make the pieces work/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "1");
+  await page.getByRole("heading", { name: "Then, something that works.", exact: true }).waitFor();
   assert.equal(await openingStory.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "desktop chapter control scrolls to the build act");
   assert.equal(await page.locator(".flight-narrative h2").textContent(), "Then, something that works.", "build act presents its story");
   await openingStory.getByRole("button", { name: /Put it in the world/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
+  await page.getByRole("heading", { name: "Finally, out in the world.", exact: true }).waitFor();
   assert.equal(await page.locator(".flight-narrative h2").textContent(), "Finally, out in the world.", "ship act presents its story");
   await openingStory.getByRole("button", { name: /Find the question/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "0");
@@ -337,6 +339,7 @@ try {
   assert.equal(await touchChapters.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "mobile hero chapter works without a pinned scroll range");
   await touchChapters.getByRole("button", { name: /Put it in the world/ }).tap();
   await touchPage.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
+  await touchPage.getByRole("heading", { name: "Finally, out in the world.", exact: true }).waitFor();
   assert.equal(await touchPage.locator(".flight-narrative h2").textContent(), "Finally, out in the world.", "mobile hero updates its story");
   const companionTrigger = touchPage.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true });
   const identityCard = touchPage.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });

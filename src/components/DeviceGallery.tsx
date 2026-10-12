@@ -21,10 +21,12 @@ import {
   useSpring,
 } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
-import { PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
+import { DEVICE_TIMELINE, PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
 import ProductScenery from "@/components/ProductScenery";
 import WorkArchive from "@/components/WorkArchive";
+import { ScreenshotViewer } from "@/components/ProjectGallery";
 import { scrollToPosition } from "@/components/SmoothScroll";
+import "@/app/device-gallery.css";
 
 const DeviceScene = dynamic(() => import("@/components/three/DeviceScene"), {
   ssr: false,
@@ -145,7 +147,7 @@ class ModelBoundary extends Component<
 function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
+  const inspectTrigger = useRef<HTMLButtonElement>(null);
   const entered = useInView(stage, { margin: "1200px 0px", once: true });
   const visible = useInView(stage, { margin: "150px 0px" });
   const [modelReady, setModelReady] = useState(false);
@@ -157,14 +159,20 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const [active, setActive] = useState(0);
   const [screen, setScreen] = useState(0);
   const [inspect, setInspect] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [closing, setClosing] = useState(true);
+  const [phase, setPhase] = useState("arriving");
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
-  const sceneProgress = useSpring(scrollYProgress, { stiffness: 160, damping: 32, mass: 0.6 });
-  const opacity = useTransform(sceneProgress, [0, 0.92, 0.99, 1], [1, 1, 0, 0]);
-  const deviceOpacity = useTransform(sceneProgress, [0, 0.97, 1], [1, 1, 0]);
+  const sceneProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 28, mass: 0.7 });
+  const opacity = useTransform(sceneProgress, [0.16, 0.25, 0.76, 0.83], [0, 1, 1, 0]);
+  const deviceOpacity = useTransform(sceneProgress, [0, 0.04, 0.12, 0.94, 1], [0, 0.15, 1, 1, 0]);
+  const entryHintOpacity = useTransform(sceneProgress, [0, 0.08, 0.16], [1, 1, 0]);
+  const deviceX = useTransform(sceneProgress,
+    [0, DEVICE_TIMELINE.arriveEnd, DEVICE_TIMELINE.exitStart, 1],
+    [mobile ? "65%" : "-65%", "0%", "0%", mobile ? "-75%" : "75%"],
+    { ease: (value) => value * value * (3 - 2 * value) });
   const p = mobile ? projects[3] : projects[active];
   const imageIndex = mobile ? active : screen;
   const image = p.images[imageIndex];
@@ -175,17 +183,18 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       setActive(next);
       setScreen(0);
     }
-    const exiting = value > 0.96;
+    const exiting = value < 0.2 || value > 0.79;
     if (exiting !== closing) setClosing(exiting);
+    const nextPhase = value < DEVICE_TIMELINE.arriveEnd ? "arriving"
+      : value < DEVICE_TIMELINE.openEnd ? "opening"
+      : value < DEVICE_TIMELINE.closeStart ? "reading"
+      : value < DEVICE_TIMELINE.exitStart ? "closing" : "leaving";
+    if (nextPhase !== phase) setPhase(nextPhase);
   });
   function select(index: number) {
     setScreen(0);
     if (!animated || !ref.current) {
       setActive(index);
-      if (ref.current)
-        scrollToPosition(
-          ref.current.getBoundingClientRect().top + window.scrollY - 78,
-        );
       return;
     }
     const top = ref.current.getBoundingClientRect().top + window.scrollY;
@@ -195,7 +204,6 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   }
   function inspectImage() {
     setInspect(true);
-    dialog.current?.showModal();
   }
   const fallback = (
     <div className={`device-poster ${mobile ? "is-phone" : ""}`}>
@@ -215,29 +223,33 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       className={`device-chapter center-stage product-world ${mobile ? "phone-chapter" : "web-chapter"}`}
       data-scroll={animated}
       data-project={p.slug}
+      data-phase={animated ? phase : "reading"}
       aria-label={mobile ? "Mobile project showcase" : "Web project showcase"}
     >
       <div className="chapter-sticky">
         <ProductScenery project={p.slug} name={mobile ? "A little closer." : p.name} />
-        <div className="chapter-topline page-shell">
+        <div className="chapter-topline">
           <span>
             {mobile ? "02 / A COMPANION, IN YOUR POCKET" : "01 / PRODUCTS IN THE BROWSER"}
           </span>
           <span>
-            {animated
-              ? mobile
-                ? "Scroll to turn · explore · move on"
-                : "Scroll to open · explore · close"
-              : "Choose a view below"}
+            {animated ? phase === "arriving" ? "Scroll to bring the work into view"
+              : phase === "opening" ? mobile ? "A closer look" : "Opening the workspace"
+              : phase === "closing" || phase === "leaving" ? "On to the next story"
+              : "Scroll to explore · or choose a chapter"
+              : "Choose a chapter below"}
           </span>
         </div>
-        <div className="chapter-layout page-shell">
+        <div className="chapter-layout">
           <div className="chapter-device" ref={stage} data-ready={modelReady}>
             <div className="studio-halo" aria-hidden="true" />
+            {animated && modelReady && <motion.p className="chapter-entry-cue" aria-hidden="true" style={{ opacity: entryHintOpacity }}>
+              <ArrowDown size={15} /> {mobile ? "Scroll to meet Hey Buddy" : "Scroll to open the workspace"}
+            </motion.p>}
             <div
               className="model-viewport"
               role="img"
-              aria-label={`${p.name} on a ${mobile ? "iPhone 16 Pro" : "14-inch MacBook Pro"}`}
+              aria-label={`${p.name} on ${mobile ? "an iPhone 16 Pro" : "a 14-inch MacBook Pro"}`}
             >
               {!modelReady && !modelFailed && (
                 <div className="model-preparing" role="status">
@@ -252,8 +264,8 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                   data-ready={modelReady}
                   style={
                     animated && modelReady
-                      ? { opacity: deviceOpacity }
-                      : { opacity: 1 }
+                      ? { opacity: deviceOpacity, x: deviceX }
+                      : { opacity: 1, x: 0 }
                   }
                 >
                   <ModelBoundary fallback={fallback} onError={loseModel}>
@@ -291,6 +303,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                 </div>
               )}
               <button
+                ref={inspectTrigger}
                 onClick={inspectImage}
                 aria-label={`Enlarge ${p.name} screenshot`}
               >
@@ -304,9 +317,9 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             inert={animated && closing}
           >
               <motion.div className="chapter-caption" key={active}
-                initial={{ opacity: 0.65, y: reduced ? 0 : 6 }}
+                initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reduced ? 0 : 0.18 }}>
+                transition={{ duration: reduced ? 0 : 0.48, ease: [0.22, 0.7, 0.2, 1] }}>
                 <p className="eyebrow">{mobile ? `Hey Buddy / 0${active + 1}` : p.kind}</p>
                 <h3>{mobile ? mobileStories[active].title : p.name}</h3>
                 <p className="chapter-description">{mobile ? mobileStories[active].description : p.caption}</p>
@@ -332,7 +345,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             </div>
           </motion.div>
         </div>
-        <div className="chapter-footer page-shell">
+        <div className="chapter-footer">
           {animated && <div className="chapter-progress" aria-hidden="true"><motion.i style={{ scaleX: sceneProgress }} /></div>}
           <div
             className="chapter-selector"
@@ -362,42 +375,20 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           </Link>
         </div>
       </div>
-      <dialog
-        ref={dialog}
-        className="device-inspector"
-        aria-label={`${p.name} screenshot viewer`}
-        data-lenis-prevent
-        onClose={() => setInspect(false)}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) dialog.current?.close();
-        }}
-        onKeyDown={(event) => {
-          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-          event.preventDefault();
-          const next =
-            (imageIndex +
-              (event.key === "ArrowRight" ? 1 : p.images.length - 1)) %
-            p.images.length;
+      {inspect && <ScreenshotViewer
+        images={p.images}
+        name={p.name}
+        index={imageIndex}
+        go={(step) => {
+          const next = (imageIndex + step + p.images.length) % p.images.length;
           if (mobile) setActive(next);
           else setScreen(next);
         }}
-      >
-        <button
-          className="inspector-close"
-          onClick={() => dialog.current?.close()}
-        >
-          Close ×
-        </button>
-        {inspect && (
-          <Image
-            src={image}
-            alt={`${p.name} enlarged screenshot`}
-            width={1600}
-            height={1000}
-            className="inspector-image"
-          />
-        )}
-      </dialog>
+        onDismiss={() => {
+          setInspect(false);
+          inspectTrigger.current?.focus({ preventScroll: true });
+        }}
+      />}
     </section>
   );
 }

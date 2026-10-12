@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 
 export function scrollToPosition(top: number) {
   window.dispatchEvent(
@@ -24,9 +25,12 @@ export default function SmoothScroll({
       lenis = undefined;
       if (preference.matches) return;
       lenis = new Lenis({
-        lerp: 0.12,
-        anchors: true,
+        lerp: 0.1,
+        anchors: { duration: 0.85 },
         smoothWheel: true,
+        syncTouch: false,
+        stopInertiaOnNavigate: true,
+        prevent: node => node.tagName === "DIALOG" || node.getAttribute("aria-modal") === "true",
       });
       function raf(time: number) {
         lenis?.raf(time);
@@ -37,7 +41,9 @@ export default function SmoothScroll({
     const onScrollRequest = (event: Event) => {
       const top = (event as CustomEvent<number>).detail;
       if (!Number.isFinite(top)) return;
-      if (lenis) lenis.scrollTo(top, { duration: 1, force: true });
+      if (document.querySelector("dialog[open]")) return;
+      const distance = Math.abs(top - window.scrollY);
+      if (lenis) lenis.scrollTo(top, { duration: Math.min(1.1, Math.max(0.45, distance / 1800)) });
       else window.scrollTo({ top, behavior: "instant" });
     };
     window.addEventListener("portfolio:scroll-to", onScrollRequest);

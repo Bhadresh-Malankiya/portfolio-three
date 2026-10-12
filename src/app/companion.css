@@ -62,19 +62,19 @@
 .companion-email { display: flex; justify-content: center; align-items: center; gap: 7px; padding: 12px 0 0; font: 500 10px/1.2 var(--font-plex-mono), monospace; color: #4c5945; text-decoration: none; }
 .companion-email:hover { color: #142819; }
 @media (max-width: 699px) {
-  .builder-companion { width: 86px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
-  .companion-character { width: 86px; height: 109px; }
-  .companion-plinth { width: 61px; height: 12px; bottom: 4px; }
-  .companion-chapter { width: 128px; min-height: 38px; margin-left: -42px; padding: 8px; }
+  .builder-companion { width: 60px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .companion-character { width: 60px; height: 76px; }
+  .companion-plinth { width: 47px; height: 9px; bottom: 3px; }
+  .companion-chapter { width: 100px; min-height: 36px; margin-left: -40px; padding: 8px 6px; }
   .companion-chapter-top { font-size: 9px; letter-spacing: -.3px; gap: 4px; }
   .companion-chapter-top svg { display: none; }
-  .companion-chapter-top b { font-size: 8px; }
+  .companion-chapter-top b { display: none; }
   .companion-character-hint { display: none; }
-  .companion-fallback { width: 57px; height: 73px; left: 15px; bottom: 8px; }
+  .companion-fallback { width: 44px; height: 59px; left: 8px; bottom: 6px; }
   .companion-fallback > span { left: 16px; }
-  .companion-thought { width: 185px; right: 0; bottom: 160px; }
+  .companion-thought { width: 185px; right: 0; bottom: 124px; }
   .companion-thought p { font-size: 12px; }
-  .companion-id { bottom: 144px; width: min(288px, calc(100vw - 24px)); max-height: calc(100dvh - 240px); }
+  .companion-id { bottom: 124px; width: min(288px, calc(100vw - 24px)); max-height: calc(100dvh - 210px); }
 }
 @media (max-height: 560px) and (min-width: 700px) {
   .companion-character { height: 105px; }

@@ -228,7 +228,7 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
     const dt = Math.min(delta, .05);
     if (active && !reducedMotion) elapsed.current += dt;
     const p = clamp(progress.get());
-    const chapter = p < .32 ? 0 : p < .7 ? 1 : 2;
+    const chapter = p < .32 ? 0 : p < .84 ? 1 : 2;
     if (chapter !== previousChapter.current) {
       if (chapter === 1 && !reducedMotion) burstTime.current = 0;
       previousChapter.current = chapter;

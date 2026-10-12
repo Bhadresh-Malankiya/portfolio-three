@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { PerspectiveCamera, Vector3, Euler } from "three";
-import { devicePose, PROJECT_STOPS, PROJECT_BREAKS } from "../src/lib/device-choreography.ts";
+import { devicePose, DEVICE_TIMELINE, PROJECT_STOPS, PROJECT_BREAKS } from "../src/lib/device-choreography.ts";
 import { fitDeviceCamera, DEVICE_DIMENSIONS } from "../src/lib/device-framing.ts";
 
 let samples = 0;
@@ -113,7 +113,15 @@ for (const breakpoint of PROJECT_BREAKS) {
   const after = devicePose(breakpoint + 0.0001, false);
   assert.ok(Math.abs(before.scale - after.scale) < 0.001, "Zoom must not snap at project changes");
 }
-assert.ok(devicePose(0.96, false).hinge > 1.5, "Lid closes before the device exits");
+assert.ok(devicePose(DEVICE_TIMELINE.closeEnd, false).hinge > 1.5, "Lid closes before the device exits");
+assert.equal(devicePose(DEVICE_TIMELINE.arriveEnd, false).hinge, Math.PI / 2, "The laptop arrives with its lid closed");
+assert.equal(devicePose(DEVICE_TIMELINE.openStart, false).hinge, Math.PI / 2, "Opening starts after arrival finishes");
+assert.ok(devicePose(DEVICE_TIMELINE.openEnd, false).hinge < 0, "Opening finishes before the first reading hold");
+assert.ok(devicePose(DEVICE_TIMELINE.closeStart, false).hinge < 0, "The final project remains open for its entire reading hold");
+assert.ok(DEVICE_TIMELINE.exitStart >= DEVICE_TIMELINE.closeEnd, "Exit cannot overlap lid closure");
+assert.ok(DEVICE_TIMELINE.exitEnd - DEVICE_TIMELINE.exitStart >= 0.12, "Exit must have a visible, unhurried travel interval");
+assert.ok(PROJECT_STOPS.every(stop => stop > DEVICE_TIMELINE.openEnd && stop < DEVICE_TIMELINE.closeStart), "Every selected chapter lands in the reading interval");
+assert.ok(PROJECT_BREAKS.every((stop, index) => stop > PROJECT_STOPS[index] && stop < PROJECT_STOPS[index + 1]), "Caption transitions sit between the reading holds");
 assert.equal(devicePose(0, false, false).hinge, devicePose(1, false, false).hinge, "Reduced-motion view stays open");
 console.log("Passed: readable project stops, continuous zoom, close-before-exit and reduced-motion pose.");
 
