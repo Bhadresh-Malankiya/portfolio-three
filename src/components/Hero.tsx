@@ -1,10 +1,17 @@
+"use client";
+
+import { useRef } from "react";
+import { useScroll } from "framer-motion";
 import StackSculpture from "@/components/StackSculpture";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
 import { downloads } from "@/data/downloads";
 
 export default function Hero() {
+  const story = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: story, offset: ["start start", "end end"] });
   return (
+    <div ref={story} className="hero-scroll-story">
     <section className="intro-hero page-shell">
       <div className="intro-heading">
         <p className="eyebrow">Bhadresh Malankiya / Forward Deployed Engineer</p>
@@ -31,7 +38,7 @@ export default function Hero() {
           </a>
         </div>
       </div>
-      <StackSculpture />
+      <StackSculpture progress={scrollYProgress} />
       <div className="intro-bottom">
         <span>Currently building at AscendXI</span>
         <a href="#work">
@@ -39,5 +46,6 @@ export default function Hero() {
         </a>
       </div>
     </section>
+    </div>
   );
 }

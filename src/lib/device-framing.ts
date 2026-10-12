@@ -17,7 +17,7 @@ export function fitDeviceCamera(
     if (kind === "phone") {
       for (const x of [-0.86, 0.86])
         for (const y of [-1.72, 1.72])
-          for (const z of [-0.27, 0.14])
+          for (const z of [-0.28, 0.17])
             points.push(new Vector3(x, y, z).multiplyScalar(DEVICE_MAX_SCALE)
               .applyEuler(new Euler(0, Math.PI * step / 24 - 0.6, -0.045)));
     } else {
@@ -44,14 +44,14 @@ export function fitDeviceCamera(
     camera.updateMatrixWorld();
   }
   let near = 2;
-  let far = 40;
+  let far = 160;
   const projected = new Vector3();
   for (let i = 0; i < 18; i++) {
     const distance = (near + far) / 2;
     place(distance);
     const fits = points.every((point) => {
       projected.copy(point).project(camera);
-      return Math.abs(projected.x) <= 0.95 && Math.abs(projected.y) <= 0.95 && projected.z < 1;
+      return Math.abs(projected.x) <= 0.89 && Math.abs(projected.y) <= 0.89 && projected.z < 1;
     });
     if (fits) far = distance;
     else near = distance;

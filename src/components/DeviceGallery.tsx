@@ -19,6 +19,7 @@ import {
   useScroll,
   useTransform,
   useReducedMotion,
+  useSpring,
 } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
 import { PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
@@ -160,12 +161,13 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     target: ref,
     offset: ["start start", "end end"],
   });
-  const opacity = useTransform(scrollYProgress, [0, 0.92, 0.99, 1], [1, 1, 0, 0]);
-  const deviceOpacity = useTransform(scrollYProgress, [0, 0.97, 1], [1, 1, 0]);
+  const sceneProgress = useSpring(scrollYProgress, { stiffness: 160, damping: 32, mass: 0.6 });
+  const opacity = useTransform(sceneProgress, [0, 0.92, 0.99, 1], [1, 1, 0, 0]);
+  const deviceOpacity = useTransform(sceneProgress, [0, 0.97, 1], [1, 1, 0]);
   const p = mobile ? projects[3] : projects[active];
   const imageIndex = mobile ? active : screen;
   const image = p.images[imageIndex];
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
+  useMotionValueEvent(sceneProgress, "change", (value) => {
     if (!animated || inspect) return;
     const next = value < PROJECT_BREAKS[0] ? 0 : value < PROJECT_BREAKS[1] ? 1 : 2;
     if (next !== active) {
@@ -256,7 +258,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                       kind={mobile ? "phone" : "laptop"}
                       images={mobile ? phoneScreens : webScreens}
                       image={image}
-                      progress={scrollYProgress}
+                      progress={sceneProgress}
                       animated={animated}
                       visible={visible}
                       onReady={showModel}
@@ -331,7 +333,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           </motion.div>
         </div>
         <div className="chapter-footer page-shell">
-          {animated && <div className="chapter-progress" aria-hidden="true"><motion.i style={{ scaleX: scrollYProgress }} /></div>}
+          {animated && <div className="chapter-progress" aria-hidden="true"><motion.i style={{ scaleX: sceneProgress }} /></div>}
           <div
             className="chapter-selector"
             role="group"

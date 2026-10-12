@@ -2414,13 +2414,60 @@
   .life-impact > div:hover .mark-orbit { transform: none; }
   .life-impact > div:hover .mark-check { animation: none; }
 }
+/* Separate layout rows reserve real space for hardware, copy, and navigation. */
+.center-stage .chapter-layout {
+  display: flex; position: relative; flex-direction: column;
+  width: calc(100% - 64px); max-width: 1600px; padding: 12px 0 14px;
+  gap: 12px; min-height: 0;
+}
+.center-stage .chapter-device { flex: 1 1 0; min-height: 0; height: auto; }
+.center-stage .chapter-copy { position: relative; inset: auto; margin: 0 auto; flex-shrink: 0; backdrop-filter: blur(20px); }
+.center-stage.phone-chapter .chapter-copy { max-width: 960px; }
+.center-stage .chapter-device::before { bottom: 1%; height: 12%; width: 58%; left: 21%; border-color: #c8d6e311; }
+.center-stage .chapter-screen-controls { top: 4px; right: 12px; }
+.center-stage .chapter-sticky { background: radial-gradient(ellipse at 50% 48%, #24324139, transparent 62%), #101113; }
+.center-stage .chapter-sticky::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(#bacde908 1px, transparent 1px), linear-gradient(90deg,#bacde908 1px,transparent 1px);
+  background-size: 100px 100px; mask-image: radial-gradient(ellipse at 50% 50%,#0007,transparent 68%);
+}
+.center-stage .chapter-copy h3 { font-size: clamp(22px,2.2vw,30px); }
+.center-stage.phone-chapter .chapter-copy h3 { font-size: clamp(22px,2vw,28px); }
+.center-stage .chapter-footer { padding-top: 4px; }
 @media (min-width: 900px) {
-  .center-stage .chapter-layout { position: relative; display: block; padding-bottom: 0; }
-  .center-stage .chapter-device { height: 100%; }
-  .center-stage .chapter-copy { position: absolute; left: 0; right: 0; bottom: 9px; margin-inline: auto; background: linear-gradient(115deg,#14171bed,#101215de); }
-  .center-stage.phone-chapter .chapter-copy { left: 0; right: auto; bottom: 28px; width: clamp(220px,22vw,290px); display: block; padding: 22px; }
-  .center-stage.phone-chapter .chapter-evidence { display: none; }
-  .center-stage.phone-chapter .cinema-links { margin-top: 18px; flex-wrap: wrap; }
-  .center-stage.phone-chapter .chapter-copy h3 { font-size: 28px; }
-  .center-stage.phone-chapter .chapter-description { font-size: 12px; }
+  .center-stage[data-scroll="false"] .chapter-layout { display: flex; }
+  .center-stage[data-scroll="false"] .chapter-device { flex: none; height: clamp(390px,65svh,800px); }
+}
+@media (max-width: 899px) {
+  .center-stage .chapter-layout { width: calc(100% - 40px); padding: 18px 0 25px; }
+  .center-stage .chapter-copy { margin-top: 0; }
+}
+
+/* An exploded system becomes one object. Native vectors keep every edge crisp. */
+.hero-scroll-story { position: relative; background: radial-gradient(ellipse at 78% 34%,#253b502e,transparent 50%); }
+.hero-scroll-story .intro-hero { grid-template-columns: 1.06fr 1fr; gap: 20px; }
+.intro-hero .assembly-art { position: relative; width: 100%; min-width: 0; height: auto; transform: none; display: block; isolation: isolate; pointer-events: auto; }
+.assembly-sculpture { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 14px 18px #0005); }
+.assembly-atmosphere { position: absolute; inset: 12% -8% 22%; z-index: -1; background: radial-gradient(ellipse,#7199bc17,transparent 65%); }
+.assembly-status { width: 100%; min-width: 220px; position: relative; height: 37px; margin-top: -4px; text-align: center; font: 10px var(--font-mono); color: #b7c9db; }
+.assembly-status > span { position: absolute; inset: 0; white-space: nowrap; }
+.assembly-track { position: absolute; width: 76px; height: 1px; background: #ffffff15; left: calc(50% - 38px); bottom: 12px; }
+.assembly-track i { display: block; height: 100%; background: #d0e3f3; transform-origin: left; }
+.assembly-art .stack-selector { margin-top: 5px; }
+.assembly-art .stack-selector button { border-radius: 4px; background: #ffffff03; }
+@media (min-width: 900px) and (min-height: 680px) and (prefers-reduced-motion: no-preference) {
+  .hero-scroll-story { height: 175svh; }
+  .hero-scroll-story .intro-hero { position: sticky; top: 0; height: 100svh; min-height: 0; padding-top: 100px; grid-template-rows: minmax(0,1fr) auto; }
+  .assembly-art { max-width: min(590px,60svh); justify-self: center; }
+  .hero-scroll-story .intro-bottom { margin-top: 0; padding-block: 17px; }
+}
+@media (max-width: 899px) {
+  .hero-scroll-story .intro-hero { grid-template-columns: 1.15fr 1fr; }
+  .assembly-art .stack-selector { gap: 5px; }
+  .assembly-art .stack-selector button { padding: 9px; font-size: 10px; }
+}
+@media (max-width: 600px) {
+  .hero-scroll-story .intro-hero { grid-template-columns: 1fr; }
+  .intro-hero .assembly-art { width: min(100%,420px); height: auto; margin: -20px auto 15px; opacity: 1; }
+  .assembly-art .stack-caption { font-size: 10px; }
 }

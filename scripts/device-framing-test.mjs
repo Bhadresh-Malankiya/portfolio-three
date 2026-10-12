@@ -13,6 +13,10 @@ for (const [width, height] of [
   [1024, 390],
   [1189, 570],
   [1354, 720],
+  [1600, 990],
+  [1600, 1550],
+  [900, 1400],
+  [2700, 780],
 ]) {
   for (const kind of ["laptop", "phone"]) {
     const camera = new PerspectiveCamera(
@@ -42,7 +46,7 @@ for (const [width, height] of [
       } else {
         for (const x of [-0.86, 0.86])
           for (const y of [-1.72, 1.72])
-            for (const z of [-0.26, 0.14])
+            for (const z of [-0.28, 0.17])
               points.push(
                 new Vector3(x, y, z).multiplyScalar(pose.scale).applyEuler(
                   new Euler(0, pose.rotationY, pose.rotationZ),
@@ -64,9 +68,9 @@ for (const [width, height] of [
               .add(new Vector3(0, pose.lift, 0)).project(camera));
           }
           const screenWidth = (Math.max(...screen.map(p => p.x)) - Math.min(...screen.map(p => p.x))) * width / 2;
-          const screenBottom = (1 - Math.min(...screen.map(p => p.y))) * height / 2;
-          assert.ok(screenWidth > height * 0.9, "Desktop screenshot must be large enough to read");
-          assert.ok(screenBottom < height - 100, "Project caption must not overlap the laptop screen");
+
+          assert.ok(screenWidth > Math.min(height * 0.82, width * 0.65), `Desktop screenshot must be large enough to read: ${width}×${height}, screen ${screenWidth}`);
+
         }
       }
       for (const point of points) {
@@ -81,7 +85,7 @@ for (const [width, height] of [
   }
 }
 console.log(
-  `Passed: ${samples} projected device corners remain inside the frame across eight viewport ratios and 101 scroll poses.`,
+  `Passed: ${samples} projected device corners remain inside the frame across twelve viewport ratios and 101 scroll poses.`,
 );
 
 for (const stop of PROJECT_STOPS) {
@@ -97,3 +101,6 @@ for (const breakpoint of PROJECT_BREAKS) {
 assert.ok(devicePose(0.96, false).hinge > 1.5, "Lid closes before the device exits");
 assert.equal(devicePose(0, false, false).hinge, devicePose(1, false, false).hinge, "Reduced-motion view stays open");
 console.log("Passed: readable project stops, continuous zoom, close-before-exit and reduced-motion pose.");
+
+assert.equal(devicePose(0.04, false).hinge, Math.PI / 2, "Lid waits until the section is pinned");
+assert.equal(devicePose(0.04, true).rotationY, devicePose(0, true).rotationY, "Phone waits until the section is pinned");

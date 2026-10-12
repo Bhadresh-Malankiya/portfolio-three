@@ -56,8 +56,8 @@ function Body({
       args={args}
       position={position}
       radius={radius}
-      smoothness={3}
-      bevelSegments={3}
+      smoothness={5}
+      bevelSegments={5}
       castShadow
       receiveShadow
     >
@@ -112,9 +112,9 @@ function PhoneShell({
       bevelEnabled: true,
       bevelThickness: 0.008,
       bevelSize: 0.008,
-      bevelSegments: 3,
+      bevelSegments: 5,
       steps: 1,
-      curveSegments: 16,
+      curveSegments: 32,
     });
     g.translate(0, 0, -depth / 2);
     return g;
@@ -150,7 +150,7 @@ function Screen({
 }) {
   const deferredSrc = useDeferredValue(src);
   const original = useTexture(
-    `/_next/image?url=${encodeURIComponent(deferredSrc)}&w=${width < 2 ? 640 : 1200}&q=75`,
+    `/_next/image?url=${encodeURIComponent(deferredSrc)}&w=${width < 2 ? 1080 : 1920}&q=75`,
   );
   const texture = useMemo(() => {
     const t = original.clone();
@@ -188,70 +188,54 @@ function Screen({
 }
 
 function Keyboard() {
-  const labels = useMemo(() => {
+  const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 1400;
-    canvas.height = 500;
+    canvas.width = 1536;
+    canvas.height = 640;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#c6ccd3";
-    ctx.font = "26px monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    [
-      "esc 1 2 3 4 5 6 7 8 9 0 − + ⌫",
-      "tab Q W E R T Y U I O P [ ] \\",
-      "⇪ A S D F G H J K L ; ' ↵ ↑",
-      "⇧ Z X C V B N M , . / ⇧ ← →",
-    ].forEach((row, r) =>
-      row
-        .split(" ")
-        .forEach((label, c) => ctx.fillText(label, c * 100 + 50, r * 105 + 53)),
-    );
-    const t = new CanvasTexture(canvas);
-    t.colorSpace = SRGBColorSpace;
-    return t;
+    ctx.fillStyle = "#101217";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const rows = [
+      ["esc", "☀", "☀", "▦", "⌕", "◉", "☾", "◀", "▶", "▶", "◂", "▸", "◯", "●"],
+      ["~", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "−", "+", "delete"],
+      ["tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"],
+      ["caps", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "return"],
+      ["shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "shift"],
+      ["fn", "ctrl", "option", "⌘", "", "⌘", "option", "←", "↑", "→"],
+    ];
+    rows.forEach((row, r) => {
+      const units = row.map((_, i) => r === 5 && i === 4 ? 5 : r === 4 && (i === 0 || i === row.length - 1) ? 2 : 1);
+      const unitWidth = 1504 / units.reduce((a, b) => a + b, 0);
+      let x = 16;
+      row.forEach((label, i) => {
+        const width = units[i] * unitWidth - 10;
+        const y = 12 + r * 104;
+        ctx.fillStyle = "#08090c";
+        ctx.beginPath(); ctx.roundRect(x, y + 4, width, 90, 10); ctx.fill();
+        const gradient = ctx.createLinearGradient(0, y, 0, y + 88);
+        gradient.addColorStop(0, "#30343a"); gradient.addColorStop(1, "#202328");
+        ctx.fillStyle = gradient;
+        ctx.beginPath(); ctx.roundRect(x + 1, y, width - 2, 86, 9); ctx.fill();
+        ctx.strokeStyle = "#4c5058"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = "#ced1d6"; ctx.font = `${label.length > 2 ? 15 : 23}px sans-serif`;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(label, x + width / 2, y + 44);
+        x += units[i] * unitWidth;
+      });
+    });
+    const result = new CanvasTexture(canvas);
+    result.colorSpace = SRGBColorSpace;
+    result.anisotropy = 8;
+    return result;
   }, []);
-  useEffect(() => () => labels.dispose(), [labels]);
-  return (
-    <group position={[0, 0.1, -0.26]}>
-      <Body args={[2.99, 0.018, 1.06]} radius={0.009} dark />
-      {Array.from({ length: 56 }, (_, i) => (
-        <Body
-          key={i}
-          args={[0.18, 0.035, 0.18]}
-          position={[
-            ((i % 14) - 6.5) * 0.205,
-            0.018,
-            (Math.floor(i / 14) - 1.5) * 0.22 - 0.1,
-          ]}
-          radius={0.016}
-          color="#181c23"
-          dark
-        />
-      ))}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.038, 0]}>
-        <planeGeometry args={[2.87, 1.05]} />
-        <meshBasicMaterial map={labels} transparent depthWrite={false} />
-      </mesh>
-      <Body
-        args={[1.23, 0.035, 0.15]}
-        position={[0, 0.018, 0.4]}
-        radius={0.016}
-        color="#181c23"
-        dark
-      />
-      {[-1.27, -1.05, -0.83, 0.83, 1.05, 1.27].map((x) => (
-        <Body
-          key={x}
-          args={[0.18, 0.035, 0.15]}
-          position={[x, 0.018, 0.4]}
-          radius={0.016}
-          color="#181c23"
-          dark
-        />
-      ))}
-    </group>
-  );
+  useEffect(() => () => texture.dispose(), [texture]);
+  return <group position={[0, 0.079, -0.26]}>
+    <Body args={[3.02, 0.014, 1.21]} radius={0.006} dark />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0]}>
+      <planeGeometry args={[2.97, 1.17]} />
+      <meshStandardMaterial map={texture} roughness={0.64} metalness={0.12} />
+    </mesh>
+  </group>;
 }
 
 function AppleMark({ position, scale }: { position: [number, number, number]; scale: number }) {
@@ -298,14 +282,13 @@ function Laptop({
         args={[1.29, 0.01, 0.64]}
         position={[0, 0.069, 0.82]}
         radius={0.005}
-        color="#596572"
+        color="#6f7781"
       />
       <Body
         args={[1.27, 0.009, 0.62]}
         position={[0, 0.075, 0.82]}
         radius={0.004}
-        color="#a9b0b9"
-        dark
+        color="#b3b9c1"
       />
       <Body
         args={[0.42, 0.02, 0.055]}
@@ -355,6 +338,7 @@ function Laptop({
           position={[0, 1.21, 0.051]}
           radius={0.008}
           color="#080b10"
+          dark
         />
         <Suspense fallback={null}>
           <Screen
@@ -392,16 +376,10 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
         color="#8b939e"
       />
       <PhoneShell
-        width={1.59}
-        height={3.35}
-        depth={0.18}
-        radius={0.22}
-        color="#383e48"
-      />
-      <PhoneShell
-        width={1.54}
-        height={3.3}
-        depth={0.195}
+        width={1.57}
+        height={3.33}
+        depth={0.018}
+        z={0.098}
         radius={0.21}
         color="#080b10"
         glass
@@ -411,12 +389,12 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
           src={image}
           onReady={onReady}
           rounded
-          width={1.43}
-          height={3.12}
-          position={[0, 0, 0.105]}
+          width={1.47}
+          height={3.16}
+          position={[0, 0, 0.12]}
         />
       </Suspense>
-      <group position={[0, 1.48, 0.12]}>
+      <group position={[0, 1.48, 0.14]}>
         <PhoneShell
           width={0.43}
           height={0.105}
@@ -426,7 +404,7 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
           glass
         />
       </group>
-      <mesh position={[0.135, 1.48, 0.132]}>
+      <mesh position={[0.135, 1.48, 0.155]}>
         <circleGeometry args={[0.025, 24]} />
         <meshPhysicalMaterial
           color="#13314a"
@@ -437,7 +415,7 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
       </mesh>
       <Body
         args={[0.42, 0.015, 0.008]}
-        position={[0, -1.5, 0.117]}
+        position={[0, -1.5, 0.134]}
         radius={0.003}
         color="#b4b7bc"
       />
@@ -472,18 +450,15 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
       <mesh position={[-0.1, 1.43, -0.198]} rotation={[0, Math.PI, 0]}>
         <circleGeometry args={[0.054, 24]} /><meshStandardMaterial color="#eee3c8" roughness={0.25} />
       </mesh>
-      <Body
-        args={[0.77, 0.83, 0.07]}
-        position={[-0.3, 1.09, -0.15]}
-        radius={0.034}
-        color="#737c88"
-      />
+      <group position={[-0.3, 1.09, -0.15]}>
+        <PhoneShell width={0.8} height={0.85} depth={0.07} radius={0.13} color="#737c88" />
+      </group>
       {[
         [-0.48, 1.31],
         [-0.48, 0.88],
         [-0.1, 1.1],
       ].map(([x, y]) => (
-        <group key={y} position={[x, y, -0.21]} rotation={[Math.PI / 2, 0, 0]}>
+        <group key={y} position={[x, y, -0.21]} rotation={[-Math.PI / 2, 0, 0]}>
           <mesh>
             <cylinderGeometry args={[0.167, 0.167, 0.055, 40]} />
             <meshStandardMaterial
@@ -492,14 +467,22 @@ function Phone({ image, onReady }: { image: string; onReady: () => void }) {
               roughness={0.16}
             />
           </mesh>
-          <mesh position={[0, 0.029, 0]}>
-            <cylinderGeometry args={[0.131, 0.131, 0.006, 40]} />
+          <mesh position={[0, 0.03, 0]}>
+            <cylinderGeometry args={[0.14, 0.14, 0.008, 64]} />
             <meshPhysicalMaterial
-              color="#071825"
-              metalness={0.85}
+              color="#254359"
+              metalness={0.35}
               roughness={0.04}
               clearcoat={1}
             />
+          </mesh>
+          <mesh position={[0, 0.036, 0]}>
+            <cylinderGeometry args={[0.083, 0.083, 0.004, 48]} />
+            <meshPhysicalMaterial color="#08131e" roughness={0.12} metalness={0.3} clearcoat={1} />
+          </mesh>
+          <mesh position={[-0.038, 0.04, -0.035]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.02, 24]} />
+            <meshBasicMaterial color="#86b2d5" transparent opacity={0.55} />
           </mesh>
         </group>
       ))}
@@ -601,14 +584,14 @@ export default function DeviceScene(props: Props) {
   useEffect(() => {
     props.images.forEach((src) =>
       useTexture.preload(
-        `/_next/image?url=${encodeURIComponent(src)}&w=${phone ? 640 : 1200}&q=75`,
+        `/_next/image?url=${encodeURIComponent(src)}&w=${phone ? 1080 : 1920}&q=75`,
       ),
     );
   }, [props.images, phone]);
   return (
     <Canvas
       frameloop={props.visible ? "demand" : "never"}
-      dpr={[1, 1.75]}
+      dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       camera={{
         position: phone ? [0, 0.2, 6.4] : [0, 2.45, 5.8],
