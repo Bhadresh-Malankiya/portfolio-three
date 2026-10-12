@@ -303,6 +303,11 @@ try {
   await architecturePage.goto(base + "/projects/quzo-ai#quzo-architecture", { waitUntil: "networkidle" });
   const architecture = architecturePage.locator("#quzo-architecture");
   assert.equal(await architecture.getAttribute("data-journey"), "exam", "architecture opens on the submission path");
+  await architecture.getByRole("button", { name: /Exam-start surge/ }).click();
+  assert.equal(await architecture.locator('.qarch-node-pool [data-mode="serving"]').count(), 3, "surge illustrates additional exam capacity");
+  assert.match(await architecture.locator(".qarch-pool-note").innerText(), /planned/, "illustrated extra capacity is not presented as shipped");
+  await architecture.getByRole("button", { name: /Scale back/ }).click();
+  assert.equal(await architecture.locator('.qarch-node-pool [data-mode="draining"]').count(), 1, "scale-in drains an instance before removal");
   await architecture.getByRole("button", { name: /Configure/ }).click();
   assert.equal(await architecture.getAttribute("data-journey"), "configure", "configuration path can be selected");
   assert.equal(await architecture.locator(".qarch-form-data").getAttribute("data-lit"), "true", "configuration highlights durable form storage");
@@ -311,6 +316,8 @@ try {
   await architecture.getByText("Open the engineering notes", { exact: true }).click();
   assert.ok(await architecture.getByRole("heading", { name: "Where are the limits?", exact: true }).isVisible(), "engineering tradeoffs are accessible");
   await architecturePage.setViewportSize({ width: 390, height: 844 });
+  await architecture.getByRole("button", { name: /Run an exam/ }).click();
+  await architecture.getByRole("button", { name: /Exam-start surge/ }).click();
   assert.ok(await architecturePage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "architecture fits a narrow mobile viewport");
   await architecturePage.close();
 

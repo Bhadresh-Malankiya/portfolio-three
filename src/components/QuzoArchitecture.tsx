@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight, ChartNoAxesCombined, Check, ChevronDown, Database, FilePenLine, Layers3, Network, Server, ShieldCheck, Users, Zap } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, ChartNoAxesCombined, Check, ChevronDown, Database, FilePenLine, Layers3, Network, Server, Users, Zap } from "lucide-react";
 import "@/app/quzo-architecture.css";
 
 type Journey = "configure" | "exam" | "results";
+type ScalePhase = "steady" | "surge" | "drain";
 export type QuzoArchitectureStatus = "proposed" | "mixed" | "implemented";
+
+const scalePhases = [
+  { id: "steady" as const, label: "Steady traffic", title: "Reuse reads. Keep writes durable.", description: "The exam application reads recurring definitions from Redis. Answers go to the response primary; the cache is never the record of a submission." },
+  { id: "surge" as const, label: "Exam-start surge", title: "Add exam capacity, not another copy of everything.", description: "The scale plan adds ready exam instances behind a load balancer. Warm capacity covers startup time; bounded connections protect the response database." },
+  { id: "drain" as const, label: "Scale back", title: "Finish the work before removing capacity.", description: "The scale plan stops new traffic to a draining instance, lets in-flight requests finish, then removes it. Shared state keeps sessions independent of one server." },
+];
 
 const journeys = [
   {
@@ -20,7 +27,7 @@ const journeys = [
     id: "exam" as const,
     label: "Run an exam",
     icon: Zap,
-    title: "More exam traffic. More application capacity.",
+    title: "An exam starts. The traffic arrives together.",
     description: "The exam application scales independently. Cached definitions reduce repeated fetches while answers go directly to the response database.",
     steps: ["Learner starts an exam", "Node.js serves the session", "Redis supplies repeated reads", "Responses commit to the primary"],
   },
@@ -59,15 +66,17 @@ function ArchitectureWires({ journey, scalingPlanned }: { journey: Journey; scal
 
 export default function QuzoArchitecture({ status = "mixed" }: { status?: QuzoArchitectureStatus }) {
   const [journey, setJourney] = useState<Journey>("exam");
+  const [scalePhase, setScalePhase] = useState<ScalePhase>("steady");
   const [visible, setVisible] = useState(false);
   const root = useRef<HTMLElement>(null);
   const id = useId();
   const current = journeys.find(item => item.id === journey)!;
+  const currentScale = scalePhases.find(item => item.id === scalePhase)!;
   const implemented = status === "implemented";
   const coreImplemented = status !== "proposed";
   const scalingPlanned = !implemented;
   const journeyDescription = scalingPlanned && journey === "exam"
-    ? "The exam application is separate from form administration. Redis reduces repeated fetches; responses go to their database. Independent autoscaling is the next step."
+    ? "Exam delivery is separate from form administration. Redis reduces repeated fetches; responses go to their own database. Explore the next step: independent exam capacity."
     : scalingPlanned && journey === "results"
       ? "Reporting belongs to the Forms application. Planned read replicas will give report queries their own capacity. Fresh submissions still need primary reads when immediate consistency matters."
       : current.description;
@@ -83,7 +92,7 @@ export default function QuzoArchitecture({ status = "mixed" }: { status?: QuzoAr
     return () => observer.disconnect();
   }, []);
 
-  return <section ref={root} className="quzo-architecture" id="quzo-architecture" aria-labelledby={`${id}-heading`} data-visible={visible} data-journey={journey}>
+  return <section ref={root} className="quzo-architecture" id="quzo-architecture" aria-labelledby={`${id}-heading`} data-visible={visible} data-journey={journey} data-scale-phase={scalePhase}>
     <div className="case-container qarch-container">
       <div className="qarch-heading">
         <div><span className="case-label">Inside Quzo / System design</span><h2 id={`${id}-heading`}>{status === "mixed" ? <>Built today.<br /><em>Designed to scale.</em></> : <>Behind every answer,<br /><em>a few deliberate decisions.</em></>}</h2></div>
@@ -96,11 +105,19 @@ export default function QuzoArchitecture({ status = "mixed" }: { status?: QuzoAr
           {journeys.map(({ id: journeyId, label, icon: Icon }, i) => <button key={journeyId} type="button" aria-pressed={journey === journeyId} aria-controls={`${id}-journey`} onClick={() => setJourney(journeyId)}><span className="qarch-tab-number">0{i + 1}</span><Icon size={17} /><span>{label}</span><ArrowUpRight size={15} className="qarch-tab-arrow" /></button>)}
         </div>
 
-        <div className="qarch-map" role="group" aria-label="Architecture map: clients route to separate Forms and Exams applications, a shared Redis cache, and separate configuration and response data stores">
+        {journey === "exam" && <div className="qarch-scale-plan">
+          <div className="qarch-scale-heading"><span><Server size={14} />{scalingPlanned ? "Explore planned capacity" : "Explore application capacity"}</span><small>Illustrative flow · not a load test</small></div>
+          <div className="qarch-scale-controls" role="group" aria-label="Explore exam traffic scenarios">
+            {scalePhases.map((phase, index) => <button key={phase.id} type="button" aria-pressed={phase.id === scalePhase} aria-controls={`${id}-scale-detail ${id}-map`} onClick={() => setScalePhase(phase.id)}><span>0{index + 1}</span>{phase.label}</button>)}
+          </div>
+          <div className="qarch-scale-detail" id={`${id}-scale-detail`} aria-live="polite" aria-atomic="true"><strong>{currentScale.title}</strong><p>{currentScale.description}</p></div>
+        </div>}
+
+        <div className="qarch-map" id={`${id}-map`} role="group" aria-label="Architecture map: planned load-balanced ingress routes to separate Forms and Exams applications, a shared Redis cache, and separate configuration and response data stores">
           <div className="qarch-column-label qarch-client-label">01 / People</div><div className="qarch-column-label qarch-app-label">02 / Application boundaries</div><div className="qarch-column-label qarch-data-label">03 / Data by workload</div>
           <ArchitectureWires journey={journey} scalingPlanned={scalingPlanned} />
           <Node className="qarch-clients" active>
-            <Users size={25} strokeWidth={1.3} /><h3>Educators<br />& learners</h3><p>Browser requests</p><span className="qarch-router"><Network size={12} /> Route + balance</span>
+            <Users size={25} strokeWidth={1.3} /><h3>Educators<br />& learners</h3><p>Browser requests</p><div className="qarch-router"><Network size={14} /><span>Load balancer<small>{scalingPlanned ? "Planned ingress" : "Request routing"}</small></span></div>
           </Node>
 
           <Node className="qarch-forms" active={journey !== "exam"}>
@@ -108,7 +125,13 @@ export default function QuzoArchitecture({ status = "mixed" }: { status?: QuzoAr
           </Node>
 
           <Node className="qarch-exams" active={journey === "exam"}>
-            <span className="qarch-node-eyebrow"><Layers3 size={13} /> Modular monolith / B</span><div className="qarch-title-state"><h3>Exam delivery</h3><span className="qarch-state" data-built={coreImplemented}>{coreLabel}</span></div><div className="qarch-module-list"><span>Sessions</span><span>Responses</span></div><div className="qarch-node-pool" aria-label={scalingPlanned ? "Node.js exam application; additional stateless instances and autoscaling are planned" : "Stateless Node.js instances scale with demand"}><span><Server size={12} /> Node.js</span>{implemented && <span><Server size={12} /> Node.js</span>}<span className="qarch-scale-node">+ n {scalingPlanned && <small>planned</small>}</span></div><p>{scalingPlanned ? "Next: stateless pool + autoscaling" : "Stateless instances · scale with demand"}</p>
+            <span className="qarch-node-eyebrow"><Layers3 size={13} /> Modular monolith / B</span><div className="qarch-title-state"><h3>Exam delivery</h3><span className="qarch-state" data-built={coreImplemented}>{coreLabel}</span></div><div className="qarch-module-list"><span>Sessions</span><span>Responses</span></div>
+            <div className="qarch-node-pool" role="group" aria-label={`Illustrative Node.js pool: ${currentScale.label}. ${scalingPlanned ? "Additional instances and autoscaling are planned." : "Instance counts are illustrative."}`}>
+              {[0, 1, 2].map(index => {
+                const mode = index === 0 || scalePhase === "surge" || (scalePhase === "drain" && index === 1) ? "serving" : scalePhase === "drain" ? "draining" : "standby";
+                return <span key={index} data-capacity={index === 0 ? "base" : "planned"} data-mode={mode}><Server size={12} />0{index + 1}<small>{mode === "standby" ? "Reserved" : mode === "draining" ? "Draining" : "Serving"}</small></span>;
+              })}
+            </div><p className="qarch-pool-note">{scalingPlanned ? "Node.js · extra capacity planned" : "Node.js · illustrative instances"}</p>
           </Node>
 
           <Node className="qarch-cache" active={journey !== "results"}>
@@ -131,19 +154,13 @@ export default function QuzoArchitecture({ status = "mixed" }: { status?: QuzoAr
         </div>
       </div>
 
-      <div className="qarch-principles">
-        <div><ShieldCheck size={21} strokeWidth={1.4} /><h3>Keep answers durable.</h3><p>Critical writes reach the database. Redis accelerates reads; it is not the record of an answer.</p></div>
-        <div><Server size={21} strokeWidth={1.4} /><h3>Scale the busy part.</h3><p>{scalingPlanned ? "Planned autoscaling targets the exam application first. Database capacity remains a separate concern." : "The exam pool grows independently of form administration. Database capacity remains a separate concern."}</p></div>
-        <div><Database size={21} strokeWidth={1.4} /><h3>Read with intent.</h3><p>{scalingPlanned ? "Read replicas are planned for reporting. Primary reads remain necessary when immediate freshness matters." : "Replicas absorb reporting reads. Submission confirmation uses the primary when freshness matters."}</p></div>
-      </div>
-
       <details className="qarch-details"><summary><span>Open the engineering notes</span><ChevronDown size={17} /></summary><div className="qarch-notes">
         <div><h3>Why two modular monoliths?</h3><p>Forms and exams have different traffic patterns. Each remains one deployable application with internal modules, keeping changes easier to reason about while allowing independent application scaling.</p></div>
         <div><h3>What happens to cached data?</h3><p>Repeated, authorized reads can use cache-aside. Keys need workspace and version boundaries, an expiry, and invalidation after edits. A cache miss falls back to the database; answers bypass the cache.</p></div>
-        <div><h3>What does autoscaling need?</h3><p>Scale the stateless Node.js pool against measured demand and latency, with warm capacity and bounded database connections. Persist session state outside individual processes and drain in-flight work before removing an instance.</p></div>
+        <div><h3>What does autoscaling need?</h3><p>The scale plan uses requests per instance or utilization, with latency as a health signal. Keep warm capacity, cap database connections and store sessions outside individual processes. Drain in-flight requests before scale-in; submission retries need idempotency and bounded backoff.</p></div>
         <div><h3>Where are the limits?</h3><p>Replicas can lag; they do not increase primary write capacity. Failover needs a tested recovery path. Load tests, connection limits and recovery drills must establish capacity before publishing a concurrency or availability claim.</p></div>
       </div></details>
-      <p className="qarch-scope"><Check size={13} />{status === "mixed" ? "Implemented: the Forms and Exams modular applications and shared Redis cache. Planned: exam autoscaling, HA standby and read replicas. No measured concurrency or availability claim is implied." : implemented ? "A simplified explanation of the architecture. No concurrency benchmark or availability guarantee is implied." : "Architecture exploration for Quzo’s scaling needs. This diagram is a proposed design, not a claim of deployed infrastructure or measured capacity."}</p>
+      <p className="qarch-scope"><Check size={13} />{status === "mixed" ? "Built: Forms, Exams and shared Redis. Planned: load-balanced exam autoscaling, HA standby and read replicas. Shown instance counts explain the design; they are not a deployment inventory or a concurrency benchmark." : implemented ? "A simplified explanation of the architecture. Shown instance counts are illustrative; no concurrency benchmark or availability guarantee is implied." : "Architecture exploration for Quzo’s scaling needs. This diagram is a proposed design, not a claim of deployed infrastructure or measured capacity."}</p>
     </div>
   </section>;
 }

@@ -20,6 +20,21 @@
 .qarch-controls button:focus-visible { outline: 2px solid var(--qa-accent); outline-offset: -5px; }
 .qarch-tab-number { font: 10px/1.5 var(--font-mono), monospace; opacity: .65; margin-right: 5px; }
 .qarch-tab-arrow { margin-left: auto; opacity: .5; }
+.qarch-scale-plan { display: grid; grid-template-columns: minmax(340px, .95fr) minmax(0, 1.25fr); gap: 16px 30px; padding: 21px 26px 24px; background: #352b45; border-bottom: 1px solid #bba6d533; }
+.qarch-scale-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.qarch-scale-heading > span { display: inline-flex; align-items: center; gap: 9px; color: #eadcfb; font: 11px/1.5 var(--font-mono), monospace; }
+.qarch-scale-heading svg { width: 14px; height: 14px; flex-shrink: 0; }
+.qarch-scale-heading small { color: #c6b6d8; font-size: 11px; line-height: 1.5; }
+.qarch-scale-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; align-self: start; }
+.qarch-scale-controls button { display: flex; align-items: flex-start; gap: 8px; min-width: 0; min-height: 54px; padding: 11px 10px; border: 1px solid #a68fbc57; border-radius: 5px; color: #d4c5e4; background: #2c233b; font-size: 12px; line-height: 1.45; text-align: left; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
+.qarch-scale-controls button > span { font: 10px/1.75 var(--font-mono), monospace; color: #b49acd; }
+.qarch-scale-controls button:hover { background: #423252; border-color: #c2a2e3; }
+.qarch-scale-controls button[aria-pressed="true"] { color: #fff4ff; background: #544063; border-color: #d9c0f0; }
+.qarch-scale-controls button[aria-pressed="true"] > span { color: #e0c2ff; }
+.qarch-scale-controls button:focus-visible { outline: 2px solid #e2caff; outline-offset: 3px; }
+.qarch-scale-detail { min-width: 0; min-height: 70px; }
+.qarch-scale-detail strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.4; color: #f0e5fb; }
+.qarch-scale-detail p { margin: 7px 0 0; font-size: 12px; line-height: 1.75; color: #cebedf; max-width: 77ch; }
 .qarch-map { position: relative; height: 620px; background-image: radial-gradient(#ffffff15 .8px, transparent .8px); background-size: 17px 17px; isolation: isolate; }
 .qarch-column-label { position: absolute; top: 26px; font: 10px/1.5 var(--font-mono), monospace; text-transform: uppercase; letter-spacing: .06em; color: #a69cb6; }
 .qarch-client-label { left: 2.5%; }
@@ -48,15 +63,24 @@
 .qarch-clients > svg { color: var(--qa-accent); }
 .qarch-clients h3 { font-size: 17px; margin-top: 14px; }
 .qarch-clients p { margin: 10px 0 18px; }
-.qarch-router { display: flex; gap: 6px; align-items: center; margin: 0 -15px; padding: 12px 9px; border-top: 1px solid #c9b3e830; color: #c9b3e8; font: 10px/1.4 var(--font-mono), monospace; }
+.qarch-router { display: flex; gap: 7px; align-items: flex-start; margin: 0 -15px; padding: 12px 9px; border-top: 1px solid #c9b3e830; color: #dfcbed; font: 10px/1.4 var(--font-mono), monospace; }
+.qarch-router > svg { flex-shrink: 0; margin-top: 1px; }
+.qarch-router > span { min-width: 0; }
+.qarch-router small { display: block; margin-top: 4px; font: 11px/1.45 var(--font-plex-sans), sans-serif; color: #bcaacb; }
 .qarch-forms { left: 26%; top: 64px; width: 26%; min-height: 166px; }
 .qarch-exams { left: 26%; top: 364px; width: 26%; min-height: 184px; }
 .qarch-module-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
 .qarch-module-list span { font: 10px/1.5 var(--font-mono), monospace; color: #d6cee2; padding: 5px 7px; border: 1px solid #ffffff20; border-radius: 2px; background: #ffffff05; }
-.qarch-node-pool { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 13px; }
-.qarch-node-pool > span { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #967cac; padding: 6px 8px; border-radius: 3px; font: 10px/1.4 var(--font-mono), monospace; color: #ece0fc; }
-.qarch-node-pool > .qarch-scale-node { border-style: dashed; color: #c4a4e7; }
-.qarch-scale-node small { font: inherit; color: #b5a2c9; }
+.qarch-exams .qarch-title-state { margin-top: 8px; }
+.qarch-exams .qarch-module-list { margin-top: 8px; }
+.qarch-node-pool { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
+.qarch-node-pool > span { display: grid; grid-template-columns: 12px auto; justify-content: center; align-items: center; column-gap: 5px; row-gap: 3px; min-width: 0; border: 1px solid #967cac; padding: 6px 4px; border-radius: 3px; font: 11px/1.4 var(--font-mono), monospace; color: #ece0fc; background: #473452; transition: color .25s, background .25s, border-color .25s; }
+.qarch-node-pool > span[data-capacity="planned"] { border-style: dashed; }
+.qarch-node-pool > span[data-mode="standby"] { color: #c3b4d2; background: #2b2236; border-color: #806790; }
+.qarch-node-pool > span[data-mode="draining"] { color: #e4cbae; background: #453440; border-color: #b6977b; }
+.qarch-node-pool > span[data-mode="serving"] { border-color: #c4a4df; }
+.qarch-node-pool small { grid-column: 1 / -1; text-align: center; font: 11px/1.35 var(--font-plex-sans), sans-serif; color: inherit; }
+.qarch-exams .qarch-pool-note { margin-top: 8px; font-size: 11px; line-height: 1.5; color: #b9a7c9; }
 .qarch-exams p { margin-top: 10px; font-size: 11px; }
 .qarch-cache { left: 57%; top: 252px; width: 17%; min-height: 111px; display: flex; align-items: flex-start; gap: 11px; flex-wrap: wrap; padding: 17px 15px; background: #35273c; }
 .qarch-cache > svg { color: #dfbbdf; margin-top: 2px; flex-shrink: 0; }
@@ -87,12 +111,7 @@
 .qarch-journey li { display: flex; gap: 8px; align-items: baseline; color: #c8bdd5; font-size: 11px; line-height: 1.7; }
 .qarch-journey li > span { color: #a08ab5; font: 10px/1.8 var(--font-mono), monospace; }
 .qarch-journey li > svg { flex-shrink: 0; margin-left: auto; color: #786587; align-self: center; }
-.qarch-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6%; padding: 35px 0; }
-.qarch-principles > div { border-top: 1px solid #79668b45; padding-top: 24px; }
-.qarch-principles svg { color: #73588e; }
-.qarch-principles h3 { font: 500 18px/1.4 var(--font-plex-sans), sans-serif; margin: 15px 0 9px; letter-spacing: -.035em; }
-.qarch-principles p { font-size: 13px; line-height: 1.8; color: #5f526e; }
-.qarch-details { border-block: 1px solid #79668b45; }
+.qarch-details { border-block: 1px solid #79668b45; margin-top: 24px; }
 .qarch-details > summary { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; font: 11px/1.5 var(--font-mono), monospace; cursor: pointer; list-style: none; }
 .qarch-details > summary::-webkit-details-marker { display: none; }
 .qarch-details > summary > svg { transition: transform .2s; }
@@ -107,7 +126,8 @@
 @media (min-width: 1600px) { .qarch-node h3 { font-size: 19px; } .qarch-form-data h3, .qarch-response-data h3 { font-size: 16px; } .qarch-node p { font-size: 11px; } .qarch-node-eyebrow { font-size: 10px; } .qarch-cache > span { font-size: 11px; } }
 @media (max-width: 1160px) {
   .qarch-heading { display: block; } .qarch-heading-note { display: flex; justify-content: space-between; align-items: flex-end; gap: 25px; margin-top: 25px; } .qarch-heading-note p { margin: 0; text-align: right; }
-  .qarch-console { display: flex; flex-direction: column; } .qarch-console-top { order: 0; } .qarch-controls { order: 1; } .qarch-journey { order: 2; border-top: 0; border-bottom: 1px solid var(--qa-line); } .qarch-map { order: 3; }
+  .qarch-console { display: flex; flex-direction: column; } .qarch-console-top { order: 0; } .qarch-controls { order: 1; } .qarch-scale-plan { order: 2; } .qarch-journey { order: 3; border-top: 0; border-bottom: 1px solid var(--qa-line); } .qarch-map { order: 4; }
+  .qarch-scale-plan { grid-template-columns: 1fr; gap: 16px; } .qarch-scale-heading { grid-column: auto; } .qarch-scale-controls { max-width: 630px; } .qarch-scale-controls button { min-height: 45px; align-items: center; } .qarch-scale-detail { min-height: 0; }
   .qarch-map { height: auto; padding: 27px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .qarch-node { position: relative; inset: auto; width: auto; min-width: 0; min-height: 0; }
   .qarch-wires, .qarch-column-label { display: none; }
@@ -127,18 +147,18 @@
   .qarch-heading { margin-bottom: 25px; } .qarch-heading h2 { font-size: clamp(30px, 7.5vw, 42px); margin-top: 15px; } .qarch-heading-note { display: block; margin-top: 22px; } .qarch-heading-note p { font-size: 12px; margin-top: 12px; text-align: left; } .qarch-status { font-size: 11px; padding: 7px; gap: 5px; }
   .qarch-console { border-radius: 8px; } .qarch-console-top { padding: 13px 15px; font-size: 11px; gap: 8px; } .qarch-console-hint { display: none; }
   .qarch-controls button { min-width: 0; min-height: 58px; padding: 14px 8px; gap: 6px; justify-content: center; font-size: 11px; line-height: 1.5; } .qarch-controls button > svg:first-of-type { width: 13px; height: 13px; } .qarch-controls button::after { left: 10px; right: 10px; } .qarch-tab-arrow, .qarch-tab-number { display: none; }
+  .qarch-scale-plan { padding: 19px 18px 21px; gap: 15px; } .qarch-scale-heading { display: block; } .qarch-scale-heading > span { font-size: 11px; } .qarch-scale-heading small { display: block; margin-top: 7px; font-size: 11px; } .qarch-scale-controls { gap: 6px; } .qarch-scale-controls button { flex-direction: column; align-items: flex-start; gap: 4px; padding: 9px 7px; min-height: 72px; font-size: 11px; } .qarch-scale-controls button > span { font-size: 11px; line-height: 1.4; } .qarch-scale-detail strong { font-size: 14px; } .qarch-scale-detail p { font-size: 12px; }
   .qarch-map { padding: 18px; gap: 21px 12px; }
   .qarch-clients { display: grid; grid-template-columns: 26px 1fr; padding: 16px; gap: 4px 12px; } .qarch-clients > svg { grid-row: 1 / 3; } .qarch-clients h3 { font-size: 14px; } .qarch-clients p { font-size: 11px; } .qarch-router { grid-column: 1 / -1; margin: 9px 0 0; padding: 11px 0 0; border-left: 0; border-top: 1px solid #ffffff25; font-size: 11px; }
   .qarch-forms, .qarch-exams { grid-column: 1 / -1; padding: 18px; } .qarch-forms { grid-row: 2; } .qarch-exams { grid-row: 3; }
-  .qarch-node h3 { font-size: 17px; } .qarch-node-eyebrow { font-size: 11px; } .qarch-node p { font-size: 12px; } .qarch-module-list span { font-size: 11px; } .qarch-node-pool > span { font-size: 11px; padding: 7px 9px; }
+  .qarch-node h3 { font-size: 17px; } .qarch-node-eyebrow { font-size: 11px; } .qarch-node p { font-size: 12px; } .qarch-module-list span { font-size: 11px; } .qarch-node-pool > span { font-size: 11px; padding: 7px 4px; }
   .qarch-cache { grid-row: 4; gap: 10px; padding: 17px; } .qarch-cache h3 { margin: 0; } .qarch-cache > span { width: 100%; margin: 0; font-size: 11px; }
   .qarch-form-data { grid-column: 1 / -1; grid-row: 5; padding: 18px; } .qarch-response-data { grid-column: 1 / -1; grid-row: 6; padding: 18px; }
   .qarch-form-data::before, .qarch-response-data::before { display: none; }
   .qarch-data-pair { margin-top: 16px; gap: 15px; } .qarch-data-pair strong { font-size: 12px; } .qarch-data-pair small { font-size: 11px; } .qarch-data-pair > span { flex: 1; min-width: 0; }
   .qarch-map-key { gap: 10px 14px; font-size: 11px; } .qarch-map-key > .qarch-map-abstraction { margin: 0; width: 100%; }
   .qarch-journey { padding: 23px 18px; } .qarch-journey-copy { gap: 12px; } .qarch-journey-index { font-size: 25px; } .qarch-journey h3 { font-size: 16px; } .qarch-journey p { font-size: 12px; min-height: 0; } .qarch-journey ol { gap: 14px 12px; margin-top: 23px; } .qarch-journey li { font-size: 11px; align-items: flex-start; gap: 5px; } .qarch-journey li > svg { display: none; }
-  .qarch-principles { grid-template-columns: 1fr; gap: 24px; padding: 30px 0; } .qarch-principles > div { padding-top: 22px; display: grid; grid-template-columns: 24px 1fr; gap: 8px 13px; } .qarch-principles svg { grid-row: 1 / 3; margin-top: 2px; } .qarch-principles h3 { margin: 0; font-size: 17px; } .qarch-principles p { grid-column: 2; font-size: 12px; }
   .qarch-module-list span, .qarch-node-eyebrow, .qarch-node-pool > span, .qarch-router, .qarch-cache > span, .qarch-map-key, .qarch-console-top, .qarch-status, .qarch-scope, .qarch-state { font-size: 11px; }
   .qarch-notes { grid-template-columns: 1fr; gap: 24px; } .qarch-details > summary { font-size: 11px; } .qarch-scope { font-size: 11px; }
 }
-@media (prefers-reduced-motion: reduce) { .qarch-wire-traffic { animation: none; } .qarch-node, .qarch-controls button, .qarch-controls button::after, .qarch-wire-base, .qarch-wire-traffic, .qarch-details > summary > svg { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .qarch-wire-traffic { animation: none; } .qarch-node, .qarch-controls button, .qarch-controls button::after, .qarch-wire-base, .qarch-wire-traffic, .qarch-details > summary > svg, .qarch-scale-controls button, .qarch-node-pool > span { transition: none; } }
