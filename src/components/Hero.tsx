@@ -4,7 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Component, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { ArrowDown, ArrowUpRight, MoveUpRight } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
 import { scrollToPosition } from "@/components/SmoothScroll";
 import "@/app/hero-story.css";
@@ -20,9 +20,9 @@ const pinnedSnapshot = () => window.matchMedia(pinnedQuery).matches;
 const serverSnapshot = () => false;
 const stops = [.08, .5, .86];
 const acts = [
-  { label: "Find the question", title: "Everything starts with “what if?”", detail: "Listen to the people. Find the problem worth solving.", note: "A rough idea is a good start.", word: "QUESTION" },
-  { label: "Make the pieces work", title: "A little less guessing. A working prototype.", detail: "Interface, backend, AI. I bring the pieces together.", note: "This is the hands-on part.", word: "BUILD" },
-  { label: "Put it in the world", title: "Ship it. Watch it. Make it better.", detail: "Real people teach you what the next version needs.", note: "Built to leave the sketchbook.", word: "SHIP" },
+  { label: "Find the question", title: "First, a question.", detail: "I find the problem worth solving.", word: "QUESTION" },
+  { label: "Make the pieces work", title: "Then, something that works.", detail: "Frontend. Backend. AI. One working product.", word: "BUILD" },
+  { label: "Put it in the world", title: "Finally, out in the world.", detail: "Ship, learn, improve. Then do it again.", word: "SHIP" },
 ];
 
 class FlightBoundary extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
@@ -73,9 +73,8 @@ export default function Hero() {
       <header className="flight-heading">
         <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span>/</span> Forward Deployed Engineer</motion.p>
         <h1><span>Ideas don’t</span><em>ship themselves<span className="flight-fullstop">.</span></em></h1>
-        <p className="flight-introduction">That’s where I come in.</p>
       </header>
-      <div className="flight-stage" role="img" aria-label={`A paper plane: ${acts[act].label.toLowerCase()}`}>
+      <div className="flight-stage" role="img" aria-label={`A paper plane becoming an aircraft: ${acts[act].label.toLowerCase()}`}>
         <div className="flight-stage-grid" aria-hidden="true" />
         <svg className="flight-path" viewBox="0 0 1200 420" fill="none" aria-hidden="true">
           <path className="flight-pencil-line" d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" />
@@ -86,8 +85,6 @@ export default function Hero() {
           <PlaneSketch />
           {!failed && <FlightBoundary onError={onUnavailable}><PaperPlaneScene progress={progress} reducedMotion={!!reduced} active={activeInView} onReady={onReady} onUnavailable={onUnavailable} /></FlightBoundary>}
         </div>
-        <div className="flight-annotation" aria-hidden="true"><span>{acts[act].note}</span><svg viewBox="0 0 90 50"><path d="M5 9C19 8 59 10 70 40m-16-8 17 10 5-19" fill="none" stroke="currentColor" /></svg></div>
-        <div className="flight-stamp" aria-hidden="true"><span>STILL</span><strong>building.</strong><MoveUpRight size={16} /></div>
         <span className="flight-stage-caption" aria-hidden="true">0{act + 1} / {acts[act].word}</span>
       </div>
       <div className="flight-bottom">

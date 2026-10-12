@@ -229,10 +229,9 @@ for (const project of portfolioProjects) {
 }
 
 export const selectedWork = [
-  "extendedforms-io",
-  "vocalxi",
   "quzo-ai",
-  "zwopr",
+  "vocalxi",
+  "extendedforms-io",
 ].map((slug) => portfolioProjects.find((p) => p.slug === slug)!);
 
 export const expertise = [

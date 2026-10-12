@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import ProjectGallery from "@/components/ProjectGallery";
+import QuzoArchitecture from "@/components/QuzoArchitecture";
 import Reveal from "@/components/Reveal";
 import type { PortfolioProject } from "@/data/portfolio";
 import { getProjectWorld, type ProjectWorld } from "@/data/project-themes";
@@ -57,7 +58,7 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
             <Reveal className="case-cover-copy"><p className="case-label">{project.kind}</p><h1>{project.name}</h1><p className="case-cover-line">{world.line}</p></Reveal>
             <motion.div className="case-cover-art" style={reduced ? undefined : { y: artworkY, rotate: artworkRotate }}><WorldDrawing motif={world.motif} /><span className="case-art-caption">A study in {project.category.toLowerCase()}</span></motion.div>
           </div>
-          <Reveal className="case-cover-bottom"><p>{project.oneLiner}</p><a href="#project-screens" className="case-round-link" aria-label={`Explore ${project.name}`}><ArrowDown size={23} /></a></Reveal>
+          <Reveal className="case-cover-bottom"><p>{project.oneLiner}{project.slug === "quzo-ai" && <a href="#quzo-architecture" className="case-architecture-link">Explore the architecture <ArrowUpRight size={16} /></a>}</p><a href="#project-screens" className="case-round-link" aria-label={`Explore ${project.name}`}><ArrowDown size={23} /></a></Reveal>
         </div>
       </section>
 
@@ -68,6 +69,8 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
           <div className="case-sequence" aria-label="Product workflow">{world.sequence.map((step, i) => <span key={step}><i>0{i + 1}</i>{step}{i < 2 && <ArrowRight size={17} />}</span>)}</div>
         </div>
       </section>
+
+      {project.slug === "quzo-ai" && <QuzoArchitecture />}
 
       <section className="case-story case-container" aria-labelledby="story-heading">
         <aside className="case-margin"><span className="case-label">02 / The build notes</span><h2 id="story-heading">{world.chapter}</h2><div className="case-role"><span>My role</span><p>{project.role}</p><span>Project status</span><p>{project.status}</p></div></aside>

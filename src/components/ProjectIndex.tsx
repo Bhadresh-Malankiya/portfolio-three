@@ -6,8 +6,10 @@ import Link from "next/link";
 import { ArrowUpRight, CornerDownRight } from "lucide-react";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectMotif from "@/components/ProjectMotif";
-import { portfolioProjects as projects } from "@/data/portfolio";
+import { portfolioProjects, selectedWork } from "@/data/portfolio";
 import { getProjectWorld } from "@/data/project-themes";
+
+const projects = [...selectedWork, ...portfolioProjects.filter(project => !selectedWork.some(selected => selected.slug === project.slug))];
 
 const filters = [
   "All work",

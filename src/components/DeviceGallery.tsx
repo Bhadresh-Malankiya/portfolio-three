@@ -43,22 +43,12 @@ type GalleryProject = {
 };
 const projects: GalleryProject[] = [
   {
-    slug: "vocalxi",
-    name: "VocalXI",
-    kind: "01 / my own product",
-    caption: "Forms, with a voice.",
-    role: "Founder & product engineer · AscendXI",
-    features: ["Voice conversations", "Answer review", "Form workflows"],
-    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
-    url: "https://vocalxi.com",
-  },
-  {
     slug: "quzo-ai",
     name: "Quzo.ai",
-    kind: "02 / employer product",
-    caption: "From questions to insight.",
+    kind: "01 / systems & AI",
+    caption: "AI on the surface. Architecture underneath.",
     role: "Full-stack & AI engineering · ExpressTech",
-    features: ["AI authoring", "Exam delivery", "Response reports"],
+    features: ["AI authoring", "Modular architecture", "Exam delivery"],
     images: [
       "/images/quzo_dashboard.png",
       "/images/quzo_form_screen.png",
@@ -67,12 +57,22 @@ const projects: GalleryProject[] = [
     url: "https://quzo.ai",
   },
   {
+    slug: "vocalxi",
+    name: "VocalXI",
+    kind: "02 / my own product",
+    caption: "Forms, with a voice.",
+    role: "Founder & product engineer · AscendXI",
+    features: ["Voice conversations", "Answer review", "Form workflows"],
+    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
+    url: "https://vocalxi.com",
+  },
+  {
     slug: "extendedforms-io",
     name: "ExtendedForms",
     kind: "03 / employer product",
     caption: "A form. A full assessment.",
     role: "Technical lead · ExpressTech",
-    features: ["Timed exams", "Proctoring", "Reporting"],
+    features: ["400K+ users", "10M+ exams", "Technical leadership"],
     images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
     url: "https://extendedforms.io",
   },
@@ -237,7 +237,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             <div
               className="model-viewport"
               role="img"
-              aria-label={`${p.name} on a ${mobile ? "titanium iPhone Pro" : "silver MacBook Pro"}`}
+              aria-label={`${p.name} on a ${mobile ? "iPhone 16 Pro" : "14-inch MacBook Pro"}`}
             >
               {!modelReady && !modelFailed && (
                 <div className="model-preparing" role="status">
@@ -318,8 +318,8 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
               <p className="cinema-role">{p.role}</p>
             </div>
             <div className="cinema-links">
-              <Link className="button-primary" href={`/projects/${p.slug}`}>
-                Inside the build <ArrowUpRight size={16} />
+              <Link className="button-primary" href={`/projects/${p.slug}${p.slug === "quzo-ai" ? "#quzo-architecture" : ""}`}>
+                {p.slug === "quzo-ai" ? "Explore the architecture" : "Inside the build"} <ArrowUpRight size={16} />
               </Link>
               <a
                 className="text-link"
@@ -406,10 +406,10 @@ export default function DeviceGallery() {
   return (
     <>
       <div className="work-prologue">
-        <p className="eyebrow">Selected work / A few things I’ve put into the world</p>
+        <p className="eyebrow">Selected work / Three products. Three different challenges.</p>
         <span className="work-prologue-stamp" aria-hidden="true">DESIGNED TO<strong>work.</strong>BUILT TO BE USED</span>
         <h2>Different problems.<br /><em>All the way to live.</em></h2>
-        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>My own ideas. Products built with teams. Tools that found their way into everyday work.</p></div>
+        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>Systems at Quzo. Ownership at VocalXI. Scale at ExtendedForms.</p></div>
       </div>
       <ProjectChapter />
       <div className="mobile-interlude">

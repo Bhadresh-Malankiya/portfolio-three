@@ -186,17 +186,17 @@ try {
   await openingStory.getByRole("button", { name: /Make the pieces work/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "1");
   assert.equal(await openingStory.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "desktop chapter control scrolls to the build act");
-  assert.equal(await page.locator(".flight-narrative h2").textContent(), "A little less guessing. A working prototype.", "build act presents its story");
+  assert.equal(await page.locator(".flight-narrative h2").textContent(), "Then, something that works.", "build act presents its story");
   await openingStory.getByRole("button", { name: /Put it in the world/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
-  assert.equal(await page.locator(".flight-narrative h2").textContent(), "Ship it. Watch it. Make it better.", "ship act presents its story");
+  assert.equal(await page.locator(".flight-narrative h2").textContent(), "Finally, out in the world.", "ship act presents its story");
   await openingStory.getByRole("button", { name: /Find the question/ }).click();
   await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "0");
-  await page.getByRole("button", { name: "02 Quzo.ai", exact: true }).click();
+  await page.getByRole("button", { name: "01 Quzo.ai", exact: true }).click();
   await page.waitForFunction(
     () =>
       document
-        .querySelector("#work .chapter-selector button:nth-child(2)")
+        .querySelector("#work .chapter-selector button:nth-child(1)")
         ?.getAttribute("aria-pressed") === "true",
   );
   const quzoScreens = page.getByRole("group", {
@@ -298,6 +298,22 @@ try {
   );
   await context.close();
 
+  const architecturePage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  architecturePage.on("pageerror", (error) => errors.push(`architecture: ${error.message}`));
+  await architecturePage.goto(base + "/projects/quzo-ai#quzo-architecture", { waitUntil: "networkidle" });
+  const architecture = architecturePage.locator("#quzo-architecture");
+  assert.equal(await architecture.getAttribute("data-journey"), "exam", "architecture opens on the submission path");
+  await architecture.getByRole("button", { name: /Configure/ }).click();
+  assert.equal(await architecture.getAttribute("data-journey"), "configure", "configuration path can be selected");
+  assert.equal(await architecture.locator(".qarch-form-data").getAttribute("data-lit"), "true", "configuration highlights durable form storage");
+  await architecture.getByRole("button", { name: /Review results/ }).click();
+  assert.equal(await architecture.locator(".qarch-route.route-report-read").getAttribute("data-lit"), "true", "reports highlight their separate read route");
+  await architecture.getByText("Open the engineering notes", { exact: true }).click();
+  assert.ok(await architecture.getByRole("heading", { name: "Where are the limits?", exact: true }).isVisible(), "engineering tradeoffs are accessible");
+  await architecturePage.setViewportSize({ width: 390, height: 844 });
+  assert.ok(await architecturePage.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "architecture fits a narrow mobile viewport");
+  await architecturePage.close();
+
   // A real touch context prevents mouse-hover timing from pretending to test taps.
   const touchContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -314,7 +330,7 @@ try {
   assert.equal(await touchChapters.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "mobile hero chapter works without a pinned scroll range");
   await touchChapters.getByRole("button", { name: /Put it in the world/ }).tap();
   await touchPage.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
-  assert.equal(await touchPage.locator(".flight-narrative h2").textContent(), "Ship it. Watch it. Make it better.", "mobile hero updates its story");
+  assert.equal(await touchPage.locator(".flight-narrative h2").textContent(), "Finally, out in the world.", "mobile hero updates its story");
   const companionTrigger = touchPage.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true });
   const identityCard = touchPage.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });
   await companionTrigger.tap();

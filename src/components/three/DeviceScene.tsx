@@ -20,12 +20,14 @@ import {
   ShaderMaterial,
   PlaneGeometry,
   WebGLRenderer,
+  LinearFilter,
+  LinearMipmapLinearFilter,
 } from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { useReducedMotion, type MotionValue } from "framer-motion";
 import { devicePose } from "@/lib/device-choreography";
-import { fitDeviceCamera } from "@/lib/device-framing";
+import { fitDeviceCamera, DEVICE_DIMENSIONS } from "@/lib/device-framing";
 
 type Props = {
   kind: "laptop" | "phone";
@@ -103,6 +105,8 @@ function PhoneShell({
   z = 0,
   color,
   glass = false,
+  bevel = 0.004,
+  matte = false,
 }: {
   width: number;
   height: number;
@@ -111,29 +115,31 @@ function PhoneShell({
   z?: number;
   color: string;
   glass?: boolean;
+  bevel?: number;
+  matte?: boolean;
 }) {
   const geometry = useMemo(() => {
-    const g = new ExtrudeGeometry(roundedShape(width, height, radius), {
-      depth,
+    const g = new ExtrudeGeometry(roundedShape(width - bevel * 2, height - bevel * 2, radius - bevel), {
+      depth: Math.max(0.001, depth - bevel * 2),
       bevelEnabled: true,
-      bevelThickness: 0.008,
-      bevelSize: 0.008,
+      bevelThickness: bevel,
+      bevelSize: bevel,
       bevelSegments: 5,
       steps: 1,
       curveSegments: 32,
     });
-    g.translate(0, 0, -depth / 2);
+    g.translate(0, 0, -Math.max(0.001, depth - bevel * 2) / 2);
     return g;
-  }, [width, height, depth, radius]);
+  }, [width, height, depth, radius, bevel]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh geometry={geometry} position={[0, 0, z]}>
       <meshPhysicalMaterial
         {...metal}
         color={color}
-        metalness={glass ? 0.15 : 0.85}
-        roughness={glass ? 0.12 : 0.36}
-        clearcoat={glass ? 1 : 0.1}
+        metalness={glass || matte ? 0.12 : 0.85}
+        roughness={matte ? 0.52 : glass ? 0.11 : 0.3}
+        clearcoat={glass ? 1 : matte ? 0.28 : 0.1}
       />
     </mesh>
   );
@@ -181,6 +187,10 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
         #include <colorspace_fragment>
       }`,
     toneMapped: false,
+    // A small depth bias keeps the display above its close-fitting cover glass.
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
   });
   function load(source: string) {
     const cached = cache.get(source);
@@ -193,14 +203,17 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
           return;
         }
         texture.colorSpace = SRGBColorSpace;
-        texture.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy());
+        texture.anisotropy = Math.min(16, gl.capabilities.getMaxAnisotropy());
+        texture.minFilter = LinearMipmapLinearFilter;
+        texture.magFilter = LinearFilter;
+        texture.generateMipmaps = true;
         texture.needsUpdate = true;
         gl.initTexture(texture);
         loaded.add(texture);
         resolve(texture);
       };
-      const optimized = `/_next/image?url=${encodeURIComponent(source)}&w=${width < 2 ? 1080 : 1920}&q=75`;
-      loader.load(optimized, prepare, undefined, () => loader.load(source, prepare, undefined, reject));
+      // Preserve the native screenshot pixels; WebGL caps oversized sources to the GPU limit.
+      loader.load(source, prepare, undefined, reject);
     });
     cache.set(source, request);
     return request;
@@ -296,7 +309,7 @@ function Screen({
     if (state.pending) invalidate();
   });
   const screenGeometry = useMemo(() => {
-    const geometry = new ShapeGeometry(roundedShape(width, height, rounded ? 0.19 : 0.06), 32);
+    const geometry = new ShapeGeometry(roundedShape(width, height, rounded ? DEVICE_DIMENSIONS.phone.screenRadius : 0.047), 32);
     const points = geometry.attributes.position;
     const uv = geometry.attributes.uv;
     for (let i = 0; i < points.count; i++)
@@ -325,9 +338,9 @@ function Keyboard() {
     ];
     const bodies: RoundedBoxGeometry[] = [];
     const labels: PlaneGeometry[] = [];
-    let z = -0.56;
+    let z = -0.585;
     rows.forEach((row, rowIndex) => {
-      const depth = rowIndex === 0 ? 0.125 : 0.17;
+      const depth = 0.17;
       const units = row.map((_, i) => {
         if (rowIndex === 5) return i === 4 ? 5 : i === 3 || i === 5 ? 1.3 : 1;
         if (rowIndex === 4 && (i === 0 || i === row.length - 1)) return 2.05;
@@ -343,8 +356,8 @@ function Keyboard() {
         const keyWidth = span - 0.027;
         const centerX = x + span / 2;
         const centerZ = z + depth / 2;
-        const key = new RoundedBoxGeometry(keyWidth, 0.018, depth, 2, 0.008);
-        key.translate(centerX, 0.013, centerZ);
+        const key = new RoundedBoxGeometry(keyWidth, 0.014, depth, 2, 0.006);
+        key.translate(centerX, 0.011, centerZ);
         bodies.push(key);
         const labelPlane = new PlaneGeometry(keyWidth - 0.006, depth - 0.006);
         const uv = labelPlane.attributes.uv;
@@ -352,7 +365,7 @@ function Keyboard() {
           uv.setXY(vertex, (index + uv.getX(vertex)) / 14, 1 - (rowIndex + 1 - uv.getY(vertex)) / 6);
         }
         labelPlane.rotateX(-Math.PI / 2);
-        labelPlane.translate(centerX, 0.0225, centerZ);
+        labelPlane.translate(centerX, 0.0185, centerZ);
         labels.push(labelPlane);
         ctx.fillStyle = "#f0f0f1";
         ctx.font = `${label.length > 3 ? 22 : 37}px -apple-system, sans-serif`;
@@ -426,11 +439,7 @@ function AppleMark({ position, scale }: { position: [number, number, number]; sc
 }
 
 function Laptop({
-  image,
-  images,
-  hinge,
-  onReady,
-  onUnavailable,
+  image, images, hinge, onReady, onUnavailable,
 }: {
   image: string;
   images: string[];
@@ -438,215 +447,114 @@ function Laptop({
   onReady: () => void;
   onUnavailable: () => void;
 }) {
-  return (
-    <group position={[0, -0.63, 0]}>
-      <group position={[0, 0, 0.15]} rotation={[-Math.PI / 2, 0, 0]}>
-        <PhoneShell width={3.8} height={2.5} depth={0.13} radius={0.13} color="#c3c6cb" />
-      </group>
-      <Body
-        args={[3.68, 0.04, 2.4]}
-        position={[0, -0.074, 0.15]}
-        radius={0.018}
-        color="#4b515b"
-      />
-      <Keyboard />
-      <SpeakerGrilles />
-      <Body
-        args={[1.29, 0.01, 0.64]}
-        position={[0, 0.069, 0.82]}
-        radius={0.005}
-        color="#6f7781"
-      />
-      <Body
-        args={[1.27, 0.009, 0.62]}
-        position={[0, 0.075, 0.82]}
-        radius={0.004}
-        color="#b3b9c1"
-      />
-      <Body
-        args={[0.42, 0.02, 0.055]}
-        position={[0, 0.06, 1.389]}
-        radius={0.008}
-        dark
-      />
-      {[-0.55, -0.2].map((z) => <group key={z}>
-        <Body args={[0.017, 0.047, 0.153]} position={[-1.902, -0.005, z]} radius={0.007} color="#787d83" />
-        <Body args={[0.019, 0.031, 0.121]} position={[-1.912, -0.005, z]} radius={0.006} dark />
-      </group>)}
-      <Body args={[0.019, 0.033, 0.23]} position={[-1.911, -0.005, -0.88]} radius={0.008} dark />
-      <Body args={[0.019, 0.034, 0.27]} position={[1.911, -0.005, -0.72]} radius={0.006} dark />
-      <Body args={[0.019, 0.017, 0.25]} position={[1.911, -0.005, -0.25]} radius={0.005} dark />
-      <Body args={[0.019, 0.032, 0.12]} position={[1.911, -0.005, 0.16]} radius={0.006} dark />
-      <mesh position={[0, 0.085, -1.06]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.075, 0.075, 3.25, 24]} />
-        <meshStandardMaterial
-          color="#343a43"
-          metalness={0.85}
-          roughness={0.3}
-        />
-      </mesh>
-      <group ref={hinge} position={[0, 0.18, -1.06]}>
-        <group position={[0, 1.21, 0]}>
-          <PhoneShell width={3.8} height={2.42} depth={0.085} radius={0.105} color="#c3c6cb" />
-          <PhoneShell width={3.71} height={2.33} depth={0.012} radius={0.08} z={0.05} color="#07090c" glass />
-        </group>
-          <Screen
-            src={image}
-            images={images}
-            onUnavailable={onUnavailable}
-            onReady={onReady}
-            width={3.58}
-            height={2.2375}
-            position={[0, 1.21, 0.071]}
-          />
-        <Body args={[0.38, 0.105, 0.014]} position={[0, 2.305, 0.078]} radius={0.008} dark />
-        <mesh position={[0, 2.32, 0.09]}>
-          <circleGeometry args={[0.013, 20]} />
-          <meshPhysicalMaterial
-            color="#163448"
-            metalness={0.7}
-            roughness={0.07}
-            clearcoat={1}
-          />
-        </mesh>
-        <AppleMark position={[0, 1.24, -0.052]} scale={0.28} />
-      </group>
+  const laptop = DEVICE_DIMENSIONS.laptop;
+  return <group position={[0, -0.63, 0]}>
+    <group rotation={[-Math.PI / 2, 0, 0]}>
+      <PhoneShell width={laptop.width} height={laptop.depth} depth={0.106} radius={0.132} bevel={0.014} color="#bdc1c5" />
+      <PhoneShell width={3.755} height={laptop.depth - 0.045} depth={0.008} radius={0.119} bevel={0.002} z={-0.052} color="#a7abb0" />
     </group>
-  );
+    {[-1, 1].flatMap((x) => [-1, 1].map((z) => <mesh key={`${x}-${z}`} position={[x * 1.55, -0.06, z * 1.045]}>
+      <cylinderGeometry args={[0.108, 0.104, 0.014, 40]} /><meshStandardMaterial color="#27282b" roughness={0.8} />
+    </mesh>))}
+    <group position={[0, -0.022, -0.085]}><Keyboard /><SpeakerGrilles /></group>
+    <group position={[0, 0.054, 0.755]} rotation={[-Math.PI / 2, 0, 0]}>
+      <PhoneShell width={1.515} height={0.917} depth={0.002} radius={0.064} bevel={0.0005} color="#82878c" />
+      <PhoneShell width={1.5} height={0.902} depth={0.002} radius={0.057} bevel={0.0005} z={0.0015} color="#b8bdc2" />
+    </group>
+    <Body args={[0.59, 0.012, 0.041]} position={[0, 0.052, laptop.depth / 2 - 0.012]} radius={0.005} color="#91969b" />
+    <Body args={[0.46, 0.008, 0.027]} position={[0, 0.051, laptop.depth / 2 + 0.002]} radius={0.003} color="#b4b8bd" />
+    {/* Left: MagSafe, two Thunderbolt sockets, headphone jack. */}
+    <Body args={[0.005, 0.035, 0.205]} position={[-1.901, -0.006, -1.008]} radius={0.002} color="#73777b" />
+    <Body args={[0.006, 0.023, 0.172]} position={[-1.904, -0.006, -1.008]} radius={0.002} dark />
+    {[-0.066, -0.033, 0, 0.033, 0.066].map((offset) => <Body key={offset} args={[0.006, 0.009, 0.014]} position={[-1.908, -0.006, -1.008 + offset]} radius={0.001} color="#c5bba7" />)}
+    {[-0.771, -0.585].map((z) => <group key={z}>
+      <Body args={[0.005, 0.041, 0.106]} position={[-1.901, -0.006, z]} radius={0.002} color="#73787e" />
+      <Body args={[0.006, 0.027, 0.09]} position={[-1.904, -0.006, z]} radius={0.002} dark />
+      <Body args={[0.006, 0.005, 0.061]} position={[-1.908, -0.006, z]} radius={0.002} color="#777b80" />
+    </group>)}
+    <mesh position={[-1.904, -0.006, -0.424]} rotation={[0, -Math.PI / 2, 0]}><circleGeometry args={[0.022, 32]} /><meshStandardMaterial color="#111214" roughness={0.5} /></mesh>
+    {/* Right: HDMI, one Thunderbolt socket, SDXC, from rear to front. */}
+    <Body args={[0.006, 0.044, 0.178]} position={[1.902, -0.006, -1.008]} radius={0.002} color="#757a7f" />
+    <Body args={[0.007, 0.029, 0.15]} position={[1.905, -0.006, -1.008]} radius={0.003} dark />
+    <Body args={[0.006, 0.012, 0.112]} position={[1.909, -0.008, -1.008]} radius={0.002} color="#767b80" />
+    <Body args={[0.006, 0.038, 0.106]} position={[1.902, -0.006, -0.779]} radius={0.002} color="#73787e" />
+    <Body args={[0.007, 0.027, 0.09]} position={[1.905, -0.006, -0.779]} radius={0.002} dark />
+    <Body args={[0.007, 0.005, 0.061]} position={[1.909, -0.006, -0.779]} radius={0.002} color="#777b80" />
+    <Body args={[0.006, 0.018, 0.312]} position={[1.904, -0.006, -0.476]} radius={0.002} dark />
+    {[-1, 1].map((side) => <Body key={side} args={[0.006, 0.009, 1.27]} position={[side * 1.862, -0.052, 0.427]} radius={0.002} dark />)}
+    <mesh position={[0, 0.043, laptop.hingeZ]} rotation={[0, 0, Math.PI / 2]}>
+      <cylinderGeometry args={[0.049, 0.049, 3.23, 40]} /><meshStandardMaterial color="#252a30" metalness={0.75} roughness={0.35} />
+    </mesh>
+    <group ref={hinge} position={[0, laptop.hingeY, laptop.hingeZ]}>
+      <group position={[0, laptop.lidHeight / 2, 0]}>
+        <PhoneShell width={laptop.width} height={laptop.lidHeight} depth={0.041} radius={0.123} bevel={0.006} color="#bfc3c7" />
+        <PhoneShell width={3.764} height={laptop.lidHeight - 0.036} depth={0.004} radius={0.102} bevel={0.001} z={0.023} color="#06080a" glass />
+      </group>
+      <Screen src={image} images={images} onUnavailable={onUnavailable} onReady={onReady}
+        width={laptop.screenWidth} height={laptop.screenHeight} position={[0, laptop.screenY, 0.0255]} />
+      <group position={[0, laptop.lidHeight - 0.083, 0.026]}>
+        <PhoneShell width={0.45} height={0.106} depth={0.006} radius={0.02} bevel={0.001} color="#040507" />
+        <mesh position={[0, 0.002, 0.005]}><circleGeometry args={[0.011, 32]} /><meshPhysicalMaterial color="#1b2a39" metalness={0.5} roughness={0.12} clearcoat={1} /></mesh>
+      </group>
+      <AppleMark position={[0, laptop.lidHeight / 2, -0.0215]} scale={0.25} />
+    </group>
+  </group>;
 }
 
 function Phone({ image, images, onReady, onUnavailable }: Pick<Props, "image" | "images" | "onReady" | "onUnavailable">) {
-  return (
-    <group>
-      <PhoneShell
-        width={1.64}
-        height={3.4}
-        depth={0.17}
-        radius={0.24}
-        color="#a6a29b"
-      />
-      <PhoneShell
-        width={1.57}
-        height={3.33}
-        depth={0.018}
-        z={0.098}
-        radius={0.21}
-        color="#080b10"
-        glass
-      />
-        <Screen
-          src={image}
-            images={images}
-            onUnavailable={onUnavailable}
-          onReady={onReady}
-          rounded
-          width={1.47}
-          height={3.16}
-          position={[0, 0, 0.12]}
-        />
-      <group position={[0, 1.48, 0.14]}>
-        <PhoneShell
-          width={0.43}
-          height={0.105}
-          depth={0.015}
-          radius={0.05}
-          color="#030407"
-          glass
-        />
-      </group>
-      <mesh position={[0.135, 1.48, 0.155]}>
-        <circleGeometry args={[0.025, 24]} />
-        <meshPhysicalMaterial
-          color="#13314a"
-          metalness={0.9}
-          roughness={0.05}
-          clearcoat={1}
-        />
-      </mesh>
-      <Body
-        args={[0.42, 0.015, 0.008]}
-        position={[0, -1.5, 0.134]}
-        radius={0.003}
-        color="#b4b7bc"
-      />
-      <Body
-        args={[0.035, 0.36, 0.085]}
-        position={[0.83, 0.6, 0]}
-        radius={0.012}
-      />
-      {[-0.05, 0.38].map((y) => (
-        <Body
-          key={y}
-          args={[0.035, 0.26, 0.085]}
-          position={[-0.83, y, 0]}
-          radius={0.012}
-        />
-      ))}
-      <PhoneShell
-        width={1.5}
-        height={3.25}
-        depth={0.022}
-        radius={0.2}
-        z={-0.11}
-        color="#88857f"
-      />
-      <AppleMark position={[0, -0.05, -0.13]} scale={0.2} />
-      {[-1.15, 1.15].map((y) => [-1, 1].map((side) => (
-        <Body key={`${side}-${y}`} args={[0.014, 0.026, 0.16]} position={[side * 0.824, y, 0]} radius={0.003} color="#54575b" dark />
-      )))}
-      <Body args={[0.22, 0.014, 0.06]} position={[0, -1.705, 0]} radius={0.004} dark />
-      <Body args={[0.16, 0.005, 0.012]} position={[0, -1.714, 0]} radius={0.002} color="#8c8272" />
-      {[-1, 1].flatMap((side) => Array.from({ length: 6 }, (_, index) => (
-        <mesh key={`${side}-${index}`} position={[side * (0.29 + index * 0.052), -1.709, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.014, 12]} />
-          <meshBasicMaterial color="#202123" />
-        </mesh>
-      )))}
-      <mesh position={[-0.1, 0.84, -0.212]} rotation={[0, Math.PI, 0]}>
-        <circleGeometry args={[0.043, 32]} /><meshPhysicalMaterial color="#15191d" roughness={0.25} clearcoat={0.6} />
-      </mesh>
-      <Body args={[0.032, 0.12, 0.08]} position={[-0.83, 0.82, 0]} radius={0.01} />
-      <mesh position={[-0.1, 1.43, -0.212]} rotation={[0, Math.PI, 0]}>
-        <circleGeometry args={[0.054, 24]} /><meshStandardMaterial color="#eee3c8" roughness={0.25} />
-      </mesh>
-      <group position={[-0.3, 1.09, -0.15]}>
-        <PhoneShell width={0.8} height={0.85} depth={0.07} radius={0.13} color="#99958e" />
-      </group>
-      {[
-        [-0.48, 1.31],
-        [-0.48, 0.88],
-        [-0.1, 1.1],
-      ].map(([x, y]) => (
-        <group key={y} position={[x, y, -0.21]} rotation={[-Math.PI / 2, 0, 0]}>
-          <mesh>
-            <cylinderGeometry args={[0.167, 0.167, 0.055, 40]} />
-            <meshStandardMaterial
-              color="#252e39"
-              metalness={1}
-              roughness={0.16}
-            />
-          </mesh>
-          <mesh position={[0, 0.03, 0]}>
-            <cylinderGeometry args={[0.14, 0.14, 0.008, 64]} />
-            <meshPhysicalMaterial
-              color="#254359"
-              metalness={0.35}
-              roughness={0.04}
-              clearcoat={1}
-            />
-          </mesh>
-          <mesh position={[0, 0.036, 0]}>
-            <cylinderGeometry args={[0.083, 0.083, 0.004, 48]} />
-            <meshPhysicalMaterial color="#08131e" roughness={0.12} metalness={0.3} clearcoat={1} />
-          </mesh>
-          <mesh position={[-0.038, 0.04, -0.035]} rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.02, 24]} />
-            <meshBasicMaterial color="#86b2d5" transparent opacity={0.55} />
-          </mesh>
-        </group>
-      ))}
+  const phone = DEVICE_DIMENSIONS.phone;
+  const unit = phone.height / 149.61;
+  const halfWidth = phone.width / 2;
+  const back = -phone.thickness / 2;
+  const lens = (mmX: number, mmY: number) => [halfWidth - mmX * unit, phone.height / 2 - mmY * unit] as const;
+  return <group>
+    <PhoneShell width={phone.width} height={phone.height} depth={phone.thickness - 0.011} radius={phone.radius} bevel={0.011} color="#9c9991" />
+    <PhoneShell width={69.45 * unit} height={147.61 * unit} depth={0.01} z={phone.thickness / 2 - 0.005} radius={phone.radius - 0.023} bevel={0.002} color="#08090b" glass />
+    <PhoneShell width={69.45 * unit} height={147.61 * unit} depth={0.01} z={back + 0.005} radius={phone.radius - 0.023} bevel={0.002} color="#aaa79e" matte />
+    <Screen src={image} images={images} onUnavailable={onUnavailable} onReady={onReady} rounded
+      width={phone.screenWidth} height={phone.screenHeight} position={[0, 0, phone.thickness / 2 + 0.001]} />
+    <group position={[0, phone.height / 2 - 7.9 * unit, phone.thickness / 2 + 0.003]}>
+      <PhoneShell width={20.73 * unit} height={6.07 * unit} depth={0.004} radius={3.035 * unit} bevel={0.001} color="#030405" glass />
+      <mesh position={[0.165, 0, 0.003]}><circleGeometry args={[0.019, 32]} /><meshPhysicalMaterial color="#152333" metalness={0.55} roughness={0.06} clearcoat={1} /></mesh>
     </group>
-  );
+    <Body args={[0.13, 0.007, 0.008]} position={[0, phone.height / 2 - 0.024, phone.thickness / 2 - 0.002]} radius={0.002} dark />
+    <Body args={[0.48, 0.014, 0.002]} position={[0, -phone.height / 2 + 0.11, phone.thickness / 2 + 0.003]} radius={0.0008} color="#b4b7bc" />
+    <Body args={[0.012, 17.1 * unit, 0.055]} position={[halfWidth + 0.002, phone.height / 2 - 48.23 * unit, 0]} radius={0.004} color="#a6a39b" />
+    {/* Camera Control is the recessed sapphire strip on the lower right side. */}
+    <Body args={[0.005, 17.5 * unit, 0.071]} position={[halfWidth + 0.001, phone.height / 2 - 98.19 * unit, 0]} radius={0.002} color="#5c5e5c" />
+    <Body args={[0.006, 15.3 * unit, 0.054]} position={[halfWidth + 0.004, phone.height / 2 - 98.19 * unit, 0]} radius={0.002} color="#777972" />
+    <Body args={[0.012, 6.5 * unit, 0.052]} position={[-halfWidth - 0.002, phone.height / 2 - 34.08 * unit, 0]} radius={0.004} color="#a6a39b" />
+    {[48.23, 62.43].map((offset) => <Body key={offset} args={[0.012, 8.17 * unit, 0.052]} position={[-halfWidth - 0.002, phone.height / 2 - offset * unit, 0]} radius={0.004} color="#a6a39b" />)}
+    <AppleMark position={[0, -0.05, back - 0.001]} scale={0.19} />
+    {[-1.25, 1.25].map((y) => [-1, 1].map((side) => <Body key={`${side}-${y}`} args={[0.004, 0.024, phone.thickness - 0.025]} position={[side * (halfWidth - 0.001), y, 0]} radius={0.001} color="#6a6a63" />))}
+    <group position={[0, -phone.height / 2, 0]}>
+      <Body args={[8.85 * unit, 0.003, 2.66 * unit]} position={[0, -0.001, 0]} radius={0.001} color="#62645f" />
+      <Body args={[8.2 * unit, 0.004, 2.2 * unit]} position={[0, -0.003, 0]} radius={0.001} dark />
+      <Body args={[6.5 * unit, 0.004, 0.012]} position={[0, -0.006, 0]} radius={0.001} color="#918d81" />
+      {[-1, 1].flatMap((side) => Array.from({ length: side < 0 ? 3 : 5 }, (_, i) => <mesh key={`${side}-${i}`} position={[side * (0.285 + i * 0.055), -0.002, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[1.35 * unit / 2, 20]} /><meshBasicMaterial color="#242521" />
+      </mesh>))}
+      {[-1, 1].map((side) => <mesh key={side} position={[side * 0.155, -0.002, 0]} rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[0.016, 24]} /><meshStandardMaterial color="#5c5e58" metalness={0.85} roughness={0.25} /></mesh>)}
+    </group>
+    <group position={[halfWidth - 23.1 * unit, phone.height / 2 - 23.1 * unit, back - 2.05 * unit / 2]}>
+      <PhoneShell width={38.2 * unit} height={40.5 * unit} depth={2.05 * unit} radius={0.19} bevel={0.008} color="#a5a198" matte />
+    </group>
+    {[[14.17, 14.17], [14.17, 33.41], [32.16, 23.79]].map(([mmX, mmY]) => {
+      const [x, y] = lens(mmX, mmY);
+      return <group key={mmY} position={[x, y, back - 3.04 * unit]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh><cylinderGeometry args={[8.1 * unit, 8.1 * unit, 2.48 * unit, 64]} /><meshStandardMaterial color="#777870" metalness={0.95} roughness={0.24} /></mesh>
+        <mesh position={[0, 1.12 * unit, 0]}><cylinderGeometry args={[7.33 * unit, 7.33 * unit, 0.15 * unit, 64]} /><meshStandardMaterial color="#111615" metalness={0.45} roughness={0.2} /></mesh>
+        <mesh position={[0, 1.18 * unit, 0]}><cylinderGeometry args={[6.52 * unit, 6.52 * unit, 0.06 * unit, 64]} /><meshPhysicalMaterial color="#11212c" metalness={0.32} roughness={0.09} clearcoat={1} /></mesh>
+        <mesh position={[0, 1.218 * unit, 0]}><cylinderGeometry args={[3.7 * unit, 3.7 * unit, 0.004 * unit, 48]} /><meshPhysicalMaterial color="#050c12" roughness={0.12} metalness={0.2} clearcoat={1} /></mesh>
+        <mesh position={[-0.035, 1.225 * unit, -0.035]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.013, 24]} /><meshBasicMaterial color="#698499" transparent opacity={0.45} /></mesh>
+      </group>;
+    })}
+    {([{ x:32.16, y:10.22, radius:3.0, color:'#e4ddce' }, { x:32.16, y:38.14, radius:3.2, color:'#111915' }] as const).map((part) => {
+      const [x, y] = lens(part.x, part.y);
+      return <mesh key={part.y} position={[x, y, back - 2.08 * unit]} rotation={[0, Math.PI, 0]}><circleGeometry args={[part.radius * unit, 40]} /><meshPhysicalMaterial color={part.color} roughness={0.25} clearcoat={0.5} /></mesh>;
+    })}
+    <mesh position={[halfWidth - 41.56 * unit, phone.height / 2 - 34.14 * unit, back - 0.001]} rotation={[0, Math.PI, 0]}><circleGeometry args={[0.009, 20]} /><meshBasicMaterial color="#31342d" /></mesh>
+  </group>;
 }
 
 function Scene({
@@ -698,7 +606,7 @@ function Scene({
       <ambientLight intensity={0.45} />
       <directionalLight position={[-3, 6, 4]} intensity={2.2} color="#f4f5fa" />
       <directionalLight position={[4, 1, -3]} intensity={2} color="#d0d8e2" />
-      <Environment resolution={256} frames={1}>
+      <Environment resolution={512} frames={1}>
         <Lightformer
           form="rect"
           intensity={1.2}

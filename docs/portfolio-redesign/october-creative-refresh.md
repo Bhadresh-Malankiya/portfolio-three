@@ -12,9 +12,9 @@ Creative research references: Bruno Simon, Dennis Snellenberg and Lusion. These 
 
 ## Current section sequence
 
-1. **From a question to a working product** — `Hero.tsx` uses “Ideas don’t ship themselves.” above a genuine folded-paper model in `three/PaperPlaneScene.tsx`. Scrolling on large screens moves through question, build and ship; chapter buttons provide direct control, including mobile and reduced-motion modes. The detailed aperture image and zoom have been removed from the hero.
+1. **From a question to a working product** — `Hero.tsx` uses “Ideas don’t ship themselves.” above a folded-paper model that becomes a small twin-engine aircraft in `three/PaperPlaneScene.tsx`. The same wing geometry morphs continuously, with a one-time banked arrival and a short speed-line burst in the middle act. Scrolling on large screens moves through question, build and ship; chapter buttons provide direct control, including mobile and reduced-motion modes. The detailed aperture image and zoom have been removed from the hero.
 2. **Selected work** — `DeviceGallery.tsx`, `three/DeviceScene.tsx` and `ProductScenery.tsx` provide separate laptop and phone chapters. Project screens, short explanations and background motifs change together. Device visibility, framing and screen transitions are handled independently so changing a screenshot does not remount the entire device.
-3. **Other corners of the work** — `WorkArchive.tsx` is a horizontally browsable poster rail featuring JewelXI, ZWOPR and HelpDesk AI. It links to the full project index rather than repeating the featured device projects.
+3. **The rest of the work** — `WorkArchive.tsx` is a compact stack of project folders linking to the full index. The homepage concentrates on Quzo (architecture and AI), VocalXI (founder ownership), ExtendedForms (scale and leadership), and Hey Buddy (mobile). The project index opens with the same three web products; other projects remain accessible without receiving another large featured slot.
 4. **The person behind the build** — `LifePanel.tsx` presents the actual portrait as a cobalt-and-paper collage, a single expandable career timeline, four large linked impact figures and a visible six-part expertise index.
 5. **After the handover** — `ClientReviews.tsx` presents three existing Upwork quotes in a large manual spotlight, with previous/next buttons and keyboard-operable review tabs. Quote text remains unchanged.
 6. **Take something with you** — `DownloadsSection.tsx` retains the existing book and résumé files while fitting the new editorial presentation.
@@ -30,11 +30,13 @@ Creative research references: Bruno Simon, Dennis Snellenberg and Lusion. These 
 
 Project-specific themes include the warm voice-product palette for VocalXI, lilac assessment graphics for Quzo, green forms graphics for ExtendedForms, and a jewellery-oriented treatment for JewelXI. These are presentation themes, not new product or performance claims. The source of profile and project facts remains the existing typed data, including `src/data/portfolio.ts`.
 
+Quzo additionally includes `QuzoArchitecture.tsx`: three selectable request paths, separate Forms/Exams modular monoliths, Redis and distinct configuration/response stores. The user confirmed that core modules and Redis are implemented; autoscaling and replicas are planned. The diagram labels these states separately, treats HA standby as planned, and makes no measured concurrency or uptime claim. Engineering notes explain cache invalidation, replica lag, database write limits and scaling prerequisites.
+
 ## Asset provenance
 
 - **`public/images/engineers-aperture.webp`** is a retained, currently unused decorative image from the earlier hero: a chrome-and-glass architectural aperture. It was produced with the built-in image-generation tool and converted from its native output to WebP for the page. It is visual atmosphere, not a photograph of an actual installation or a project screenshot.
 - **`public/images/profile.png`** remains the user's existing portrait. Its new borders, orbit lines, labels and print treatment are native HTML/CSS/SVG decoration; the person's likeness was not regenerated.
-- The laptop and phone are **procedural Three.js devices**, constructed in `src/components/three/DeviceScene.tsx`. They are MacBook- and iPhone-inspired geometry, not downloaded Apple CAD assets. No external 3D model files or additional external-model licences were introduced.
+- The laptop and phone are **procedural Three.js devices**, constructed in `src/components/three/DeviceScene.tsx`. They are MacBook- and iPhone-inspired geometry, not downloaded Apple CAD assets. No external 3D model files or additional external-model licences were introduced. Proportions now follow the 2024 14-inch M4 Pro MacBook Pro and iPhone 16 Pro; official dimensions, product-photo references, native texture sizes and approximation limits are recorded in `device-reference.md`.
 - The paper plane and cartoon guide are original procedural Three.js geometry, with no external model assets. The guide is a stylized character, not an exact likeness. Existing real project screenshots and downloadable PDFs remain in use.
 
 ## Styling and animation ownership
@@ -44,6 +46,7 @@ Project-specific themes include the warm voice-product palette for VocalXI, lila
 - `src/app/exhibition.css`: work stages, archive and overarching exhibition presentation.
 - `src/app/human-story.css`: scoped paper journal, cobalt reviews and contact finale.
 - `src/app/project-worlds.css`: project-specific case studies and project index presentation.
+- `src/app/quzo-architecture.css`: architecture map, request paths and responsive engineering notes.
 - `src/lib/device-framing.ts`: camera fitting and safe model bounds.
 - `src/lib/device-choreography.ts`: scroll pose and project timing.
 - `scripts/device-framing-test.mjs`: framing and choreography regression checks.
@@ -62,3 +65,9 @@ The subsequent hero-and-guide pass reviewed **1440 × 1000**, **1440 × 800**, *
 ## Content guardrails
 
 Keep MB Systems at **2020–2022**. Retain **400K+ ExtendedForms users**, **10M+ online exams**, **10+ developers managed**, and experience scaling products **from 10 to 100,000 users**. The last figure is not a concurrent-user claim. Keep founder work distinct from employer products, preserve the actual Upwork quotes, and do not use generated product images or decorative metrics as evidence.
+
+## Device, flight and architecture refinement
+
+The integrated refinement was reviewed at 1440 × 1000, 1265 × 720 and 390 × 844. A browser-only morph-target initialization error was fixed by constructing each wing Mesh with its geometry, and readiness now follows a successful draw. Actual rendering of the paper and aircraft, mobile chapter selection, profile-card dismissal/CV access, laptop/phone screens and Quzo request-path selection were checked. The initial hardware blur was removed. A mobile display/glass depth conflict was fixed with camera clipping planes fitted to the hardware bounds and a small screen depth bias; dedicated depth-separation checks were added. Guide notes moved above the avatar and desktop project controls reserve room for the companion. Architecture technical text was enlarged and switches to a stacked layout below 1160 px. No global horizontal overflow was found on the mobile checks.
+
+Lint, TypeScript, production build and all 36,360 device-framing checks passed. The smoke script was updated for the curated project order, shorter hero narrative and architecture journeys; its CLI runner was not executed in this pass. Existing GitHub dependency-audit findings remain a separate release-check limitation.
