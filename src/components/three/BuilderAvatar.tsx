@@ -3,6 +3,7 @@
 import { Component, useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
+import { sampleAvatarStride } from "@/lib/avatar-locomotion";
 import {
   BufferGeometry,
   CatmullRomCurve3,
@@ -133,7 +134,7 @@ function Pebble({ position, scale, color, glossy = false }: {
 
 function Hand() {
   return (
-    <group position={[0, -0.45, 0.025]}>
+    <group position={[0, -0.215, 0.025]}>
       <Pebble position={[0, -0.035, 0]} scale={[0.098, 0.119, 0.073]} color={SKIN} />
       <Pebble position={[0.082, -0.013, 0.027]} scale={[0.043, 0.074, 0.047]} color={SKIN} />
       <Stroke points={[[-0.033, -0.054, 0.066], [-0.028, -0.088, 0.059]]} radius={0.006} color="#b57450" />
@@ -142,18 +143,24 @@ function Hand() {
   );
 }
 
-function Arm() {
+function Arm({ elbow }: { elbow: RefObject<Group | null> }) {
   return (
     <>
-      <mesh position={[0, -0.20, 0]}>
-        <capsuleGeometry args={[0.105, 0.23, 6, 12]} />
+      <mesh position={[0, -0.105, 0]}>
+        <capsuleGeometry args={[0.102, 0.12, 6, 12]} />
         <meshStandardMaterial color={JACKET} roughness={0.73} />
       </mesh>
-      <mesh position={[0, -0.37, 0.01]}>
-        <cylinderGeometry args={[0.091, 0.086, 0.065, 16]} />
-        <meshStandardMaterial color="#163472" roughness={0.7} />
-      </mesh>
-      <Hand />
+      <group ref={elbow} position={[0, -0.225, 0]}>
+        <mesh position={[0, -0.055, 0]}>
+          <capsuleGeometry args={[0.091, 0.105, 6, 12]} />
+          <meshStandardMaterial color={JACKET} roughness={0.73} />
+        </mesh>
+        <mesh position={[0, -0.142, 0.01]}>
+          <cylinderGeometry args={[0.091, 0.086, 0.065, 16]} />
+          <meshStandardMaterial color="#24394e" roughness={0.7} />
+        </mesh>
+        <Hand />
+      </group>
     </>
   );
 }
@@ -169,6 +176,8 @@ const expressions = {
 
 function Character({ mood, reducedMotion = false, active = true, travel, interacting = false, onReady }: Props) {
   const figure = useRef<Group>(null);
+  const torso = useRef<Group>(null);
+  const pelvis = useRef<Group>(null);
   const head = useRef<Group>(null);
   const eyes = useRef<Group>(null);
   const pupils = useRef<Group>(null);
@@ -176,6 +185,10 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
   const mouth = useRef<Group>(null);
   const rightArm = useRef<Group>(null);
   const leftArm = useRef<Group>(null);
+  const rightElbow = useRef<Group>(null);
+  const leftElbow = useRef<Group>(null);
+  const rightAnkle = useRef<Group>(null);
+  const leftAnkle = useRef<Group>(null);
   const rightLeg = useRef<Group>(null);
   const leftLeg = useRef<Group>(null);
   const rightKnee = useRef<Group>(null);
@@ -215,7 +228,7 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
   useEffect(() => { invalidate(); }, [mood, reducedMotion, active, invalidate]);
 
   useFrame(({ clock }, delta) => {
-    if (!figure.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current || !rightLeg.current || !leftLeg.current || !rightKnee.current || !leftKnee.current) return;
+    if (!figure.current || !torso.current || !pelvis.current || !rightElbow.current || !leftElbow.current || !rightAnkle.current || !leftAnkle.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current || !rightLeg.current || !leftLeg.current || !rightKnee.current || !leftKnee.current) return;
     const time = clock.elapsedTime;
     const still = reducedMotion || !active;
     const pose = expressions[mood];
@@ -234,22 +247,33 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     gait.current.amount = still ? 0 : MathUtils.damp(gait.current.amount, targetAmount, targetAmount > gait.current.amount ? 12 : 7, step);
     if (Math.abs(velocity) > 22) gait.current.direction = ease(gait.current.direction, Math.sign(velocity));
     const walk = gait.current.amount * (1 - flying);
-    if (walk > 0.005) gait.current.phase += step * (5 + 7 * walk);
+    if (gait.current.amount > .005) gait.current.phase += step * (7 + 7 * gait.current.amount);
     const stride = Math.sin(gait.current.phase);
-    const oppositeStride = -stride;
-    const arriving = !still && !interacting && motion && motion.arrivedAt > 0 && now - motion.arrivedAt < 4200 && walk < 0.12 && mood !== "wave" && mood !== "grateful";
-    const breath = still ? 0 : Math.sin(time * 1.8) * 0.012;
-    figure.current.position.y = breath * (1 - walk) + (1 - Math.cos(gait.current.phase * 2)) * 0.024 * walk;
-    figure.current.position.x = still ? 0 : stride * 0.024 * walk;
-    figure.current.rotation.y = ease(figure.current.rotation.y, -0.11 + gait.current.direction * (0.78 * walk + .58 * flying));
-    figure.current.rotation.z = ease(figure.current.rotation.z, stride * 0.033 * walk - gait.current.direction * .24 * flying);
-    rightLeg.current.rotation.x = ease(rightLeg.current.rotation.x, stride * .72 * walk + .32 * flying);
-    leftLeg.current.rotation.x = ease(leftLeg.current.rotation.x, oppositeStride * .72 * walk - .18 * flying);
-    rightKnee.current.rotation.x = ease(rightKnee.current.rotation.x, Math.max(0, -stride) * .95 * walk + .7 * flying);
-    leftKnee.current.rotation.x = ease(leftKnee.current.rotation.x, Math.max(0, -oppositeStride) * .95 * walk + .9 * flying);
-    head.current.rotation.z = ease(head.current.rotation.z, pose.tilt);
-    head.current.rotation.y = ease(head.current.rotation.y, arriving ? pointDirection * .26 : pose.turn - gait.current.direction * .26 * walk);
-    head.current.rotation.x = ease(head.current.rotation.x, mood === "grateful" ? 0.08 : -0.025);
+    const locomotion = sampleAvatarStride(gait.current.phase, gait.current.amount);
+    const direction = gait.current.direction;
+    const arriving = !still && !interacting && motion && motion.arrivedAt > 0 && now - motion.arrivedAt < 4200 && walk < .12 && flying < .1 && mood !== "wave" && mood !== "grateful";
+    const breath = still ? 0 : Math.sin(time * 1.8) * .012;
+    const flightFlutter = still ? 0 : Math.sin(time * 3.2) * .022 * flying;
+    figure.current.position.y = breath * (1 - walk) * (1 - flying) + locomotion.bodyY * walk + .025 * flying;
+    figure.current.position.x = ease(figure.current.position.x, stride * .014 * walk);
+    figure.current.rotation.y = ease(figure.current.rotation.y, -.11 + direction * (1.02 * walk + 1.13 * flying));
+    figure.current.rotation.x = ease(figure.current.rotation.x, .38 * flying);
+    figure.current.rotation.z = ease(figure.current.rotation.z, stride * .026 * walk - direction * (.14 + flightFlutter) * flying);
+    figure.current.scale.setScalar(1 - .035 * flying);
+    pelvis.current.rotation.y = ease(pelvis.current.rotation.y, stride * .13 * walk);
+    pelvis.current.rotation.z = ease(pelvis.current.rotation.z, -stride * .025 * walk);
+    torso.current.rotation.y = ease(torso.current.rotation.y, -stride * .105 * walk);
+    torso.current.rotation.x = ease(torso.current.rotation.x, (.07 + locomotion.running * .09) * walk);
+    torso.current.rotation.z = ease(torso.current.rotation.z, stride * .016 * walk);
+    rightLeg.current.rotation.x = locomotion.right.hip * walk + (.28 + flightFlutter) * flying;
+    leftLeg.current.rotation.x = locomotion.left.hip * walk + (.18 - flightFlutter) * flying;
+    rightKnee.current.rotation.x = locomotion.right.knee * walk + .42 * flying;
+    leftKnee.current.rotation.x = locomotion.left.knee * walk + .63 * flying;
+    rightAnkle.current.rotation.x = locomotion.right.ankle * walk + .28 * flying;
+    leftAnkle.current.rotation.x = locomotion.left.ankle * walk + .2 * flying;
+    head.current.rotation.z = ease(head.current.rotation.z, pose.tilt * (1 - flying) - stride * .012 * walk);
+    head.current.rotation.y = ease(head.current.rotation.y, arriving ? pointDirection * .26 : pose.turn - direction * .24 * walk);
+    head.current.rotation.x = ease(head.current.rotation.x, (mood === "grateful" ? .08 : -.025) - .2 * flying - .06 * walk);
     const blinkCycle = time % 5.2;
     const blink = !still && blinkCycle > 4.94 ? Math.max(0.09, Math.abs(blinkCycle - 5.07) / 0.13) : 1;
     eyes.current.scale.y = blink * (mood === "proud" || mood === "grateful" ? 0.85 : 1);
@@ -259,11 +283,16 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     brows.current.position.y = ease(brows.current.position.y, mood === "curious" ? 0.055 : mood === "wave" ? 0.026 : 0);
     mouth.current.scale.y = ease(mouth.current.scale.y, pose.smile);
     mouth.current.scale.x = ease(mouth.current.scale.x, mood === "proud" ? 1.12 : 1);
-    const wave = !still && mood === "wave" ? Math.sin(time * 7) * 0.16 : 0;
-    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection < 0 ? -1.28 : pose.rightArm + wave, -.18, walk), -1.46, flying));
-    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(arriving ? -.14 : pose.armX, oppositeStride * .8, walk), -.3, flying));
-    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection > 0 ? 1.28 : pose.leftArm, .18, walk), 1.46, flying));
-    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, stride * .8, walk), -.3, flying));
+    const wave = !still && mood === "wave" ? Math.sin(time * 7) * .16 : 0;
+    const armSwing = .38 + .22 * locomotion.running;
+    const armPhase = Math.cos(gait.current.phase);
+    const elbowBend = .38 + .55 * locomotion.running;
+    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection < 0 ? -1.28 : pose.rightArm + wave, -.12, walk), -.12, flying));
+    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(arriving ? -.14 : pose.armX, armPhase * armSwing, walk), -1.65, flying));
+    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection > 0 ? 1.28 : pose.leftArm, .12, walk), .19, flying));
+    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, -armPhase * armSwing, walk), -1.44, flying));
+    rightElbow.current.rotation.x = ease(rightElbow.current.rotation.x, MathUtils.lerp(-elbowBend * walk - Math.max(0, -armPhase) * .14 * walk, -.18, flying));
+    leftElbow.current.rotation.x = ease(leftElbow.current.rotation.x, MathUtils.lerp(-elbowBend * walk - Math.max(0, armPhase) * .14 * walk, -.3, flying));
     if (!ready.current) {
       ready.current = true;
       onReady?.();
@@ -277,20 +306,25 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
         <meshBasicMaterial color="#101927" transparent opacity={0.13} depthWrite={false} />
       </mesh>
       <group ref={figure}>
+      <group ref={pelvis}>
       {[-1, 1].map((side) => (
         <group key={side} ref={side < 0 ? rightLeg : leftLeg} position={[side * 0.155, -0.68, 0]}>
           <mesh position={[0, -0.05, 0]}><capsuleGeometry args={[0.103, 0.105, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
           <group ref={side < 0 ? rightKnee : leftKnee} position={[0, -0.205, 0]}>
           <mesh position={[0, -0.078, 0]}><capsuleGeometry args={[0.096, 0.085, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
-          <RoundedBox args={[0.25, 0.14, 0.37]} radius={0.065} smoothness={3} position={[0, -0.215, 0.07]}>
+          <group ref={side < 0 ? rightAnkle : leftAnkle} position={[0, -0.205, 0]}>
+          <RoundedBox args={[0.25, 0.14, 0.37]} radius={0.065} smoothness={3} position={[0, -0.01, 0.07]}>
             <meshStandardMaterial color="#eee9df" roughness={0.56} />
           </RoundedBox>
-          <RoundedBox args={[0.255, 0.041, 0.374]} radius={0.016} smoothness={2} position={[0, -0.271, 0.07]}>
+          <RoundedBox args={[0.255, 0.041, 0.374]} radius={0.016} smoothness={2} position={[0, -0.066, 0.07]}>
             <meshStandardMaterial color="#b7c2ce" roughness={0.65} />
           </RoundedBox>
           </group>
+          </group>
         </group>
       ))}
+      </group>
+      <group ref={torso}>
       <Pebble position={[0, -0.34, 0]} scale={[0.365, 0.415, 0.23]} color={JACKET} />
       <RoundedBox args={[0.145, 0.49, 0.027]} radius={0.025} smoothness={3} position={[0, -0.32, 0.221]}>
         <meshStandardMaterial color="#e5e2d6" roughness={0.88} />
@@ -302,8 +336,8 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
       </RoundedBox>
       <Stroke points={[[0.212, -0.198, 0.211], [0.224, -0.210, 0.211], [0.245, -0.185, 0.205]]} radius={0.006} color="#163d2c" />
       <Pebble position={[0, 0.08, 0]} scale={[0.15, 0.19, 0.14]} color={SKIN} />
-      <group ref={rightArm} position={[-0.31, -0.085, 0]}><Arm /></group>
-      <group ref={leftArm} position={[0.31, -0.085, 0]}><Arm /></group>
+      <group ref={rightArm} position={[-0.31, -0.085, 0]}><Arm elbow={rightElbow} /></group>
+      <group ref={leftArm} position={[0.31, -0.085, 0]}><Arm elbow={leftElbow} /></group>
       <group ref={head} position={[0, 0.65, 0]}>
         <mesh geometry={geometries.face}><meshPhysicalMaterial color={SKIN} roughness={0.66} clearcoat={0.07} /></mesh>
         <mesh geometry={geometries.cap}><meshStandardMaterial color={HAIR} roughness={0.56} /></mesh>
@@ -343,6 +377,7 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
           <Stroke points={[[-0.076, 0, 0.014], [0, -0.019, 0.029], [0.076, 0, 0.014]]} radius={0.009} color="#fff2db" />
         </group>
         <Pebble position={[0, -0.398, 0.398]} scale={[0.053, 0.055, 0.024]} color="#252934" />
+      </group>
       </group>
       </group>
     </group>

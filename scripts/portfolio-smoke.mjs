@@ -174,6 +174,8 @@ try {
     "true",
   );
   await page.goto(base, { waitUntil: "networkidle" });
+  await page.waitForFunction(() => document.querySelectorAll('.chapter-device[data-scene-ready="true"]').length === 2);
+  assert.equal(await page.locator(".chapter-device").evaluateAll(stages => stages.every(stage => stage.getBoundingClientRect().top > innerHeight)), true, "both device scenes are warmed before visitors leave the hero");
   const desktopGuide = page.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true });
   const desktopCard = page.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });
   await desktopGuide.hover();
@@ -238,12 +240,12 @@ try {
   await page.getByRole("link", { name: "about()", exact: true }).click();
   await page.waitForFunction(
     () =>
-      document.querySelector("#mobile-work .device-canvas")?.style.opacity ===
+      document.querySelector("#mobile-work .device-render-stage")?.style.opacity ===
       "0",
   );
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForFunction(() =>
-    Array.from(document.querySelectorAll(".device-canvas")).every(
+    Array.from(document.querySelectorAll(".device-render-stage")).every(
       (el) =>
         getComputedStyle(el).opacity === "1" &&
         getComputedStyle(el).transform === "none",

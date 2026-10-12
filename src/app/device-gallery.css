@@ -121,3 +121,41 @@
   color: var(--stage-accent); font: 10px/1.5 var(--font-mono); letter-spacing: .015em;
   pointer-events: none;
 }
+
+/* Keep the same product silhouette on screen while a cold GPU is prepared. */
+.device-render-stage, .device-preview-layer { position: absolute; inset: 0; }
+.device-render-stage { pointer-events: none; will-change: transform; }
+.device-preview-layer { container-type: size; opacity: 1; transition: opacity 220ms ease; }
+.device-preview-layer[data-covered="true"] { opacity: 0; visibility: hidden; transition: opacity 220ms ease, visibility 0s 220ms; }
+.device-render-stage .device-canvas { opacity: 1; transition: opacity 220ms ease; }
+.device-render-stage .device-canvas[data-ready="false"] { opacity: 0; visibility: visible; }
+.device-preview { position: absolute; inset: 0; display: grid; place-items: center; perspective: 1400px; }
+.preview-hardware { position: relative; transform-style: preserve-3d; }
+.preview-laptop .preview-hardware { width: min(84cqw, 116cqh); aspect-ratio: 1.35; }
+.preview-laptop-lid { position: absolute; inset: 0 0 7%; padding: 1.25%; border-radius: 2.8% 2.8% 1.2% 1.2%; background: linear-gradient(130deg,#c3c6c8,#7d8387 54%,#e5e7e7); border: 1px solid #d7dcde; transform-origin: 50% 100%; transform-style: preserve-3d; box-shadow: 0 1px 0 #555d62; }
+.preview-laptop-display { position: relative; height: 100%; background: #080b10; border: 4px solid #080b10; border-bottom-width: 9px; border-radius: 2%; overflow: hidden; }
+.preview-notch { position: absolute; top: 0; left: 45%; width: 10%; height: 4%; border-radius: 0 0 3px 3px; background: #080b10; }
+.preview-notch::after { content: ""; position: absolute; width: 3px; height: 3px; top: 25%; left: 50%; border-radius: 50%; background: #354652; }
+.preview-laptop-deck { position: absolute; bottom: 2%; left: -3.5%; width: 107%; height: 6%; border-radius: 2px 2px 30% 30%; background: linear-gradient(#d2d5d7 0%,#a5abad 50%,#747b81 55%,#b9bdc0 95%); box-shadow: 0 12px 28px #0004; }
+.preview-laptop-deck > i { position: absolute; left: 43%; width: 14%; top: 0; height: 28%; border-radius: 0 0 8px 8px; background: #8c959c; }
+.preview-laptop-deck > b { position: absolute; left: 10%; right: 10%; bottom: -2px; height: 2px; background: #454d51; border-radius: 50%; }
+.preview-phone .preview-hardware { height: min(86cqh, 172cqw); aspect-ratio: 71.45 / 149.61; }
+.preview-phone-front, .preview-phone-back { position: absolute; inset: 0; border: 2px solid #bab7ae; border-radius: 22% / 10.5%; backface-visibility: hidden; }
+.preview-phone-front { padding: 2%; background: #0b0e0e; box-shadow: inset 1px 0 0 #eee8de, 0 15px 35px #0003; }
+.preview-phone-display { position: relative; width: 100%; height: 100%; border-radius: 20% / 9.5%; background: #080b10; overflow: hidden; }
+.preview-island { position: absolute; top: 2.8%; left: 33.5%; width: 33%; height: 3.3%; background: #050706; border-radius: 100px; }
+.preview-home { position: absolute; bottom: 1.4%; left: 34%; width: 32%; height: .6%; background: #aaa; border-radius: 100px; }
+.preview-phone-back { transform: rotateY(180deg); background: linear-gradient(110deg,#bab7af,#8e8e85); box-shadow: inset 0 0 1px 1px #e4e2d9; }
+.preview-camera-plate { position: absolute; top: 4%; left: 7%; width: 53%; height: 26%; border: 1px solid #c4c1b8; border-radius: 21%; background: #a5a198; box-shadow: 1px 2px 4px #494c474a; }
+.preview-camera-plate > i { position: absolute; width: 38%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 42% 40%,#3f5260 0 5%,#060f15 8% 30%,#10212b 32% 46%,#090f11 47% 60%,#6a6d66 62% 73%,#c3c2b6 75% 80%,#30332f 83%); box-shadow: 1px 2px 3px #4446; }
+.preview-camera-plate > i:nth-child(1) { top: 5%; left: 6%; }
+.preview-camera-plate > i:nth-child(2) { bottom: 5%; left: 6%; }
+.preview-camera-plate > i:nth-child(3) { top: 31%; right: 5%; }
+.preview-camera-plate > b { position: absolute; top: 9%; right: 14%; width: 12%; aspect-ratio: 1; border-radius: 50%; background: #e8e1d0; }
+.preview-phone-button { position: absolute; right: -1%; top: 30%; width: 1.5%; height: 13%; border-radius: 3px; background: #b5b2a9; }
+@media(prefers-reduced-motion:reduce) {
+  .device-render-stage { will-change: auto; }
+  .device-preview-layer, .device-render-stage .device-canvas { transition: none; }
+}
+
+.device-preview-note { position: absolute; bottom: 10px; left: 12%; right: 12%; text-align: center; color: #d0d5ce; font: 11px/1.6 var(--font-mono); }

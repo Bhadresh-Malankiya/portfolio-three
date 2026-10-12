@@ -106,6 +106,7 @@ function Companion({ pathname }: { pathname: string }) {
       dockElement?.style.setProperty("--companion-progress", String(progress));
       let next = initialChapter;
       const readingLine = Math.min(window.innerHeight * 0.35, 260);
+      if (chapters.some(item => !item.element.isConnected)) collect();
       for (const item of chapters) {
         if (item.element.getBoundingClientRect().top <= readingLine) next = item.chapter;
       }
@@ -208,16 +209,22 @@ function Companion({ pathname }: { pathname: string }) {
       const fromY = y.get();
       const crossing = Math.abs(distance) >= 8;
       element.dataset.travelling = crossing ? "true" : "false";
-      const duration = crossing ? Math.min(1.7, Math.max(1.05, Math.abs(distance) / 900)) : .65;
+      const duration = crossing ? Math.min(2.4, Math.max(1.6, Math.abs(distance) / 620)) : .65;
       const lift = crossing ? Math.min(44, viewport.height * .055) : 0;
+      let previousX = fromX;
+      let previousTime = performance.now();
       controls = animate(0, 1, {
         duration,
         ease: [0.4, 0, 0.25, 1],
         onUpdate: (progress) => {
-          x.set(fromX + distance * progress);
+          const nextX = fromX + distance * progress;
+          const now = performance.now();
+          state.journeyVelocity = crossing ? Math.max(-1800, Math.min(1800, (nextX - previousX) / Math.max(1, now - previousTime) * 1000)) : 0;
+          previousX = nextX;
+          previousTime = now;
+          x.set(nextX);
           y.set(fromY + (target.y - fromY) * progress - Math.sin(progress * Math.PI) * lift);
           state.flight = crossing ? Math.sin(progress * Math.PI) ** 2 : 0;
-          state.journeyVelocity = crossing ? Math.sign(distance) * 1100 * Math.sin(progress * Math.PI) : 0;
           element.dataset.flying = state.flight > .3 ? "true" : "false";
           element.style.setProperty("--companion-flight", String(state.flight));
         },

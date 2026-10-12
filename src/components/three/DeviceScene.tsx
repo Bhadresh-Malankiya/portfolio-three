@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Environment,
@@ -216,6 +216,10 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
       loader.load(source, prepare, undefined, reject);
     });
     cache.set(source, request);
+    // A failed background request must remain retryable when selected later.
+    void request.catch(() => {
+      if (cache.get(source) === request) cache.delete(source);
+    });
     return request;
   }
   return { shader, load, activate: () => { disposed = false; }, dispose: () => {
@@ -278,13 +282,25 @@ function Screen({
       }
       invalidate();
     }).catch(() => {
-      if (current && !transition.current.ready) onUnavailable();
+      // Never leave the previous product on the display beneath a new caption.
+      if (current) onUnavailable();
     });
     return () => { current = false; };
   }, [src, resources, invalidate, onReady, onUnavailable]);
   useEffect(() => {
-    // Pre-upload every screen so a project change never suspends the hardware.
-    images.forEach((source) => { void resources.load(source).catch(() => undefined); });
+    // Native screenshots can be large. Two workers warm the library without
+    // a burst of image decoding and GPU uploads competing with the hero.
+    let mounted = true;
+    let index = 0;
+    async function warmScreens() {
+      while (mounted && index < images.length) {
+        const source = images[index++];
+        await resources.load(source).catch(() => undefined);
+      }
+    }
+    void warmScreens();
+    void warmScreens();
+    return () => { mounted = false; };
   }, [images, resources]);
   useFrame((_, delta) => {
     const state = transition.current;
@@ -557,52 +573,9 @@ function Phone({ image, images, onReady, onUnavailable }: Pick<Props, "image" | 
   </group>;
 }
 
-function Scene({
-  kind,
-  image,
-  images,
-  progress,
-  animated,
-  visible,
-  onReady,
-  onUnavailable,
-}: Props) {
-  const group = useRef<Group>(null);
-  const hinge = useRef<Group>(null);
-  const invalidate = useThree((s) => s.invalidate);
-  const camera = useThree((s) => s.camera);
-  const size = useThree((s) => s.size);
-  const gl = useThree((s) => s.gl);
-  useEffect(() => {
-    if (!(camera instanceof PerspectiveCamera)) return;
-    fitDeviceCamera(camera, kind, size.width, size.height);
-    invalidate();
-  }, [camera, size.width, size.height, kind, invalidate]);
-  useEffect(() => {
-    if (!visible) return;
-    invalidate();
-    return progress.on("change", () => invalidate());
-  }, [progress, invalidate, visible, animated]);
-  useEffect(() => {
-    const lost = (event: Event) => {
-      event.preventDefault();
-      onUnavailable();
-    };
-    const canvas = gl.domElement;
-    canvas.addEventListener("webglcontextlost", lost);
-    return () => canvas.removeEventListener("webglcontextlost", lost);
-  }, [gl, onUnavailable]);
-  useFrame(() => {
-    if (!group.current) return;
-    const pose = devicePose(progress.get(), kind === "phone", animated);
-    group.current.position.y = pose.lift;
-    group.current.rotation.y = pose.rotationY;
-    group.current.rotation.z = pose.rotationZ;
-    group.current.scale.setScalar(pose.scale);
-    if (hinge.current) hinge.current.rotation.x = pose.hinge;
-  });
-  return (
-    <>
+// Keep the one-shot environment capture stable when captions/screens change.
+const StudioLighting = memo(function StudioLighting() {
+  return <>
       <ambientLight intensity={0.45} />
       <directionalLight position={[-3, 6, 4]} intensity={2.2} color="#f4f5fa" />
       <directionalLight position={[4, 1, -3]} intensity={2} color="#d0d8e2" />
@@ -636,11 +609,82 @@ function Scene({
           target={[0, 0, 0]}
         />
       </Environment>
+  </>;
+});
+
+function Scene({
+  kind,
+  image,
+  images,
+  progress,
+  animated,
+  visible,
+  onReady,
+  onUnavailable,
+}: Props) {
+  const group = useRef<Group>(null);
+  const [screenReady, setScreenReady] = useState(false);
+  const screenAvailable = useCallback(() => setScreenReady(true), []);
+  const compiled = useRef(false);
+  const scene = useThree((state) => state.scene);
+  const hinge = useRef<Group>(null);
+  const invalidate = useThree((s) => s.invalidate);
+  const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    if (!(camera instanceof PerspectiveCamera)) return;
+    fitDeviceCamera(camera, kind, size.width, size.height);
+    invalidate();
+  }, [camera, size.width, size.height, kind, invalidate]);
+  useEffect(() => {
+    if (!visible) return;
+    invalidate();
+    return progress.on("change", () => invalidate());
+  }, [progress, invalidate, visible, animated]);
+  useEffect(() => {
+    if (!screenReady || compiled.current || size.width <= 1 || size.height <= 1) return;
+    let mounted = true;
+    let readyFrame = 0;
+    // Compile every material while the scene is still covered by its preview.
+    // A real paint also uploads geometry and builds the environment's PMREM map.
+    void gl.compileAsync(scene, camera).then(() => {
+      if (!mounted) return;
+      gl.render(scene, camera);
+      readyFrame = requestAnimationFrame(() => {
+        if (!mounted) return;
+        compiled.current = true;
+        onReady();
+      });
+    }).catch(() => { if (mounted) onUnavailable(); });
+    return () => { mounted = false; cancelAnimationFrame(readyFrame); };
+  }, [screenReady, gl, scene, camera, size.width, size.height, onReady, onUnavailable]);
+  useEffect(() => {
+    const lost = (event: Event) => {
+      event.preventDefault();
+      onUnavailable();
+    };
+    const canvas = gl.domElement;
+    canvas.addEventListener("webglcontextlost", lost);
+    return () => canvas.removeEventListener("webglcontextlost", lost);
+  }, [gl, onUnavailable]);
+  useFrame(() => {
+    if (!group.current) return;
+    const pose = devicePose(progress.get(), kind === "phone", animated);
+    group.current.position.y = pose.lift;
+    group.current.rotation.y = pose.rotationY;
+    group.current.rotation.z = pose.rotationZ;
+    group.current.scale.setScalar(pose.scale);
+    if (hinge.current) hinge.current.rotation.x = pose.hinge;
+  });
+  return (
+    <>
+      <StudioLighting />
       <group ref={group}>
         {kind === "laptop" ? (
-          <Laptop image={image} images={images} hinge={hinge} onReady={onReady} onUnavailable={onUnavailable} />
+          <Laptop image={image} images={images} hinge={hinge} onReady={screenAvailable} onUnavailable={onUnavailable} />
         ) : (
-          <Phone image={image} images={images} onReady={onReady} onUnavailable={onUnavailable} />
+          <Phone image={image} images={images} onReady={screenAvailable} onUnavailable={onUnavailable} />
         )}
       </group>
     </>
@@ -649,10 +693,16 @@ function Scene({
 
 export default function DeviceScene(props: Props) {
   const phone = props.kind === "phone";
+  const [prepared, setPrepared] = useState(false);
+  const { onReady } = props;
+  const completePreparation = useCallback(() => {
+    setPrepared(true);
+    onReady();
+  }, [onReady]);
 
   return (
     <Canvas
-      frameloop={props.visible ? "demand" : "never"}
+      frameloop={props.visible || !prepared ? "demand" : "never"}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       camera={{
@@ -662,7 +712,7 @@ export default function DeviceScene(props: Props) {
       onCreated={({ camera }) => camera.lookAt(0, phone ? 0 : 0.35, 0)}
     >
       <Suspense fallback={null}>
-        <Scene {...props} />
+        <Scene {...props} onReady={completePreparation} />
       </Suspense>
     </Canvas>
   );

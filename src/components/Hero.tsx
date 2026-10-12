@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
 import { scrollToPosition } from "@/components/SmoothScroll";
+import { flightStops as stops, flightScrollStops as scrollStops, flightTimelineProgress as timelineProgress, flightChapterAt as chapterAt } from "@/lib/hero-flight";
 import "@/app/hero-story.css";
 
 const PaperPlaneScene = dynamic(() => import("@/components/three/PaperPlaneScene"), { ssr: false });
@@ -18,21 +19,6 @@ function subscribe(callback: () => void) {
 }
 const pinnedSnapshot = () => window.matchMedia(pinnedQuery).matches;
 const serverSnapshot = () => false;
-const stops = [.08, .5, .86];
-const scrollStops = [.09, .48, .91];
-const scrollTimeline = [0, .18, .38, .58, .82, 1];
-const sceneTimeline = [.08, .08, .5, .5, .86, .86];
-function timelineProgress(value: number) {
-  for (let i = 1; i < scrollTimeline.length; i += 1) {
-    if (value <= scrollTimeline[i]) {
-      const t = Math.max(0, (value - scrollTimeline[i - 1]) / (scrollTimeline[i] - scrollTimeline[i - 1]));
-      return sceneTimeline[i - 1] + t * (sceneTimeline[i] - sceneTimeline[i - 1]);
-    }
-  }
-  return sceneTimeline[sceneTimeline.length - 1];
-}
-// Copy changes after the fold and after the aircraft morph have completed.
-const chapterAt = (value: number) => value < .32 ? 0 : value < .84 ? 1 : 2;
 const acts = [
   { label: "Find the question", short: "Sketch it", title: "First, a question.", detail: "I find the problem worth solving.", word: "QUESTION" },
   { label: "Make the pieces work", short: "Make it work", title: "Then, something that works.", detail: "Frontend. Backend. AI. One working product.", word: "BUILD" },
@@ -58,10 +44,12 @@ export default function Hero() {
   const [act, setAct] = useState(0);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const rawProgress = useMotionValue(stops[0]);
+  const rawProgress = useMotionValue<number>(stops[0]);
   const springProgress = useSpring(rawProgress, { stiffness: 180, damping: 31, mass: .65 });
   const progress = reduced ? rawProgress : springProgress;
   const routeProgress = useTransform(progress, [.08, .86], [0, 1]);
+  const routeOpacity = useTransform(progress, [.08, .5, .86], [.5, .3, 0]);
+  const gridOpacity = useTransform(progress, [.08, .86], [.65, .08]);
   const horizonY = useTransform(progress, [.08, .5, .86], [26, 0, -24]);
   const horizonScale = useTransform(progress, [.08, .86], [1, 1.08]);
   const currentOpacity = useTransform(progress, [.08, .5, .86], [.3, .7, 1]);
@@ -112,12 +100,11 @@ export default function Hero() {
         <h1><span>Ideas don’t</span><em>ship themselves<span className="flight-fullstop">.</span></em></h1>
       </header>
       <div className="flight-stage" role="img" aria-label={`A paper plane becoming an aircraft: ${acts[act].label.toLowerCase()}`}>
-        <div className="flight-stage-grid" aria-hidden="true" />
-        <svg className="flight-path" viewBox="0 0 1200 420" fill="none" aria-hidden="true">
-          <path className="flight-pencil-line" d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" />
-          <motion.path d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" stroke="#d6ad78" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : routeProgress }} />
-          <path d="m1094 70 22 16-21 17M55 309v22m-11-11h22" stroke="#aca797" strokeWidth="1" />
-        </svg>
+        <motion.div className="flight-stage-grid" aria-hidden="true" style={{ opacity: reduced ? .2 : gridOpacity }} />
+        <motion.svg className="flight-path" viewBox="0 0 1200 420" fill="none" aria-hidden="true" style={{ opacity: reduced ? .2 : routeOpacity }}>
+          <path className="flight-pencil-line" d="M85 315C350 315 550 245 740 200S1030 145 1120 95" />
+          <motion.path d="M85 315C350 315 550 245 740 200S1030 145 1120 95" stroke="#d6ad78" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : routeProgress }} />
+        </motion.svg>
         <div className="flight-object" data-ready={ready && !failed}>
           <PlaneSketch />
           {!failed && <FlightBoundary onError={onUnavailable}><PaperPlaneScene progress={progress} reducedMotion={!!reduced} active={activeInView} onReady={onReady} onUnavailable={onUnavailable} /></FlightBoundary>}

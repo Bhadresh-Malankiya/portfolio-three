@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
   Component,
   useCallback,
+  useEffect,
+  startTransition,
   useRef,
   useState,
   useSyncExternalStore,
@@ -22,6 +23,8 @@ import {
 } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
 import { DEVICE_TIMELINE, PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
+import DevicePreview from "@/components/DevicePreview";
+import { scheduleDevicePreparation } from "@/lib/device-preparation";
 import ProductScenery from "@/components/ProductScenery";
 import WorkArchive from "@/components/WorkArchive";
 import { ScreenshotViewer } from "@/components/ProjectGallery";
@@ -150,10 +153,20 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const inspectTrigger = useRef<HTMLButtonElement>(null);
   const entered = useInView(stage, { margin: "1200px 0px", once: true });
   const visible = useInView(stage, { margin: "150px 0px" });
+  const [prepared, setPrepared] = useState(false);
   const [modelReady, setModelReady] = useState(false);
   const [modelFailed, setModelFailed] = useState(false);
   const showModel = useCallback(() => setModelReady(true), []);
   const loseModel = useCallback(() => setModelFailed(true), []);
+  useEffect(() => {
+    let mounted = true;
+    const cancel = scheduleDevicePreparation(() => {
+      void import("@/components/three/DeviceScene").then(() => {
+        if (mounted) startTransition(() => setPrepared(true));
+      }).catch(() => { if (mounted) loseModel(); });
+    }, mobile ? 220 : 0);
+    return () => { mounted = false; cancel(); };
+  }, [mobile, loseModel]);
   const animated = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
   const reduced = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -205,17 +218,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   function inspectImage() {
     setInspect(true);
   }
-  const fallback = (
-    <div className={`device-poster ${mobile ? "is-phone" : ""}`}>
-      <Image
-        src={image}
-        alt={`${p.name} screenshot`}
-        fill
-        sizes="(min-width: 900px) 650px, 90vw"
-        className="object-contain"
-      />
-    </div>
-  );
+
   return (
     <section
       ref={ref}
@@ -241,9 +244,9 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           </span>
         </div>
         <div className="chapter-layout">
-          <div className="chapter-device" ref={stage} data-ready={modelReady}>
+          <div className="chapter-device" ref={stage} data-ready={modelReady} data-scene-ready={modelReady} data-scene-mounted={prepared || entered}>
             <div className="studio-halo" aria-hidden="true" />
-            {animated && modelReady && <motion.p className="chapter-entry-cue" aria-hidden="true" style={{ opacity: entryHintOpacity }}>
+            {animated && <motion.p className="chapter-entry-cue" aria-hidden="true" style={{ opacity: entryHintOpacity }}>
               <ArrowDown size={15} /> {mobile ? "Scroll to meet Hey Buddy" : "Scroll to open the workspace"}
             </motion.p>}
             <div
@@ -251,38 +254,32 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
               role="img"
               aria-label={`${p.name} on ${mobile ? "an iPhone 16 Pro" : "a 14-inch MacBook Pro"}`}
             >
-              {!modelReady && !modelFailed && (
-                <div className="model-preparing" role="status">
-                  <span aria-hidden="true" />
-                  <small>Preparing the 3D view</small>
+              <motion.div
+                className="device-render-stage"
+                style={animated ? { opacity: deviceOpacity, x: deviceX } : { opacity: 1, x: 0 }}
+              >
+                <div className="device-preview-layer" data-covered={modelReady && !modelFailed}>
+                  <DevicePreview kind={mobile ? "phone" : "laptop"} image={image} progress={sceneProgress} animated={animated} />
                 </div>
-              )}
-              {modelFailed && <div className="model-loading-poster">{fallback}</div>}
-              {entered && !modelFailed && (
-                <motion.div
-                  className="device-canvas"
-                  data-ready={modelReady}
-                  style={
-                    animated && modelReady
-                      ? { opacity: deviceOpacity, x: deviceX }
-                      : { opacity: 1, x: 0 }
-                  }
-                >
-                  <ModelBoundary fallback={fallback} onError={loseModel}>
-                    <DeviceScene
-                      kind={mobile ? "phone" : "laptop"}
-                      images={mobile ? phoneScreens : webScreens}
-                      image={image}
-                      progress={sceneProgress}
-                      animated={animated}
-                      visible={visible}
-                      onReady={showModel}
-                      onUnavailable={loseModel}
-                    />
-                  </ModelBoundary>
-                </motion.div>
-              )}
+                {(prepared || entered) && !modelFailed && (
+                  <div className="device-canvas" data-ready={modelReady}>
+                    <ModelBoundary fallback={null} onError={loseModel}>
+                      <DeviceScene
+                        kind={mobile ? "phone" : "laptop"}
+                        images={mobile ? phoneScreens : webScreens}
+                        image={image}
+                        progress={sceneProgress}
+                        animated={animated}
+                        visible={visible}
+                        onReady={showModel}
+                        onUnavailable={loseModel}
+                      />
+                    </ModelBoundary>
+                  </div>
+                )}
+              </motion.div>
             </div>
+            {modelFailed && <p className="device-preview-note" role="status">Interactive view unavailable. Open the project to explore its screenshots.</p>}
             <motion.div
               className="chapter-screen-controls"
               style={{ opacity: animated ? opacity : 1 }}

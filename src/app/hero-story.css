@@ -6,7 +6,7 @@
   background: #0b111a;
   color: var(--flight-paper);
 }
-.flight-story[data-pinned="true"] { height: 210svh; }
+.flight-story[data-pinned="true"] { height: 320svh; }
 .flight-theatre {
   position: relative;
   isolation: isolate;
@@ -37,7 +37,7 @@
 .flight-heading { position: relative; z-index: 2; padding: clamp(16px, 2.4vh, 30px) 0 8px; text-align: center; pointer-events: none; }
 .flight-byline { margin: 0 0 15px; color: #b7bdc5; font: 10px/1.6 var(--font-mono); letter-spacing: .045em; }
 .flight-byline > span { margin-inline: 12px; color: #787d84; }
-.flight-heading h1 { margin: 0; font: 500 clamp(64px, min(6.7vw, 10.5svh), 112px)/.97 var(--font-sans); letter-spacing: -.067em; }
+.flight-heading h1 { margin: 0; font: 500 clamp(58px, min(6.2vw, 8.6svh), 96px)/.97 var(--font-sans); letter-spacing: -.067em; }
 .flight-heading h1 > span, .flight-heading h1 > em { display: block; }
 .flight-heading h1 em { margin-top: 5px; color: var(--flight-accent); font: italic 400 1.03em/.97 var(--font-fraunces); letter-spacing: -.06em; }
 .flight-fullstop { font-style: normal; }
@@ -52,7 +52,7 @@
 }
 .flight-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .flight-pencil-line { stroke: #c5bfad38; stroke-width: 1; stroke-dasharray: 3 7; }
-.flight-object { position: absolute; inset: 0 8% 15px; }
+.flight-object { position: absolute; inset: 0 2% 15px; }
 .flight-object > div { width: 100%; height: 100%; opacity: 0; }
 .flight-object[data-ready="true"] > div { opacity: 1; }
 .flight-object canvas { display: block; }
@@ -81,7 +81,7 @@
 @media (min-width: 900px) and (max-height: 800px) {
   .flight-theatre { min-height: 710px; padding-top: 86px; padding-bottom: 19px; grid-template-rows: auto auto minmax(225px, 1fr) auto auto; }
   .flight-heading { padding-top: 15px; }
-  .flight-heading h1 { font-size: clamp(60px, 9.9svh, 79px); }
+  .flight-heading h1 { font-size: clamp(56px, 8.6svh, 69px); }
   .flight-byline { margin-bottom: 10px; }
   .flight-bottom { padding-top: 12px; padding-bottom: 13px; }
   .flight-copy { height: 53px; }
