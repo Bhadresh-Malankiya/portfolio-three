@@ -53,14 +53,15 @@ try {
       assert.equal(await page.locator("h1").count(), 1, `${route}: one h1`);
       const expectedGuide = guideLabels[route] ?? "Inside the work";
       await page.waitForFunction(
-        (label) => document.querySelector(".companion-chapter-top > span")?.textContent === label,
+        (label) => document.querySelector(".builder-companion")?.getAttribute("data-section-label") === label,
         expectedGuide,
       );
       assert.equal(
-        await page.locator(".companion-chapter-top > span").textContent(),
+        await page.locator(".builder-companion").getAttribute("data-section-label"),
         expectedGuide,
         `${width}px ${route}: companion describes the current page`,
       );
+      assert.equal(await page.locator(".companion-chapter").count(), 0, "the guide has no persistent bottom chat label");
       if (route === "/" && [390, 1440].includes(width)) {
         await assertCompanionRendered(page, `${width}px: actual 3D companion renders`);
       }

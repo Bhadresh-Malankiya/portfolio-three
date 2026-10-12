@@ -47,7 +47,7 @@ class FlightBoundary extends Component<{ children: ReactNode; onError: () => voi
 }
 
 function PlaneSketch() {
-  return <svg viewBox="0 0 800 370" className="flight-fallback" aria-hidden="true"><path d="M145 210 668 65 454 315 371 211 145 210Z" fill="#ecebe2" stroke="#adb4a3" strokeWidth="2" /><path d="m668 65-297 146 35 94 48 10Z" fill="#c6d4f3" /><path d="m145 210 264 32 259-177-297 146Z" fill="#fffdf2" /><path d="m371 211 38 31-3 63Z" fill="#354eab" /><path d="m145 210 523-145-259 177M371 211l297-146M409 242l45 73" fill="none" stroke="#9fa8a0" strokeWidth="1.2" /></svg>;
+  return <svg viewBox="0 0 800 370" className="flight-fallback" aria-hidden="true"><path d="M145 210 668 65 454 315 371 211 145 210Z" fill="#eee9de" stroke="#b8b4ac" strokeWidth="2" /><path d="m668 65-297 146 35 94 48 10Z" fill="#8994a0" /><path d="m145 210 264 32 259-177-297 146Z" fill="#fffaf0" /><path d="m371 211 38 31-3 63Z" fill="#34404d" /><path d="m145 210 523-145-259 177M371 211l297-146M409 242l45 73" fill="none" stroke="#d6ad78" strokeWidth="1.2" /></svg>;
 }
 
 export default function Hero() {
@@ -62,6 +62,9 @@ export default function Hero() {
   const springProgress = useSpring(rawProgress, { stiffness: 180, damping: 31, mass: .65 });
   const progress = reduced ? rawProgress : springProgress;
   const routeProgress = useTransform(progress, [.08, .86], [0, 1]);
+  const horizonY = useTransform(progress, [.08, .5, .86], [26, 0, -24]);
+  const horizonScale = useTransform(progress, [.08, .86], [1, 1.08]);
+  const currentOpacity = useTransform(progress, [.08, .5, .86], [.3, .7, 1]);
   const { scrollYProgress } = useScroll({ target: story, offset: ["start start", "end end"] });
   useMotionValueEvent(scrollYProgress, "change", value => { if (pinned) rawProgress.set(timelineProgress(value)); });
   useMotionValueEvent(progress, "change", value => {
@@ -81,8 +84,28 @@ export default function Hero() {
       rawProgress.set(stops[index]);
     }
   }
-  return <section ref={story} id="hero" className="flight-story" data-pinned={pinned} data-act={act} aria-label="From a question to a working product">
+  return <section ref={story} id="hero" className="flight-story" data-pinned={pinned} data-act={act} data-active={activeInView} aria-label="From a question to a working product">
     <div className="flight-theatre">
+      <motion.div className="flight-atmosphere" aria-hidden="true" style={{ y: reduced ? 0 : horizonY, scale: reduced ? 1 : horizonScale }}>
+        <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none">
+          <defs>
+            <linearGradient id="flight-horizon-wash" x1="720" y1="390" x2="720" y2="850" gradientUnits="userSpaceOnUse"><stop stopColor="#b58b57" stopOpacity=".12" /><stop offset=".5" stopColor="#324456" stopOpacity=".1" /><stop offset="1" stopColor="#0b111a" stopOpacity="0" /></linearGradient>
+            <linearGradient id="flight-horizon-edge" x1="0" y1="530" x2="1440" y2="440" gradientUnits="userSpaceOnUse"><stop stopColor="#d6ad78" stopOpacity="0" /><stop offset=".55" stopColor="#d6ad78" stopOpacity=".5" /><stop offset="1" stopColor="#e7dccb" stopOpacity="0" /></linearGradient>
+          </defs>
+          <path d="M-100 595C250 540 400 484 715 477S1200 464 1540 337V950H-100Z" fill="url(#flight-horizon-wash)" />
+          <path d="M-100 595C250 540 400 484 715 477S1200 464 1540 337" stroke="url(#flight-horizon-edge)" strokeWidth="1.2" />
+          <g className="flight-air-contours">
+            <path d="M-100 639C241 557 445 505 727 493S1252 451 1540 317" />
+            <path d="M-100 698C226 586 448 537 744 511S1310 442 1540 295" />
+            <path d="M-100 775C214 624 491 565 763 532S1328 438 1540 269" />
+            <path d="M-100 875C187 682 504 601 787 558S1370 435 1540 235" />
+          </g>
+          <motion.g className="flight-air-currents" style={{ opacity: reduced ? .5 : currentOpacity }}>
+            <path d="M-100 639C241 557 445 505 727 493S1252 451 1540 317" pathLength="100" />
+            <path d="M-100 775C214 624 491 565 763 532S1328 438 1540 269" pathLength="100" />
+          </motion.g>
+        </svg>
+      </motion.div>
       <div className="flight-rule" aria-hidden="true"><span>BH / 01</span><i /><span>IDEA → REALITY</span></div>
       <header className="flight-heading">
         <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span aria-hidden="true">/</span> Forward Deployed Engineer</motion.p>
@@ -92,8 +115,8 @@ export default function Hero() {
         <div className="flight-stage-grid" aria-hidden="true" />
         <svg className="flight-path" viewBox="0 0 1200 420" fill="none" aria-hidden="true">
           <path className="flight-pencil-line" d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" />
-          <motion.path d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" stroke="#d7eea8" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : routeProgress }} />
-          <path d="m1094 70 22 16-21 17M55 309v22m-11-11h22" stroke="#aab995" strokeWidth="1" />
+          <motion.path d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" stroke="#d6ad78" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : routeProgress }} />
+          <path d="m1094 70 22 16-21 17M55 309v22m-11-11h22" stroke="#aca797" strokeWidth="1" />
         </svg>
         <div className="flight-object" data-ready={ready && !failed}>
           <PlaneSketch />

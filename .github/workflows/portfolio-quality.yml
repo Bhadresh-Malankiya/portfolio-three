@@ -26,6 +26,8 @@ jobs:
       - run: npx tsc --noEmit
       - name: Contact delivery and validation checks
         run: node --experimental-strip-types scripts/contact-test.mjs
+      - name: Companion motion and viewport checks
+        run: node --experimental-strip-types scripts/companion-journey-test.mjs
       - run: npm run build
       - name: Browser regression checks
         run: |

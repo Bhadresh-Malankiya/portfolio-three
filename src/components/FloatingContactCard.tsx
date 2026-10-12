@@ -5,10 +5,10 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Download, Mail, MessageCircle, X } from "lucide-react";
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { ArrowUpLeft, ArrowUpRight, Download, Mail, X } from "lucide-react";
 import { downloads } from "@/data/downloads";
-import { companionChapters, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
+import { companionChapters, companionDestination, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
 import type { CompanionTravel } from "@/components/three/BuilderAvatar";
 import "@/app/companion.css";
 
@@ -21,6 +21,12 @@ function Companion({ pathname }: { pathname: string }) {
   const [chapter, setChapter] = useState<CompanionChapter>(initialChapter);
   const [expanded, setExpanded] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [side, setSide] = useState<"left" | "right">("right");
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
+  const lastViewportWidth = useRef(0);
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
   const [avatarReady, setAvatarReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
@@ -28,13 +34,14 @@ function Companion({ pathname }: { pathname: string }) {
   const dock = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const currentChapter = useRef(initialChapter.id);
+  const currentSide = useRef<"left" | "right">("right");
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const speechTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const suppressFocus = useRef(false);
   const pointerInside = useRef(false);
   const openedByClick = useRef(false);
-  const travel = useRef<CompanionTravel>({ velocity: 0, updatedAt: 0, arrivedAt: 0 });
+  const travel = useRef<CompanionTravel>({ velocity: 0, updatedAt: 0, arrivedAt: 0, flight: 0, journeyVelocity: 0, pointDirection: -1 });
 
   const cancelClose = useCallback(() => clearTimeout(closeTimer.current), []);
   const closeCard = useCallback((restoreFocus = false) => {
@@ -50,16 +57,17 @@ function Companion({ pathname }: { pathname: string }) {
   const showNote = useCallback(() => {
     clearTimeout(speechTimer.current);
     setSpeaking(true);
-    speechTimer.current = setTimeout(() => setSpeaking(false), 5500);
+    speechTimer.current = setTimeout(() => setSpeaking(false), 3200);
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/contact") return;
-    const viewport = window.matchMedia("(max-width: 699px)");
-    const update = () => setCompactContact(viewport.matches);
+    const update = () => {
+      setViewport({ width: window.innerWidth, height: window.innerHeight });
+      setCompactContact(pathname === "/contact" && window.innerWidth < 700);
+    };
     update();
-    viewport.addEventListener("change", update);
-    return () => viewport.removeEventListener("change", update);
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
   }, [pathname]);
 
   useEffect(() => {
@@ -103,9 +111,7 @@ function Companion({ pathname }: { pathname: string }) {
       }
       if (next.id !== currentChapter.current) {
         currentChapter.current = next.id;
-        travelState.arrivedAt = now;
         setChapter(next);
-        if (!reduced && window.matchMedia("(min-width: 700px)").matches) showNote();
       }
     };
     const schedule = () => { if (!frame) frame = window.requestAnimationFrame(measure); };
@@ -125,7 +131,101 @@ function Companion({ pathname }: { pathname: string }) {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", resize);
     };
-  }, [pathname, initialChapter, reduced, showNote]);
+  }, [pathname, initialChapter, reduced]);
+
+  useEffect(() => {
+    const downloads = document.querySelector('button[aria-label="Résumé and book downloads"]');
+    if (!downloads) return;
+    const update = () => setDownloadsOpen(downloads.getAttribute("aria-expanded") === "true");
+    const observer = new MutationObserver(update);
+    observer.observe(downloads, { attributes: true, attributeFilter: ["aria-expanded"] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!viewport.width || !dock.current) return;
+    const element = dock.current;
+    const state = travel.current;
+    let controls: { stop: () => void } | undefined;
+    const stop = () => {
+      controls?.stop();
+      state.journeyVelocity = 0;
+      state.flight = 0;
+      element.dataset.travelling = "false";
+      element.dataset.flying = "false";
+      element.style.setProperty("--companion-flight", "0");
+    };
+    const frame = window.requestAnimationFrame(() => {
+      // An open CV card stays where the visitor put it, even while the page scrolls.
+      if (expanded) {
+        const mobile = viewport.width < 700;
+        const availableWidth = document.documentElement.clientWidth;
+        const styles = window.getComputedStyle(element);
+        const dockWidth = element.offsetWidth;
+        const rightInset = Number.parseFloat(styles.right);
+        // A viewport resize may change the available margin while the card is open.
+        const boundedX = mobile ? 0 : Math.max(-(availableWidth - dockWidth - rightInset - 20), Math.min(0, x.get()));
+        x.set(boundedX);
+        const cardClearance = mobile ? 126 : viewport.height <= 560 ? 158 : 196;
+        const maximumLift = Math.max(0, viewport.height - cardClearance - 120);
+        const boundedY = Math.max(-maximumLift, Math.min(0, y.get()));
+        y.set(boundedY);
+        element.style.setProperty("--companion-lift", `${-boundedY}px`);
+        if (mobile) { currentSide.current = "right"; setSide("right"); }
+        const left = availableWidth - rightInset - dockWidth + boundedX;
+        const cardWidth = Math.min(288, availableWidth - 24);
+        const preferred = currentSide.current === "left" ? 0 : dockWidth - cardWidth;
+        const offset = Math.max(12 - left, Math.min(preferred, availableWidth - 12 - cardWidth - left));
+        element.style.setProperty("--companion-card-left", `${offset}px`);
+        return;
+      }
+      element.style.removeProperty("--companion-card-left");
+      const resized = lastViewportWidth.current !== viewport.width;
+      lastViewportWidth.current = viewport.width;
+      const downloads = document.querySelector<HTMLButtonElement>('button[aria-label="Résumé and book downloads"]');
+      const downloadsVisible = Boolean(downloads?.getClientRects().length && downloads.offsetWidth);
+      const location = downloadsOpen ? { ...chapter, side: "right" as const } : chapter;
+      const target = companionDestination(location, viewport.width, viewport.height, downloadsVisible, reduced);
+      if (target.side === "left") target.x += viewport.width - document.documentElement.clientWidth;
+      currentSide.current = target.side;
+      setSide(target.side);
+      state.pointDirection = target.side === "left" ? 1 : -1;
+      setSpeaking(false);
+      element.style.setProperty("--companion-lift", `${-target.y}px`);
+      const finish = () => {
+        stop();
+        state.arrivedAt = performance.now();
+        if (!reduced && pageVisible && viewport.width >= 700) showNote();
+      };
+      const distance = target.x - x.get();
+      if (reduced || !pageVisible || resized) {
+        x.set(target.x);
+        y.set(target.y);
+        finish();
+        return;
+      }
+      const fromX = x.get();
+      const fromY = y.get();
+      const crossing = Math.abs(distance) >= 8;
+      element.dataset.travelling = crossing ? "true" : "false";
+      const duration = crossing ? Math.min(1.7, Math.max(1.05, Math.abs(distance) / 900)) : .65;
+      const lift = crossing ? Math.min(44, viewport.height * .055) : 0;
+      controls = animate(0, 1, {
+        duration,
+        ease: [0.4, 0, 0.25, 1],
+        onUpdate: (progress) => {
+          x.set(fromX + distance * progress);
+          y.set(fromY + (target.y - fromY) * progress - Math.sin(progress * Math.PI) * lift);
+          state.flight = crossing ? Math.sin(progress * Math.PI) ** 2 : 0;
+          state.journeyVelocity = crossing ? Math.sign(distance) * 1100 * Math.sin(progress * Math.PI) : 0;
+          element.dataset.flying = state.flight > .3 ? "true" : "false";
+          element.style.setProperty("--companion-flight", String(state.flight));
+        },
+        onComplete: finish,
+      });
+    });
+    return () => { window.cancelAnimationFrame(frame); stop(); };
+  }, [chapter, viewport, expanded, reduced, pageVisible, downloadsOpen, showNote, x, y]);
 
   useEffect(() => {
     const visibility = () => {
@@ -159,8 +259,8 @@ function Companion({ pathname }: { pathname: string }) {
   const onAvatarReady = useCallback(() => setAvatarReady(true), []);
   const onAvatarUnavailable = useCallback(() => setUnavailable(true), []);
 
-  return <div className="builder-companion" data-expanded={expanded} data-contact-page={pathname === "/contact"} ref={dock}
-    onPointerEnter={() => { pointerInside.current = true; cancelClose(); }}
+  return <motion.div className="builder-companion" style={{ x, y }} data-side={side} data-chapter={chapter.id} data-section-label={chapter.label} data-expanded={expanded} data-contact-page={pathname === "/contact"} ref={dock}
+    onPointerEnter={() => { pointerInside.current = true; cancelClose(); if (!expanded) showNote(); }}
     onPointerLeave={() => {
       pointerInside.current = false;
       clearTimeout(hoverTimer.current);
@@ -173,14 +273,13 @@ function Companion({ pathname }: { pathname: string }) {
       }
     }}>
     <AnimatePresence>
-      {speaking && !expanded && <motion.div className="companion-thought" key={chapter.id}
-        initial={{ opacity: 0, y: reduced ? 0 : 7, rotate: reduced ? 0 : -2 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
-        exit={{ opacity: 0, y: reduced ? 0 : 4 }} transition={{ duration: reduced ? 0 : 0.24 }}>
-        <span className="companion-thought-name">A note from Bhadresh</span><p>{chapter.note}</p>
-        <button type="button" onClick={() => setSpeaking(false)} aria-label="Dismiss guide note"><X size={12} /></button>
+      {speaking && !expanded && <motion.div className="companion-tooltip" id="companion-tooltip" role="tooltip" key={chapter.id}
+        initial={{ opacity: 0, x: reduced ? 0 : side === "left" ? -5 : 5 }} animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0 }} transition={{ duration: reduced ? 0 : 0.2 }}>
+        {side === "right" && <ArrowUpLeft size={14} aria-hidden="true" />}<span>{chapter.note}</span>{side === "left" && <ArrowUpRight size={14} aria-hidden="true" />}
       </motion.div>}
     </AnimatePresence>
-    <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh — profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card"
+    <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh — profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card" aria-describedby={speaking && !expanded ? "companion-tooltip" : undefined}
       onClick={() => {
         clearTimeout(hoverTimer.current);
         cancelClose();
@@ -188,12 +287,12 @@ function Companion({ pathname }: { pathname: string }) {
         else { openedByClick.current = true; setExpanded(true); }
       }}
       onFocus={() => { if (!suppressFocus.current && trigger.current?.matches(":focus-visible")) setExpanded(true); }}
-      onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 180); }}>
+      onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 650); }}>
       <span className="companion-model" aria-hidden="true">
         {(!avatarReady || unavailable) && <span className="companion-fallback"><Image src="/images/profile.png" alt="" width={96} height={96} /><span>hi.</span></span>}
         {!unavailable && !compactContact && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
       </span>
-      <span className="companion-plinth" aria-hidden="true" /><span className="companion-footsteps" aria-hidden="true"><i /><i /><i /></span><span className="companion-character-hint" aria-hidden="true">Meet the builder ↗</span>
+      <span className="companion-plinth" aria-hidden="true" /><span className="companion-footsteps" aria-hidden="true"><i /><i /><i /></span>
     </button>
     <AnimatePresence>
       {expanded && <motion.section className="companion-id" id="builder-id-card" role="dialog" aria-label="Bhadresh’s profile card" data-lenis-prevent
@@ -212,15 +311,7 @@ function Companion({ pathname }: { pathname: string }) {
         <Link className="companion-email" href="/contact" onClick={() => closeCard()}><Mail size={13} />Say hello<ArrowUpRight size={13} /></Link>
       </motion.section>}
     </AnimatePresence>
-    <button className="companion-chapter" type="button" onClick={() => {
-      if (expanded) { closeCard(); showNote(); }
-      else if (speaking) setSpeaking(false);
-      else showNote();
-    }} aria-label={`${chapter.label}. ${speaking && !expanded ? "Hide" : "Show"} Bhadresh’s guide note`} aria-expanded={speaking && !expanded}>
-      <span className="companion-chapter-top"><MessageCircle size={11} /><span>{chapter.label}</span><b>{chapter.number}</b></span>
-      <span className="companion-journey" aria-hidden="true"><i /></span>
-    </button>
-  </div>;
+  </motion.div>;
 }
 
 export default function FloatingContactCard() {

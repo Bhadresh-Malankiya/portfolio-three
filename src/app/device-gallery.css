@@ -64,6 +64,7 @@
   .device-chapter.product-world.center-stage .chapter-footer { min-height: 50px; }
 }
 @media(min-width:900px) {
+  .device-chapter.product-world.center-stage.web-chapter .chapter-footer { padding-left: max(150px, 9vw); }
   .device-chapter.product-world.center-stage[data-scroll="false"] .chapter-layout { height: min(82svh,980px); min-height: 500px; display: block; }
   .device-chapter.product-world.center-stage[data-scroll="false"] .chapter-device { height: 100%; }
 }
