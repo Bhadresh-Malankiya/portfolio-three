@@ -6,7 +6,6 @@
   background: #0b111a;
   color: var(--flight-paper);
 }
-.flight-story[data-pinned="true"] { height: 320svh; }
 .flight-theatre {
   position: relative;
   isolation: isolate;
@@ -17,11 +16,11 @@
   min-height: 780px;
   padding: 96px 5vw 26px;
 }
-.flight-story[data-pinned="true"] .flight-theatre {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  min-height: 0;
+/* Match the JS media query before hydration so the canvas never changes its
+   framing when the client takes over the server-rendered hero. */
+@media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .flight-story { height: 320svh; }
+  .flight-story .flight-theatre { position: sticky; top: 0; height: 100svh; min-height: 0; }
 }
 .flight-atmosphere { position: absolute; z-index: -1; inset: -35px; overflow: hidden; pointer-events: none; transform-origin: 60% 56%; }
 .flight-atmosphere::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 64% 57%, #24374961 0, #14202b45 28%, transparent 62%); }
@@ -53,11 +52,10 @@
 .flight-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
 .flight-pencil-line { stroke: #c5bfad38; stroke-width: 1; stroke-dasharray: 3 7; }
 .flight-object { position: absolute; inset: 0 2% 15px; }
-.flight-object > div { width: 100%; height: 100%; opacity: 0; }
+.flight-object > div { width: 100%; height: 100%; opacity: 0; transition: opacity .32s ease; }
 .flight-object[data-ready="true"] > div { opacity: 1; }
 .flight-object canvas { display: block; }
 .flight-fallback { position: absolute; inset: 3% 0; width: 100%; height: 94%; opacity: 1; pointer-events: none; }
-.flight-object[data-ready="true"] .flight-fallback { opacity: 0; }
 .flight-stage-caption { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: #aea99f; font: 8px/1.4 var(--font-mono); letter-spacing: .16em; white-space: nowrap; }
 .flight-bottom { display: grid; grid-template-columns: minmax(250px, 1fr) auto auto; align-items: center; gap: 26px; width: 100%; max-width: 1440px; margin: 0 auto; padding: 18px 145px 20px 0; }
 .flight-narrative { display: flex; align-items: center; gap: 18px; min-width: 0; }
@@ -151,5 +149,6 @@
   .flight-story { height: auto !important; }
   .flight-theatre { position: relative !important; }
   .flight-work-link, .flight-chapters button i { transition: none; }
+  .flight-object > div { transition: none; }
   .flight-air-currents path { animation: none; stroke-dasharray: none; opacity: .2; }
 }

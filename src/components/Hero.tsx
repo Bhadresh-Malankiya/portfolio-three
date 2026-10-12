@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { Component, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useCallback, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
@@ -59,9 +59,17 @@ export default function Hero() {
     const next = chapterAt(value);
     setAct(current => current === next ? current : next);
   });
-  useEffect(() => {
-    rawProgress.set(pinned ? timelineProgress(scrollYProgress.get()) : stops[chapterAt(rawProgress.get())]);
-  }, [pinned, rawProgress, scrollYProgress]);
+  useLayoutEffect(() => {
+    const element = story.current;
+    if (!element) return;
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    const range = element.offsetHeight - window.innerHeight;
+    const restored = range > 0 ? (window.scrollY - top) / range : 0;
+    const initial = pinned ? timelineProgress(restored) : stops[chapterAt(rawProgress.get())];
+    rawProgress.set(initial);
+    // Hydration and breakpoint changes establish a pose, not a new flight.
+    springProgress.jump(initial);
+  }, [pinned, rawProgress, springProgress]);
   const onReady = useCallback(() => setReady(true), []);
   const onUnavailable = useCallback(() => setFailed(true), []);
   function selectAct(index: number) {
@@ -105,9 +113,9 @@ export default function Hero() {
           <path className="flight-pencil-line" d="M85 315C350 315 550 245 740 200S1030 145 1120 95" />
           <motion.path d="M85 315C350 315 550 245 740 200S1030 145 1120 95" stroke="#d6ad78" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : routeProgress }} />
         </motion.svg>
-        <div className="flight-object" data-ready={ready && !failed}>
-          <PlaneSketch />
-          {!failed && <FlightBoundary onError={onUnavailable}><PaperPlaneScene progress={progress} reducedMotion={!!reduced} active={activeInView} onReady={onReady} onUnavailable={onUnavailable} /></FlightBoundary>}
+        <div className="flight-object" data-ready={ready && !failed} data-failed={failed} aria-busy={!ready && !failed}>
+          {failed && <PlaneSketch />}
+          {!failed && <FlightBoundary onError={onUnavailable}><PaperPlaneScene progress={progress} presented={ready} reducedMotion={!!reduced} active={activeInView} onReady={onReady} onUnavailable={onUnavailable} /></FlightBoundary>}
         </div>
         <span className="flight-stage-caption" aria-hidden="true">0{act + 1} / {acts[act].word}</span>
       </div>

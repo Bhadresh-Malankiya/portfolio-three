@@ -17,3 +17,53 @@ export function flightTimelineProgress(value: number) {
 }
 
 export const flightChapterAt = (value: number) => value < .32 ? 0 : value < .84 ? 1 : 2;
+
+export const flightRevealSeconds = .32;
+export const flightEntranceSeconds = 1.5;
+
+export type FlightClock = {
+  presentedSeconds: number;
+  previousProgress: number | null;
+  wasPlaying: boolean;
+};
+
+export function createFlightClock(): FlightClock {
+  return { presentedSeconds: 0, previousProgress: null, wasPlaying: false };
+}
+
+export function advanceFlightClock(clock: FlightClock, frame: {
+  delta: number;
+  progress: number;
+  active: boolean;
+  presented: boolean;
+  reducedMotion: boolean;
+}) {
+  const delta = Number.isFinite(frame.delta) ? Math.min(.05, Math.max(0, frame.delta)) : 0;
+  let presentedSeconds = clock.presentedSeconds;
+  if (frame.active && frame.presented) {
+    // Completing the entrance for reduced motion also prevents replay if the
+    // preference changes while this same scene remains mounted.
+    presentedSeconds = frame.reducedMotion
+      ? Math.max(presentedSeconds, flightRevealSeconds + flightEntranceSeconds)
+      : presentedSeconds + delta;
+  }
+  const elapsed = Math.max(0, presentedSeconds - flightRevealSeconds);
+  const playing = frame.active && frame.presented && !frame.reducedMotion && elapsed > 0;
+  const continuous = playing && clock.wasPlaying && clock.previousProgress !== null && delta > 0;
+  const velocity = continuous && delta > 0
+    ? Math.max(-1, Math.min(1, (frame.progress - clock.previousProgress!) / delta))
+    : 0;
+  const enteredBuild = continuous
+    && flightChapterAt(clock.previousProgress!) !== 1
+    && flightChapterAt(frame.progress) === 1;
+
+  return {
+    clock: { presentedSeconds, previousProgress: frame.progress, wasPlaying: playing },
+    delta,
+    elapsed: frame.reducedMotion ? 0 : elapsed,
+    arrival: frame.reducedMotion ? 1 : 1 - (1 - Math.min(1, elapsed / flightEntranceSeconds)) ** 3,
+    playing,
+    velocity,
+    enteredBuild,
+  };
+}

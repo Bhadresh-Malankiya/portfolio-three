@@ -22,11 +22,13 @@ import {
   Vector3,
 } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { advanceFlightClock, createFlightClock } from "@/lib/hero-flight";
 
 type Props = {
   progress: MotionValue<number>;
   reducedMotion?: boolean;
   active?: boolean;
+  presented?: boolean;
   onReady?: () => void;
   onUnavailable?: () => void;
 };
@@ -312,7 +314,7 @@ function fitCamera(camera: OrthographicCamera, width: number, height: number, ai
   camera.updateProjectionMatrix();
 }
 
-function Flight({ progress, reducedMotion = false, active = true, onReady, onUnavailable }: Props) {
+function Flight({ progress, reducedMotion = false, active = true, presented = false, onReady, onUnavailable }: Props) {
   const group = useRef<Group>(null);
   const leftWing = useRef<Group>(null);
   const rightWing = useRef<Group>(null);
@@ -324,10 +326,9 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
   const wakeMaterial = useRef<LineBasicMaterial>(null);
   const ready = useRef(false);
   const readyFrame = useRef<number | null>(null);
-  const elapsed = useRef(0);
+  const prepared = useRef(false);
+  const clock = useRef(createFlightClock());
   const burstTime = useRef(2);
-  const previousChapter = useRef(-1);
-  const previousProgress = useRef(progress.get());
   const turnVelocity = useRef(0);
   const { camera, size, invalidate, gl, scene } = useThree();
   const keel = useMemo(() => closedPrism([[3.38, -.006, 0], [-1.41, -.006, 0], [-1.64, -.78, 0]], .035, 2), []);
@@ -356,11 +357,19 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
     return geometry;
   }, []);
   useEffect(() => () => { keel.dispose(); speedLines.dispose(); wingtipWake.dispose(); }, [keel, speedLines, wingtipWake]);
-  useEffect(() => () => { if (readyFrame.current !== null) cancelAnimationFrame(readyFrame.current); }, []);
+  useEffect(() => () => {
+    if (readyFrame.current !== null) {
+      cancelAnimationFrame(readyFrame.current);
+      readyFrame.current = null;
+    }
+  }, []);
   useLayoutEffect(() => {
-    fitCamera(camera as OrthographicCamera, size.width, size.height);
+    const currentProgress = clamp(progress.get());
+    fitCamera(camera as OrthographicCamera, size.width, size.height, smooth(.55, .83, currentProgress));
+    clock.current = { ...clock.current, previousProgress: currentProgress, wasPlaying: false };
+    turnVelocity.current = 0;
     invalidate();
-  }, [camera, size.width, size.height, invalidate]);
+  }, [camera, size.width, size.height, invalidate, progress]);
   useEffect(() => {
     const canvas = gl.domElement;
     const unavailable = (event: Event) => { event.preventDefault(); onUnavailable?.(); };
@@ -369,31 +378,38 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
     return () => canvas.removeEventListener("webglcontextlost", unavailable);
   }, [camera, gl, scene, onUnavailable]);
   useEffect(() => {
-    if (active) invalidate();
-    return progress.on("change", () => { if (active) invalidate(); });
-  }, [active, invalidate, progress]);
+    const syncVisibility = () => {
+      const visible = active && document.visibilityState !== "hidden";
+      if (!visible || !presented || reducedMotion) {
+        clock.current = advanceFlightClock(clock.current, { delta: 0, progress: clamp(progress.get()), active: visible, presented, reducedMotion }).clock;
+        turnVelocity.current = 0;
+      }
+      if (visible) invalidate();
+    };
+    syncVisibility();
+    document.addEventListener("visibilitychange", syncVisibility);
+    const unsubscribe = progress.on("change", () => { if (active && document.visibilityState !== "hidden") invalidate(); });
+    return () => {
+      document.removeEventListener("visibilitychange", syncVisibility);
+      unsubscribe();
+    };
+  }, [active, presented, reducedMotion, invalidate, progress]);
 
   useFrame((_, delta) => {
     if (!group.current || !leftWing.current || !rightWing.current || !aircraft.current || !keelMesh.current) return;
-    const dt = Math.min(delta, .05);
-    if (active && !reducedMotion) elapsed.current += dt;
     const p = clamp(progress.get());
-    const velocity = active && !reducedMotion ? Math.max(-1, Math.min(1, (p - previousProgress.current) / Math.max(.001, dt))) : 0;
-    turnVelocity.current = reducedMotion ? 0 : turnVelocity.current + (velocity - turnVelocity.current) * (1 - Math.exp(-dt * 5));
-    previousProgress.current = p;
-    const chapter = p < .32 ? 0 : p < .84 ? 1 : 2;
-    if (chapter !== previousChapter.current) {
-      if (chapter === 1 && !reducedMotion) burstTime.current = 0;
-      previousChapter.current = chapter;
-    }
-    if (active) burstTime.current += dt;
+    const timing = advanceFlightClock(clock.current, { delta, progress: p, active: active && document.visibilityState !== "hidden", presented, reducedMotion });
+    clock.current = timing.clock;
+    const { delta: dt, elapsed, arrival } = timing;
+    turnVelocity.current = timing.playing ? turnVelocity.current + (timing.velocity - turnVelocity.current) * (1 - Math.exp(-dt * 5)) : 0;
+    if (timing.enteredBuild) burstTime.current = 0;
+    if (timing.playing) burstTime.current += dt;
     const folded = smooth(.025, .31, p);
     const morph = smooth(.55, .83, p);
     const cruise = smooth(.84, 1, p);
     const rushing = Math.sin(smooth(.31, .7, p) * Math.PI);
     const burst = reducedMotion ? 0 : Math.sin(clamp(burstTime.current / 1.3) * Math.PI);
-    const arrival = reducedMotion ? 1 : 1 - Math.pow(1 - clamp(elapsed.current / 1.5), 3);
-    const idle = reducedMotion ? 0 : Math.sin(elapsed.current * .7);
+    const idle = reducedMotion ? 0 : Math.sin(elapsed * .7);
     const wingAngle = (.46 * (1 - folded) + .075 * folded) * (1 - morph);
     leftWing.current.rotation.x = wingAngle;
     rightWing.current.rotation.x = -wingAngle;
@@ -429,12 +445,12 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
     fitCamera(camera as OrthographicCamera, size.width, size.height, morph);
 
     if (speedMaterial.current) {
-      const launch = Math.sin(clamp((elapsed.current - .18) / 1.0) * Math.PI);
+      const launch = Math.sin(clamp((elapsed - .18) / 1.0) * Math.PI);
       const energy = reducedMotion ? 0 : Math.max(launch * .58, burst * .75, Math.abs(turnVelocity.current) * morph * .35);
       speedMaterial.current.opacity = energy * .18;
       if (energy > .001) {
         const attr = speedLines.getAttribute("position");
-        const time = burst > .01 ? burstTime.current : elapsed.current;
+        const time = burst > .01 ? burstTime.current : elapsed;
         for (let i = 0; i < 8; i += 1) {
           const x = 4.1 - ((time * 6.7 + i * .97) % 8.2);
           const y = -.76 + (i % 5) * .38;
@@ -449,6 +465,7 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
     if (wakeMaterial.current) {
       wakeMaterial.current.opacity = reducedMotion ? 0 : smooth(.71, .88, p) * (.08 + Math.abs(turnVelocity.current) * .13);
     }
+    prepared.current = true;
   });
 
   return <>
@@ -463,9 +480,12 @@ function Flight({ progress, reducedMotion = false, active = true, onReady, onUna
       <Lightformer form="rect" intensity={.75} color="#e4c59d" position={[1, -3, 4]} scale={[3, 4, 1]} target={[0, 0, 0]} />
     </Environment>
     <lineSegments geometry={speedLines} frustumCulled={false} renderOrder={1000} onAfterRender={() => {
-      if (!ready.current) {
-        ready.current = true;
-        readyFrame.current = requestAnimationFrame(() => onReady?.());
+      if (prepared.current && !ready.current && readyFrame.current === null) {
+        readyFrame.current = requestAnimationFrame(() => {
+          readyFrame.current = null;
+          ready.current = true;
+          onReady?.();
+        });
       }
     }}><lineBasicMaterial ref={speedMaterial} color="#dedbd3" transparent opacity={0} depthWrite={false} /></lineSegments>
     <group ref={group}>
