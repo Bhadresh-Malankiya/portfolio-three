@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { profile } from "@/data/profile";
+import type { ContactMessage } from "@/lib/contact-handler";
 
 export type VisitorLead = {
   name: string;
@@ -22,8 +23,29 @@ function getTransporter(): MailTransport | null {
     port: Number(process.env.SMTP_PORT) || 587,
     secure: process.env.SMTP_SECURE === "true",
     auth: { user: SMTP_USER, pass: SMTP_PASS },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    disableFileAccess: true,
+    disableUrlAccess: true,
   });
   return cachedTransporter;
+}
+
+export async function sendContactMessage(message: ContactMessage) {
+  const transporter = getTransporter();
+  if (!transporter) throw new Error("CONTACT_MAIL_UNAVAILABLE");
+  const topic = message.intent === "hire" ? "Hiring enquiry" : "Project enquiry";
+  const recipient = process.env.NOTIFY_TO_EMAIL || profile.email;
+  const info = await transporter.sendMail({
+    from: { name: "Bhadresh’s portfolio", address: process.env.SMTP_FROM || process.env.SMTP_USER! },
+    to: recipient,
+    replyTo: { name: message.name, address: message.email },
+    subject: `${topic} — ${message.name}`,
+    text: `${topic}\n\nFrom: ${message.name} <${message.email}>\n\n${message.message}\n\nSent from https://${profile.site}/contact. Reply to this email to reach the sender.`,
+    html: `<html><body style="margin:0;background:#f2f0e8;color:#202722;font-family:Arial,sans-serif"><div style="max-width:600px;margin:auto;padding:36px 24px"><p style="font-size:12px;letter-spacing:1px">PORTFOLIO / ${topic.toUpperCase()}</p><h1 style="font-size:28px;font-weight:500">${escapeHtml(message.name)} wants to ${message.intent === "hire" ? "work with you" : "talk about a project"}.</h1><p>Reply to: <a href="mailto:${escapeHtml(message.email)}" style="color:#365c3a">${escapeHtml(message.email)}</a></p><div style="margin:28px 0;padding:24px;background:#fff;border-top:2px solid #526848;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere">${escapeHtml(message.message)}</div><p style="font-size:12px;color:#596353">Sent from your portfolio contact page. Reply directly to this email to continue the conversation.</p></div></body></html>`,
+  });
+  if (!info.accepted.length || info.rejected.length) throw new Error("CONTACT_MAIL_REJECTED");
 }
 
 function escapeHtml(value: string) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Component, useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import {
@@ -16,11 +16,14 @@ import {
 } from "three";
 
 export type AvatarMood = "welcome" | "thinking" | "proud" | "curious" | "grateful" | "wave";
+export type CompanionTravel = { velocity: number; updatedAt: number; arrivedAt: number };
 
 type Props = {
   mood: AvatarMood;
   reducedMotion?: boolean;
   active?: boolean;
+  travel?: RefObject<CompanionTravel>;
+  interacting?: boolean;
   onReady?: () => void;
   onUnavailable?: () => void;
 };
@@ -164,7 +167,7 @@ const expressions = {
   wave: { tilt: -0.09, turn: -0.04, brow: 0.075, smile: 1.12, rightArm: -2.12, armX: -0.05, leftArm: 0.22 },
 } as const;
 
-function Character({ mood, reducedMotion = false, active = true, onReady }: Props) {
+function Character({ mood, reducedMotion = false, active = true, travel, interacting = false, onReady }: Props) {
   const figure = useRef<Group>(null);
   const head = useRef<Group>(null);
   const eyes = useRef<Group>(null);
@@ -173,6 +176,11 @@ function Character({ mood, reducedMotion = false, active = true, onReady }: Prop
   const mouth = useRef<Group>(null);
   const rightArm = useRef<Group>(null);
   const leftArm = useRef<Group>(null);
+  const rightLeg = useRef<Group>(null);
+  const leftLeg = useRef<Group>(null);
+  const rightKnee = useRef<Group>(null);
+  const leftKnee = useRef<Group>(null);
+  const gait = useRef({ phase: 0, amount: 0, direction: 1 });
   const ready = useRef(false);
   const invalidate = useThree((state) => state.invalidate);
   const geometries = useMemo(() => {
@@ -207,16 +215,35 @@ function Character({ mood, reducedMotion = false, active = true, onReady }: Prop
   useEffect(() => { invalidate(); }, [mood, reducedMotion, active, invalidate]);
 
   useFrame(({ clock }, delta) => {
-    if (!figure.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current) return;
+    if (!figure.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current || !rightLeg.current || !leftLeg.current || !rightKnee.current || !leftKnee.current) return;
     const time = clock.elapsedTime;
     const still = reducedMotion || !active;
     const pose = expressions[mood];
-    const ease = (current: number, target: number) => still ? target : MathUtils.damp(current, target, 9, Math.min(delta, 0.05));
+    const step = Math.min(delta, 0.05);
+    const ease = (current: number, target: number) => still ? target : MathUtils.damp(current, target, 9, step);
+    const now = performance.now();
+    const motion = travel?.current;
+    const age = motion ? Math.max(0, now - motion.updatedAt) : Infinity;
+    const velocity = still || interacting || !motion ? 0 : motion.velocity * Math.exp(-Math.max(0, age - 55) / 105);
+    const targetAmount = Math.abs(velocity) < 18 ? 0 : Math.min(1, Math.abs(velocity) / 920);
+    gait.current.amount = still ? 0 : MathUtils.damp(gait.current.amount, targetAmount, targetAmount > gait.current.amount ? 12 : 7, step);
+    if (Math.abs(velocity) > 22) gait.current.direction = ease(gait.current.direction, Math.sign(velocity));
+    const walk = gait.current.amount;
+    if (walk > 0.005) gait.current.phase += step * (5 + 7 * walk);
+    const stride = Math.sin(gait.current.phase);
+    const oppositeStride = -stride;
+    const arriving = !still && !interacting && motion && motion.arrivedAt > 0 && now - motion.arrivedAt < 4200 && walk < 0.12 && mood !== "wave" && mood !== "grateful";
     const breath = still ? 0 : Math.sin(time * 1.8) * 0.012;
-    figure.current.position.y = breath;
-    figure.current.rotation.y = still ? -0.11 : -0.11 + Math.sin(time * 0.65) * 0.035;
+    figure.current.position.y = breath * (1 - walk) + (1 - Math.cos(gait.current.phase * 2)) * 0.024 * walk;
+    figure.current.position.x = still ? 0 : stride * 0.024 * walk;
+    figure.current.rotation.y = ease(figure.current.rotation.y, -0.11 + gait.current.direction * 0.78 * walk);
+    figure.current.rotation.z = ease(figure.current.rotation.z, stride * 0.033 * walk);
+    rightLeg.current.rotation.x = ease(rightLeg.current.rotation.x, stride * 0.55 * walk);
+    leftLeg.current.rotation.x = ease(leftLeg.current.rotation.x, oppositeStride * 0.55 * walk);
+    rightKnee.current.rotation.x = ease(rightKnee.current.rotation.x, Math.max(0, -stride) * 0.65 * walk);
+    leftKnee.current.rotation.x = ease(leftKnee.current.rotation.x, Math.max(0, -oppositeStride) * 0.65 * walk);
     head.current.rotation.z = ease(head.current.rotation.z, pose.tilt);
-    head.current.rotation.y = ease(head.current.rotation.y, pose.turn);
+    head.current.rotation.y = ease(head.current.rotation.y, arriving ? -0.26 : pose.turn - gait.current.direction * 0.26 * walk);
     head.current.rotation.x = ease(head.current.rotation.x, mood === "grateful" ? 0.08 : -0.025);
     const blinkCycle = time % 5.2;
     const blink = !still && blinkCycle > 4.94 ? Math.max(0.09, Math.abs(blinkCycle - 5.07) / 0.13) : 1;
@@ -228,10 +255,10 @@ function Character({ mood, reducedMotion = false, active = true, onReady }: Prop
     mouth.current.scale.y = ease(mouth.current.scale.y, pose.smile);
     mouth.current.scale.x = ease(mouth.current.scale.x, mood === "proud" ? 1.12 : 1);
     const wave = !still && mood === "wave" ? Math.sin(time * 7) * 0.16 : 0;
-    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, pose.rightArm + wave);
-    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, pose.armX);
-    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, pose.leftArm);
-    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, mood === "grateful" ? -0.72 : 0);
+    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, MathUtils.lerp(arriving ? -1.28 : pose.rightArm + wave, -0.18, walk));
+    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, MathUtils.lerp(arriving ? -0.14 : pose.armX, oppositeStride * 0.66, walk));
+    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, MathUtils.lerp(pose.leftArm, 0.18, walk));
+    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, MathUtils.lerp(mood === "grateful" ? -0.72 : 0, stride * 0.66, walk));
     if (!ready.current) {
       ready.current = true;
       onReady?.();
@@ -239,20 +266,24 @@ function Character({ mood, reducedMotion = false, active = true, onReady }: Prop
   });
 
   return (
-    <group ref={figure}>
+    <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.185, 0]} scale={[0.7, 0.4, 1]}>
         <circleGeometry args={[1, 40]} />
         <meshBasicMaterial color="#101927" transparent opacity={0.13} depthWrite={false} />
       </mesh>
+      <group ref={figure}>
       {[-1, 1].map((side) => (
-        <group key={side} position={[side * 0.155, -0.91, 0]}>
-          <mesh><capsuleGeometry args={[0.108, 0.26, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
-          <RoundedBox args={[0.25, 0.14, 0.37]} radius={0.065} smoothness={3} position={[0, -0.19, 0.07]}>
+        <group key={side} ref={side < 0 ? rightLeg : leftLeg} position={[side * 0.155, -0.68, 0]}>
+          <mesh position={[0, -0.05, 0]}><capsuleGeometry args={[0.103, 0.105, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
+          <group ref={side < 0 ? rightKnee : leftKnee} position={[0, -0.205, 0]}>
+          <mesh position={[0, -0.078, 0]}><capsuleGeometry args={[0.096, 0.085, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
+          <RoundedBox args={[0.25, 0.14, 0.37]} radius={0.065} smoothness={3} position={[0, -0.215, 0.07]}>
             <meshStandardMaterial color="#eee9df" roughness={0.56} />
           </RoundedBox>
-          <RoundedBox args={[0.255, 0.041, 0.374]} radius={0.016} smoothness={2} position={[0, -0.246, 0.07]}>
+          <RoundedBox args={[0.255, 0.041, 0.374]} radius={0.016} smoothness={2} position={[0, -0.271, 0.07]}>
             <meshStandardMaterial color="#b7c2ce" roughness={0.65} />
           </RoundedBox>
+          </group>
         </group>
       ))}
       <Pebble position={[0, -0.34, 0]} scale={[0.365, 0.415, 0.23]} color={JACKET} />
@@ -308,6 +339,7 @@ function Character({ mood, reducedMotion = false, active = true, onReady }: Prop
         </group>
         <Pebble position={[0, -0.398, 0.398]} scale={[0.053, 0.055, 0.024]} color="#252934" />
       </group>
+      </group>
     </group>
   );
 }
@@ -345,7 +377,7 @@ class AvatarBoundary extends Component<{ children: ReactNode; onUnavailable?: ()
 }
 
 /** A small, asset-free 3D host. The containing button supplies accessible meaning. */
-export default function BuilderAvatar({ mood, reducedMotion = false, active = true, onReady, onUnavailable }: Props) {
+export default function BuilderAvatar({ mood, reducedMotion = false, active = true, travel, interacting = false, onReady, onUnavailable }: Props) {
   return (
     <AvatarBoundary onUnavailable={onUnavailable}>
       <Canvas
@@ -362,7 +394,7 @@ export default function BuilderAvatar({ mood, reducedMotion = false, active = tr
         <directionalLight position={[4, 2, -3]} color="#b7d7ff" intensity={3} />
         <directionalLight position={[2, 0, 4]} color="#d4e1ff" intensity={0.6} />
         <CameraAndContext onUnavailable={onUnavailable} />
-        <Character mood={mood} reducedMotion={reducedMotion} active={active} onReady={onReady} />
+        <Character mood={mood} reducedMotion={reducedMotion} active={active} travel={travel} interacting={interacting} onReady={onReady} />
       </Canvas>
     </AvatarBoundary>
   );

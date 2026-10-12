@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Download, Mail, MessageCircle, X } from "lucide-react";
-import { profile } from "@/data/profile";
 import { downloads } from "@/data/downloads";
 import { companionChapters, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
+import type { CompanionTravel } from "@/components/three/BuilderAvatar";
 import "@/app/companion.css";
 
 const BuilderAvatar = dynamic(() => import("@/components/three/BuilderAvatar"), { ssr: false });
@@ -23,6 +24,7 @@ function Companion({ pathname }: { pathname: string }) {
   const [avatarReady, setAvatarReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
+  const [compactContact, setCompactContact] = useState(false);
   const dock = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const currentChapter = useRef(initialChapter.id);
@@ -32,6 +34,7 @@ function Companion({ pathname }: { pathname: string }) {
   const suppressFocus = useRef(false);
   const pointerInside = useRef(false);
   const openedByClick = useRef(false);
+  const travel = useRef<CompanionTravel>({ velocity: 0, updatedAt: 0, arrivedAt: 0 });
 
   const cancelClose = useCallback(() => clearTimeout(closeTimer.current), []);
   const closeCard = useCallback((restoreFocus = false) => {
@@ -51,7 +54,21 @@ function Companion({ pathname }: { pathname: string }) {
   }, []);
 
   useEffect(() => {
+    if (pathname !== "/contact") return;
+    const viewport = window.matchMedia("(max-width: 699px)");
+    const update = () => setCompactContact(viewport.matches);
+    update();
+    viewport.addEventListener("change", update);
+    return () => viewport.removeEventListener("change", update);
+  }, [pathname]);
+
+  useEffect(() => {
+    const travelState = travel.current;
+    const dockElement = dock.current;
     let frame = 0;
+    let stopTimer: ReturnType<typeof setTimeout> | undefined;
+    let previousY = window.scrollY;
+    let previousTime = performance.now();
     let chapters: { chapter: CompanionChapter; element: Element }[] = [];
     const collect = () => {
       chapters = pathname === "/" ? companionChapters.flatMap((item) => {
@@ -61,9 +78,24 @@ function Companion({ pathname }: { pathname: string }) {
     };
     const measure = () => {
       frame = 0;
+      if (document.hidden) return;
+      const now = performance.now();
+      const distance = window.scrollY - previousY;
+      const elapsed = Math.max(16, now - previousTime);
+      const velocity = Math.max(-2400, Math.min(2400, distance / elapsed * 1000));
+      previousY = window.scrollY;
+      previousTime = now;
+      travelState.velocity = reduced ? 0 : velocity;
+      travelState.updatedAt = now;
+      if (dockElement && !reduced && Math.abs(velocity) > 22) {
+        dockElement.dataset.walking = "true";
+        dockElement.dataset.direction = velocity > 0 ? "forward" : "back";
+        clearTimeout(stopTimer);
+        stopTimer = setTimeout(() => { dockElement.dataset.walking = "false"; }, 240);
+      }
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       const progress = scrollable > 0 ? Math.max(0, Math.min(1, window.scrollY / scrollable)) : 1;
-      dock.current?.style.setProperty("--companion-progress", String(progress));
+      dockElement?.style.setProperty("--companion-progress", String(progress));
       let next = initialChapter;
       const readingLine = Math.min(window.innerHeight * 0.35, 260);
       for (const item of chapters) {
@@ -71,6 +103,7 @@ function Companion({ pathname }: { pathname: string }) {
       }
       if (next.id !== currentChapter.current) {
         currentChapter.current = next.id;
+        travelState.arrivedAt = now;
         setChapter(next);
         if (!reduced && window.matchMedia("(min-width: 700px)").matches) showNote();
       }
@@ -85,6 +118,9 @@ function Companion({ pathname }: { pathname: string }) {
     window.addEventListener("resize", resize, { passive: true });
     return () => {
       window.cancelAnimationFrame(frame);
+      clearTimeout(stopTimer);
+      travelState.velocity = 0;
+      if (dockElement) dockElement.dataset.walking = "false";
       observer.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", resize);
@@ -92,7 +128,13 @@ function Companion({ pathname }: { pathname: string }) {
   }, [pathname, initialChapter, reduced, showNote]);
 
   useEffect(() => {
-    const visibility = () => setPageVisible(!document.hidden);
+    const visibility = () => {
+      setPageVisible(!document.hidden);
+      if (document.hidden) {
+        travel.current.velocity = 0;
+        if (dock.current) dock.current.dataset.walking = "false";
+      }
+    };
     document.addEventListener("visibilitychange", visibility);
     return () => document.removeEventListener("visibilitychange", visibility);
   }, []);
@@ -117,7 +159,7 @@ function Companion({ pathname }: { pathname: string }) {
   const onAvatarReady = useCallback(() => setAvatarReady(true), []);
   const onAvatarUnavailable = useCallback(() => setUnavailable(true), []);
 
-  return <div className="builder-companion" data-expanded={expanded} ref={dock}
+  return <div className="builder-companion" data-expanded={expanded} data-contact-page={pathname === "/contact"} ref={dock}
     onPointerEnter={() => { pointerInside.current = true; cancelClose(); }}
     onPointerLeave={() => {
       pointerInside.current = false;
@@ -149,9 +191,9 @@ function Companion({ pathname }: { pathname: string }) {
       onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 180); }}>
       <span className="companion-model" aria-hidden="true">
         {(!avatarReady || unavailable) && <span className="companion-fallback"><Image src="/images/profile.png" alt="" width={96} height={96} /><span>hi.</span></span>}
-        {!unavailable && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
+        {!unavailable && !compactContact && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
       </span>
-      <span className="companion-plinth" aria-hidden="true" /><span className="companion-character-hint" aria-hidden="true">Meet the builder ↗</span>
+      <span className="companion-plinth" aria-hidden="true" /><span className="companion-footsteps" aria-hidden="true"><i /><i /><i /></span><span className="companion-character-hint" aria-hidden="true">Meet the builder ↗</span>
     </button>
     <AnimatePresence>
       {expanded && <motion.section className="companion-id" id="builder-id-card" role="dialog" aria-label="Bhadresh’s profile card" data-lenis-prevent
@@ -167,7 +209,7 @@ function Companion({ pathname }: { pathname: string }) {
         <div className="companion-id-facts"><span>Full stack · Applied AI</span><span>Surat, India ↗</span></div>
         <div className="companion-id-bottom"><div className="companion-id-barcode" aria-hidden="true">{BARCODE.map((width, index) => <i key={index} style={{ width }} />)}</div><span>8+ YEARS<br />BUILDING THINGS</span></div>
         <a className="companion-cv" href={downloads.resume.file} download={downloads.resume.filename}><Download size={16} /><span>Take my CV</span><span>PDF <ArrowUpRight size={13} /></span></a>
-        <a className="companion-email" href={`mailto:${profile.email}`}><Mail size={13} />Say hello<ArrowUpRight size={13} /></a>
+        <Link className="companion-email" href="/contact" onClick={() => closeCard()}><Mail size={13} />Say hello<ArrowUpRight size={13} /></Link>
       </motion.section>}
     </AnimatePresence>
     <button className="companion-chapter" type="button" onClick={() => {

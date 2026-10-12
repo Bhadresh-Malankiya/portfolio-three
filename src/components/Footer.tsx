@@ -26,9 +26,9 @@ export default function Footer() {
           <Link href="/field-guide" className="hover:text-gold">
             Field notes
           </Link>
-          <a href={`mailto:${profile.email}`} className="hover:text-gold">
+          <Link href="/contact" className="hover:text-gold">
             Get in touch ↗
-          </a>
+          </Link>
         </nav>
         <p className="text-[10px] text-muted">
           © {new Date().getFullYear()} {profile.shortName} Malankiya

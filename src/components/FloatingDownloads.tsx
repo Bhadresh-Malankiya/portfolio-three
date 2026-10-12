@@ -93,7 +93,7 @@ export default function FloatingDownloads() {
     <motion.div
       className="fixed bottom-5 left-5 z-40"
       ref={dock}
-      hidden={pathname === "/" && contextControlsVisible && !open}
+      hidden={pathname === "/contact" || (pathname === "/" && contextControlsVisible && !open)}
     >
       <AnimatePresence>
         {open && (

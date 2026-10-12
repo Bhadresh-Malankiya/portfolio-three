@@ -10,7 +10,6 @@ import QuzoArchitecture from "@/components/QuzoArchitecture";
 import Reveal from "@/components/Reveal";
 import type { PortfolioProject } from "@/data/portfolio";
 import { getProjectWorld, type ProjectWorld } from "@/data/project-themes";
-import { profile } from "@/data/profile";
 
 function WorldDrawing({ motif }: { motif: ProjectWorld["motif"] }) {
   const line = { fill: "none", stroke: "currentColor", strokeWidth: 1.5 };
@@ -84,7 +83,7 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
 
       <section className="case-tools case-container"><span className="case-label">{project.techLabel ?? "Tools behind the work"}</span><ul>{project.tech.map(tool => <li key={tool}>{tool}</li>)}</ul></section>
       <section className="case-next" style={{ "--next-paper": nextWorld.soft } as CSSProperties}><Link href={`/projects/${next.slug}`} className="case-container"><div><span className="case-label">Keep turning the pages</span><h2>{next.name}</h2><p>{next.category}</p></div><div className="case-next-preview">{next.images?.[0] ? <Image src={next.images[0]} alt={`${next.name} product preview`} fill sizes="(max-width: 680px) 40vw, 300px" className="object-contain" /> : <WorldDrawing motif={nextWorld.motif} />}</div><ArrowRight className="case-next-arrow" size={36} /></Link></section>
-      <div className="case-endnote case-container"><p>A product starts with a conversation.</p><a href={`mailto:${profile.email}`}>Let’s have one <ArrowUpRight size={17} /></a></div>
+      <div className="case-endnote case-container"><p>A product starts with a conversation.</p><Link href="/contact">Let’s have one <ArrowUpRight size={17} /></Link></div>
     </article>
   );
 }

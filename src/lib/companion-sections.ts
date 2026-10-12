@@ -27,9 +27,13 @@ const journeyChapter: CompanionChapter = {
 const fieldGuideChapter: CompanionChapter = {
   id: "field-guide", selector: "main", label: "For your journey", number: "↗", mood: "welcome", note: "A few notes on interviews and finding your first engineering role.",
 };
+const contactChapter: CompanionChapter = {
+  id: "contact-page", selector: "main", label: "Over to you", number: "↗", mood: "wave", note: "A project, a role, or a hello. Tell me what you have in mind.",
+};
 
 export function getCompanionChapter(pathname: string): CompanionChapter {
   if (pathname === "/") return companionChapters[0];
+  if (pathname === "/contact") return contactChapter;
   if (pathname === "/projects") return projectDirectoryChapter;
   if (pathname === "/journey" || pathname.startsWith("/journey/")) return journeyChapter;
   if (pathname === "/field-guide" || pathname.startsWith("/field-guide/")) return fieldGuideChapter;

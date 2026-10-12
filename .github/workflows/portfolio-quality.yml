@@ -24,6 +24,8 @@ jobs:
         run: npm audit --audit-level=high
       - run: npm run lint
       - run: npx tsc --noEmit
+      - name: Contact delivery and validation checks
+        run: node --experimental-strip-types scripts/contact-test.mjs
       - run: npm run build
       - name: Browser regression checks
         run: |

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import "@/app/project-worlds.css";
 import ProjectIndex from "@/components/ProjectIndex";
-import { profile } from "@/data/profile";
 import { portfolioProjects as projects } from "@/data/portfolio";
 
 export const metadata: Metadata = {
@@ -29,7 +28,7 @@ export default function ProjectsPage() {
         <div className="directory-intro-bottom"><p>Voice products, assessment platforms, client work and weekend experiments. The screens are the beginning; the decisions are in the details.</p><span>Explore by contribution ↓</span></div>
       </header>
       <section className="directory-body case-container" aria-label="Explore the project collection"><ProjectIndex /></section>
-      <div className="directory-closing"><div className="case-container"><p>What are you<br /><em>working on?</em></p><a href={`mailto:${profile.email}`}>Let’s talk about it <ArrowUpRight size={20} /></a></div></div>
+      <div className="directory-closing"><div className="case-container"><p>What are you<br /><em>working on?</em></p><Link href="/contact">Let’s talk about it <ArrowUpRight size={20} /></Link></div></div>
     </div>
   );
 }
