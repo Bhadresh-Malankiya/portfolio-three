@@ -57,6 +57,8 @@ The root implementation review used the browser at **1440 × 1000**, **390 × 84
 
 Current lint, TypeScript and device-framing checks passed before the final production build. The framing suite checked **36,360 projected corners across 15 viewport ratios**. The human sections also passed targeted ESLint and diff checks during integration. Their timeline controls expose expanded state, review tabs support arrow keys/Home/End, visible focus states remain available, and decorative portrait movement is disabled with reduced motion. Final release validation belongs to the root task's completed build and browser results.
 
+The subsequent hero-and-guide pass reviewed **1440 × 1000**, **1440 × 800**, **768 × 950** and **390 × 844**. It checked all three opening chapters, successful 3D loading, guide context after navigation, mobile card bounds, Tab order, Escape focus restoration and the CV link. A false WebGL fallback event and narrow-screen control overlap were found and fixed during that pass. The existing smoke suite now contains regressions for these behaviors; the browser CLI suite was not run in this pass.
+
 ## Content guardrails
 
 Keep MB Systems at **2020–2022**. Retain **400K+ ExtendedForms users**, **10M+ online exams**, **10+ developers managed**, and experience scaling products **from 10 to 100,000 users**. The last figure is not a concurrent-user claim. Keep founder work distinct from employer products, preserve the actual Upwork quotes, and do not use generated product images or decorative metrics as evidence.
