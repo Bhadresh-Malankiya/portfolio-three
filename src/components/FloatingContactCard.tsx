@@ -35,7 +35,6 @@ function Companion({ pathname }: { pathname: string }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const currentSide = useRef<"left" | "right">("right");
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const speechTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const suppressFocus = useRef(false);
   const pointerInside = useRef(false);
@@ -53,11 +52,6 @@ function Companion({ pathname }: { pathname: string }) {
       trigger.current?.focus({ preventScroll: true });
     }
   }, []);
-  const showNote = useCallback(() => {
-    clearTimeout(speechTimer.current);
-    setSpeaking(true);
-    speechTimer.current = setTimeout(() => setSpeaking(false), 6200);
-  }, []);
 
   useEffect(() => {
     const update = () => {
@@ -70,24 +64,13 @@ function Companion({ pathname }: { pathname: string }) {
   }, [pathname]);
 
   const updateChapter = useCallback((next: CompanionChapter) => {
-    clearTimeout(speechTimer.current);
-    setSpeaking(false);
     setChapter(next);
   }, []);
   const updateSide = useCallback((next: "left" | "right") => {
     currentSide.current = next;
     setSide(next);
   }, []);
-  useCompanionJourney({ pathname, viewport, reduced, paused: !pageVisible, expanded, downloadsOpen, dock, travel, x, y, onChapter: updateChapter, onSide: updateSide, onCue: showNote });
-  useEffect(() => {
-    travel.current.speaking = speaking && !expanded;
-    if (!speaking || expanded) travel.current.pointing = false;
-    else {
-      const element = chapter.target ? document.querySelector(chapter.target) : null;
-      const target = element?.getBoundingClientRect();
-      travel.current.pointing = Boolean(target && !element?.closest("[inert]") && target.bottom > 100 && target.top < viewport.height * .82 && Math.abs(travel.current.journeyVelocity) < 4);
-    }
-  }, [speaking, expanded, chapter, viewport.height]);
+  useCompanionJourney({ pathname, viewport, reduced, paused: !pageVisible, ready: avatarReady || unavailable, expanded, downloadsOpen, dock, travel, x, y, onChapter: updateChapter, onSide: updateSide, onCue: setSpeaking });
 
   useEffect(() => {
     const downloads = document.querySelector('button[aria-label="Résumé and book downloads"]');
@@ -102,21 +85,23 @@ function Companion({ pathname }: { pathname: string }) {
   useEffect(() => {
     if (!viewport.width || !dock.current) return;
     const element = dock.current;
-    if (!expanded) { element.style.removeProperty("--companion-card-left"); return; }
+    if (!expanded) { element.style.removeProperty("--companion-card-left"); delete element.dataset.cardLayout; return; }
     // An open CV card stays put and remains reachable after a viewport resize.
     const availableWidth = document.documentElement.clientWidth;
     const mobile = viewport.width < 700;
     const rightInset = Number.parseFloat(window.getComputedStyle(element).right);
     const dockWidth = element.offsetWidth;
     const boundedX = mobile ? 0 : Math.max(-(availableWidth - dockWidth - rightInset - 20), Math.min(0, x.get()));
-    const clearance = mobile ? 126 : viewport.height <= 560 ? 158 : 196;
+    const clearance = element.offsetHeight + (mobile ? 50 : 52);
     const boundedY = Math.max(-Math.max(0, viewport.height - clearance - 120), Math.min(0, y.get()));
     x.set(boundedX);
     y.set(boundedY);
     element.style.setProperty("--companion-lift", `${-boundedY}px`);
     const left = availableWidth - rightInset - dockWidth + boundedX;
     const cardWidth = Math.min(288, availableWidth - 24);
-    const preferred = currentSide.current === "left" ? 0 : dockWidth - cardWidth;
+    const beside = travel.current.flight > .2 && viewport.width >= 1000 && viewport.height >= 600;
+    element.dataset.cardLayout = beside ? "beside" : "above";
+    const preferred = beside ? -cardWidth - 20 : currentSide.current === "left" ? 0 : dockWidth - cardWidth;
     const offset = Math.max(12 - left, Math.min(preferred, availableWidth - 12 - cardWidth - left));
     element.style.setProperty("--companion-card-left", `${offset}px`);
   }, [viewport, expanded, x, y]);
@@ -129,6 +114,7 @@ function Companion({ pathname }: { pathname: string }) {
         if (dock.current) dock.current.dataset.walking = "false";
       }
     };
+    visibility();
     document.addEventListener("visibilitychange", visibility);
     return () => document.removeEventListener("visibilitychange", visibility);
   }, []);
@@ -148,13 +134,12 @@ function Companion({ pathname }: { pathname: string }) {
   useEffect(() => () => {
     clearTimeout(closeTimer.current);
     clearTimeout(hoverTimer.current);
-    clearTimeout(speechTimer.current);
   }, []);
   const onAvatarReady = useCallback(() => setAvatarReady(true), []);
   const onAvatarUnavailable = useCallback(() => setUnavailable(true), []);
 
   return <motion.div className="builder-companion" style={{ x, y }} data-side={side} data-chapter={chapter.id} data-section-label={chapter.label} data-expanded={expanded} data-speaking={speaking && !expanded} data-contact-page={pathname === "/contact"} ref={dock}
-    onPointerEnter={() => { pointerInside.current = true; cancelClose(); if (!expanded) showNote(); }}
+    onPointerEnter={() => { pointerInside.current = true; cancelClose(); }}
     onPointerLeave={() => {
       pointerInside.current = false;
       clearTimeout(hoverTimer.current);
@@ -169,7 +154,7 @@ function Companion({ pathname }: { pathname: string }) {
     <AnimatePresence>
       {speaking && !expanded && <motion.div className="companion-tooltip" id="companion-tooltip" role="tooltip" key={chapter.id}
         initial={{ opacity: 0, x: reduced ? 0 : side === "left" ? -5 : 5 }} animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0 }} transition={{ duration: reduced ? 0 : 0.2 }}>
+        exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: reduced ? 0 : 0.18 }}>
         <span className="companion-tooltip-label">{chapter.label}</span>
         <span className="companion-tooltip-message">{chapter.note}</span>
       </motion.div>}

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { sampleCompanionRoute, validateCompanionRoute, compileCompanionRoute, routeDistanceAtScroll, sampleCompanionRouteDistance } from "../src/lib/companion-route.ts";
+import { sampleCompanionRoute, validateCompanionRoute, compileCompanionRoute, routeDistanceAtScroll, sampleCompanionRouteDistance, rebaseCompanionRouteDistance, buildCompanionJourneyRoute } from "../src/lib/companion-route.ts";
 
 const right = { x: 0, y: 0 };
 const left = { x: -1288, y: 0 };
@@ -127,3 +127,68 @@ assert.equal(sampleCompanionRouteDistance(40, hop).phase, "fly");
 assert.throws(() => sampleCompanionRouteDistance(NaN, compiled));
 assert.throws(() => routeDistanceAtScroll(NaN, compiled));
 console.log(`Physical route: ${compiled.totalDistance.toFixed(1)}px; curve error ${maximumCurveError.toFixed(3)}px; bounded speed, matched flight pose, reversal and empty routes passed.`);
+
+function assertRebase(distance, target, route, expected, message) {
+  const result = rebaseCompanionRouteDistance(distance, target, route);
+  assert.ok(Math.abs(result - expected) <= 1e-7, message);
+  const before = sampleCompanionRouteDistance(distance, route);
+  const after = sampleCompanionRouteDistance(result, route);
+  assert.ok(Math.hypot(after.x - before.x, after.y - before.y) <= .1, `${message}: no visible position jump`);
+  return result;
+}
+
+const journey = buildCompanionJourneyRoute({
+  sectionTops: { work: 300, mobile: 2000, about: 4200, experience: 5400 },
+  width: 1574, height: 900, fixed: false,
+});
+const groundLoopEnd = journey.legs[1].endDistance;
+assertRebase(0, journey.totalDistance, journey, journey.totalDistance, "Jumping from the origin past About skips obsolete ground and flight loops");
+assertRebase(0, journey.legs[2].endDistance, journey, groundLoopEnd, "Jumping to About skips the ground loop but still performs the ascent");
+assertRebase(0, groundLoopEnd, journey, groundLoopEnd, "A ground out-and-back loop can be skipped at its identical origin");
+assertRebase(200, groundLoopEnd, journey, groundLoopEnd - 200, "A partly completed ground crossing rebases onto the exact point on its return leg");
+assertRebase(groundLoopEnd - 200, 0, journey, 200, "Reverse scrolling rebases onto the earlier matching ground point");
+assertRebase(journey.totalDistance, 0, journey, 0, "Reversing past About skips completed loops at their shared landing point");
+assertRebase(100, 500, journey, 100, "A matching point beyond the target is not eligible");
+assertRebase(groundLoopEnd - 100, journey.legs[1].startDistance + 500, journey, groundLoopEnd - 100, "A reverse candidate before the target is not eligible");
+assertRebase(journey.legs[2].startDistance + 50, journey.totalDistance, journey, journey.legs[2].startDistance + 50, "An active ascent keeps its continuous flight path");
+assertRebase(journey.legs[3].startDistance + 50, 0, journey, journey.legs[3].startDistance + 50, "An active descent cannot jump to another flight in reverse");
+assertRebase(0, hop.totalDistance, hop, hop.totalDistance, "A flight loop may be skipped between its exact landing endpoints");
+assertRebase(hop.totalDistance, 0, hop, 0, "Matching flight endpoints also rebase in reverse");
+assertRebase(20, hop.totalDistance, hop, 20, "Identical points on a flight's ascent and descent are not interchangeable poses");
+
+const raisedGround = compileCompanionRoute([
+  { start: 0, end: 100, from: { x: -20, y: -40 }, to: { x: 0, y: -40 }, mode: "run" },
+  { start: 120, end: 220, from: { x: 0, y: -40 }, to: right, mode: "fly", lift: 0 },
+  { start: 240, end: 340, from: right, to: right, mode: "fly", lift: 40 },
+]);
+assert.deepEqual(
+  [sampleCompanionRouteDistance(20, raisedGround).x, sampleCompanionRouteDistance(20, raisedGround).y],
+  [sampleCompanionRouteDistance(100, raisedGround).x, sampleCompanionRouteDistance(100, raisedGround).y],
+  "Fixture: a ground endpoint coincides with a later flight apex",
+);
+assertRebase(20, raisedGround.totalDistance, raisedGround, 20, "Matching an arbitrary airborne point must not turn a resting character into a flying one");
+assertRebase(0, 50, empty, 0, "An empty route remains at its origin");
+assertRebase(0, 100, zero, 0, "A stationary route does not invent a path");
+assertRebase(-Infinity, Infinity, journey, journey.totalDistance, "Unbounded inputs use the sampler's endpoint clamping");
+assert.throws(() => rebaseCompanionRouteDistance(NaN, 0, journey));
+assert.throws(() => rebaseCompanionRouteDistance(0, NaN, journey));
+
+let rebaseChecks = 0;
+for (const route of [compiled, journey, hop, raisedGround]) {
+  for (let step = 0; step <= 200; step += 1) {
+    const distance = route.totalDistance * step / 200;
+    const before = sampleCompanionRouteDistance(distance, route);
+    for (let targetStep = 0; targetStep <= 16; targetStep += 1) {
+      const target = route.totalDistance * targetStep / 16;
+      const result = rebaseCompanionRouteDistance(distance, target, route);
+      const after = sampleCompanionRouteDistance(result, route);
+      assert.ok(result >= Math.min(distance, target) && result <= Math.max(distance, target), "Rebasing never crosses the target or moves away from it");
+      assert.ok(Math.hypot(after.x - before.x, after.y - before.y) <= .1, "Every rebased position preserves physical continuity");
+      assert.ok(result === distance || Math.abs(target - result) < Math.abs(target - distance), "A rebase strictly reduces remaining route distance");
+      if (before.phase === "fly") assert.equal(result, distance, "Active flight poses are never rebased");
+      assert.ok(Math.abs(rebaseCompanionRouteDistance(result, target, route) - result) <= 1e-7, "One rebase selects the nearest eligible matching point");
+      rebaseChecks += 1;
+    }
+  }
+}
+console.log(`Loop rebasing: ${rebaseChecks.toLocaleString()} cases passed; forward/reverse shortcuts, exact ground projections, endpoint-only flight skips, and physical continuity verified.`);

@@ -4,13 +4,15 @@ import { useEffect, useRef, type RefObject } from "react";
 import type { MotionValue } from "framer-motion";
 import type { CompanionTravel } from "@/components/three/BuilderAvatar";
 import { companionChapters, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
-import { buildCompanionJourneyRoute, compileCompanionRoute, routeDistanceAtScroll, sampleCompanionRouteDistance } from "@/lib/companion-route";
+import { buildCompanionJourneyRoute, compileCompanionRoute, rebaseCompanionRouteDistance, routeDistanceAtScroll, sampleCompanionRouteDistance } from "@/lib/companion-route";
+import { createCueState, updateCompanionCue } from "@/lib/companion-cues";
 
 type Options = {
   pathname: string;
   viewport: { width: number; height: number };
   reduced: boolean;
   paused: boolean;
+  ready: boolean;
   expanded: boolean;
   downloadsOpen: boolean;
   dock: RefObject<HTMLDivElement | null>;
@@ -19,16 +21,17 @@ type Options = {
   y: MotionValue<number>;
   onChapter: (chapter: CompanionChapter) => void;
   onSide: (side: "left" | "right") => void;
-  onCue: () => void;
+  onCue: (visible: boolean) => void;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-/** One measured route, with long reading stops. Scroll chooses the destination;
- * bounded acceleration controls the journey there, including reverse travel. */
-export function useCompanionJourney({ pathname, viewport, reduced, paused, expanded, downloadsOpen, dock, travel, x, y, onChapter, onSide, onCue }: Options) {
+/** Scroll chooses a stop; physical travel, arrival, speech and pointing share
+ * one clock. Only time when the visitor can actually read a cue is counted. */
+export function useCompanionJourney({ pathname, viewport, reduced, paused, ready, expanded, downloadsOpen, dock, travel, x, y, onChapter, onSide, onCue }: Options) {
   const cursor = useRef({ distance: 0, velocity: 0, initialized: false, width: 0, height: 0, resizePending: false });
-  const announced = useRef(new Set<string>());
+  const cues = useRef(createCueState());
+  const chapter = useRef(getCompanionChapter(pathname));
 
   useEffect(() => {
     const element = dock.current;
@@ -40,19 +43,30 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
     const fixed = reduced || compact || pathname !== "/";
     let chapters: { chapter: CompanionChapter; element: Element; top: number }[] = [];
     let route = compileCompanionRoute([]);
-    let current = getCompanionChapter(pathname);
     let frame = 0;
     let previousTime = performance.now();
-    let settledSince = previousTime;
     let navigationStarted = 0;
-    let lastScrollAt = 0;
+    let lastScrollAt = previousTime;
+    let lastScrollY = window.scrollY;
+    let scrollSpeed = 0;
     let lastSide: "left" | "right" | undefined;
-    let targetElement: Element | null = null;
     let dirty = true;
     motion.resizePending ||= !motion.initialized || motion.width !== width || motion.height !== height;
     motion.width = width;
     motion.height = height;
 
+    const updateCue = (now: number, deltaMs: number, eligible: boolean) => {
+      const result = updateCompanionCue(cues.current, { now, id: chapter.current.id, eligible, deltaMs });
+      if (result.visible !== cues.current.visible) onCue(result.visible);
+      cues.current = result.state;
+      element.setAttribute("data-cue", result.visible ? "speaking" : result.pending ? "arriving" : "quiet");
+      return result;
+    };
+    // A hidden tab may never run its queued RAF. Record interruptions now so
+    // returning to the page cannot resume an already-read speech mid-sentence.
+    if (paused || expanded || downloadsOpen) {
+      updateCue(previousTime, 0, false);
+    }
     const rebuild = () => {
       chapters = pathname === "/" ? companionChapters.flatMap(chapter => {
         const section = document.querySelector(chapter.selector);
@@ -72,22 +86,25 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
     const tick = (now: number) => {
       frame = 0;
       if (dirty || chapters.some(item => !item.element.isConnected)) rebuild();
-      const dt = Math.min(.035, Math.max(.001, (now - previousTime) / 1000));
+      const deltaMs = Math.min(100, Math.max(0, now - previousTime));
+      const dt = Math.min(.035, Math.max(.001, deltaMs / 1000));
       previousTime = now;
+      if (now - lastScrollAt > 80) scrollSpeed *= Math.exp(-dt * 18);
       const scroll = window.scrollY;
       const readingLine = Math.min(height * .38, 300);
       let next = getCompanionChapter(pathname);
       for (const item of chapters) if (item.top - scroll <= readingLine) next = item.chapter;
-      if (next.id !== current.id) {
-        current = next;
-        settledSince = now;
-        onChapter(current);
+      if (next.id !== chapter.current.id) {
+        chapter.current = next;
+        onChapter(next);
       }
-      // Re-resolve a target on a scroll frame: project headings can change in place.
-      targetElement = current.target ? document.querySelector(current.target) : null;
+      const current = chapter.current;
+      // Project headings can change in place while their section remains pinned.
+      const targetElement = current.target ? document.querySelector(current.target) : null;
       const target = routeDistanceAtScroll(scroll, route);
-      const difference = target - motion.distance;
       if (paused || expanded || downloadsOpen) {
+        updateCue(now, 0, false);
+        state.speaking = false;
         motion.velocity = 0;
         state.journeyVelocity = 0;
         state.pointing = false;
@@ -96,8 +113,8 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
         return;
       }
 
-      // Anchor links skip whole chapters. Quietly rejoin the current scene rather
-      // than replaying metres of obsolete travel across the visitor's reading.
+      // Anchor navigation can skip the whole page. Rejoin its destination once
+      // the page settles, instead of replaying all the skipped chapters.
       element.style.opacity = navigationStarted ? "0" : "1";
       const navigationSettled = navigationStarted && now - navigationStarted > 170 && (now - lastScrollAt > 150 || now - navigationStarted > 1800);
       if (motion.resizePending || navigationSettled) {
@@ -108,12 +125,21 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
         navigationStarted = 0;
         element.style.opacity = "1";
       } else if (!navigationStarted) {
+        const rebased = rebaseCompanionRouteDistance(motion.distance, target, route);
+        if (Math.abs(rebased - motion.distance) > .1) {
+          motion.distance = rebased;
+          motion.velocity = 0;
+        }
+        const difference = target - motion.distance;
         const sample = sampleCompanionRouteDistance(motion.distance, route);
-        const speedLimit = sample.phase === "fly" ? 145 : 210;
-        const desiredVelocity = Math.sign(difference) * Math.min(speedLimit, Math.sqrt(2 * 460 * Math.abs(difference)), Math.abs(difference) * 5);
-        motion.velocity += clamp(desiredVelocity - motion.velocity, -460 * dt, 460 * dt);
+        const flying = sample.phase === "fly" || sample.y < -.5;
+        // Quicker catch-up on long ground trips, softer braking at each stop.
+        const speedLimit = flying ? 220 : clamp(270 + Math.abs(difference) * .22, 270, 430);
+        const acceleration = flying ? 650 : 950;
+        const desiredVelocity = Math.sign(difference) * Math.min(speedLimit, Math.sqrt(2 * acceleration * Math.abs(difference)), Math.abs(difference) * 7);
+        motion.velocity += clamp(desiredVelocity - motion.velocity, -acceleration * dt, acceleration * dt);
         const advance = motion.velocity * dt;
-        if (Math.abs(difference) < .15 || (advance * difference > 0 && Math.abs(advance) >= Math.abs(difference))) {
+        if (Math.abs(difference) < .3 || (advance * difference > 0 && Math.abs(advance) >= Math.abs(difference))) {
           motion.distance = target;
           motion.velocity = 0;
         } else motion.distance = clamp(motion.distance + advance, 0, route.totalDistance);
@@ -122,9 +148,10 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
       const previousX = x.get();
       x.set(sample.x);
       y.set(sample.y);
-      const moving = Math.abs(motion.velocity) > 4 || navigationStarted > 0;
-      // A hovering guide keeps an airborne pose even at the reading stop.
-      state.flight = Math.max(sample.flight, clamp(-sample.y / 100, 0, .7));
+      const remaining = Math.abs(target - motion.distance);
+      const moving = Math.abs(motion.velocity) > 4 || remaining > 1 || navigationStarted > 0;
+      // The balloon stays inflated while the guide is at an elevated stop.
+      state.flight = Math.max(sample.flight, clamp(-sample.y / 90, 0, 1));
       state.journeyVelocity = moving && !navigationStarted ? sample.phase === "fly" ? motion.velocity : (sample.x - previousX) / dt : 0;
       const side = sample.x < -(document.documentElement.clientWidth - 152) / 2 ? "left" : "right";
       if (side !== lastSide) { lastSide = side; onSide(side); }
@@ -139,29 +166,28 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
 
       const targetBounds = targetElement?.getBoundingClientRect();
       const visible = Boolean(targetBounds && !targetElement?.closest("[inert]") && targetBounds.bottom > 100 && targetBounds.top < height * .82);
-      state.pointing = !moving && visible && state.speaking === true;
+      const cue = updateCue(now, deltaMs, ready && !compact && !moving && scrollSpeed < 900 && (visible || !current.target));
+      state.speaking = cue.visible;
+      state.pointing = cue.visible && visible;
       if (targetBounds && visible) {
         const centerX = document.documentElement.clientWidth - 76 + sample.x;
-        const centerY = height - 90 + sample.y;
+        const centerY = height - 90 + sample.y - state.flight * 70;
         const dx = targetBounds.left + targetBounds.width / 2 - centerX;
         const dy = centerY - (targetBounds.top + targetBounds.height / 2);
         state.pointDirection = dx >= 0 ? 1 : -1;
         state.pointElevation = clamp(Math.atan2(dy, Math.abs(dx)) / (Math.PI / 2), -1, 1);
       } else state.pointDirection = side === "left" ? 1 : -1;
 
-      if (moving || Math.abs(target - motion.distance) > 1) settledSince = now;
-      const canIntroduce = !compact && !announced.current.has(current.id) && (visible || !current.target);
-      const readingTime = now - Math.max(settledSince, lastScrollAt);
-      if (canIntroduce && readingTime > 650) {
-        announced.current.add(current.id);
-        onCue();
-      }
-      if (moving || Math.abs(target - motion.distance) > .15 || navigationStarted || (canIntroduce && readingTime <= 650)) {
-        frame = requestAnimationFrame(tick);
-      }
+      if (moving || navigationStarted || cue.pending || scrollSpeed >= 900) frame = requestAnimationFrame(tick);
     };
     const schedule = () => { if (!frame) { previousTime = performance.now(); frame = requestAnimationFrame(tick); } };
-    const scrollChanged = () => { lastScrollAt = performance.now(); schedule(); };
+    const scrollChanged = () => {
+      const now = performance.now();
+      scrollSpeed = Math.abs(window.scrollY - lastScrollY) / Math.max(.016, (now - lastScrollAt) / 1000);
+      lastScrollAt = now;
+      lastScrollY = window.scrollY;
+      schedule();
+    };
     const navigate = (event: MouseEvent) => {
       const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
       if (!anchor || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -185,5 +211,5 @@ export function useCompanionJourney({ pathname, viewport, reduced, paused, expan
       state.journeyVelocity = 0;
       element.style.opacity = "1";
     };
-  }, [pathname, viewport, reduced, paused, expanded, downloadsOpen, dock, travel, x, y, onChapter, onSide, onCue]);
+  }, [pathname, viewport, reduced, paused, ready, expanded, downloadsOpen, dock, travel, x, y, onChapter, onSide, onCue]);
 }

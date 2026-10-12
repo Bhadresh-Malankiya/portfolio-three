@@ -10,6 +10,7 @@ import {
   Float32BufferAttribute,
   Group,
   MathUtils,
+  Mesh,
   OrthographicCamera,
   SphereGeometry,
   TubeGeometry,
@@ -173,6 +174,55 @@ function Arm({ elbow }: { elbow: RefObject<Group | null> }) {
   );
 }
 
+/** The saddle touches the crown; the rider's forward-folded legs clear its sides. */
+function BalloonRide() {
+  const seams = useMemo(() => Array.from({ length: 6 }, (_, index) => {
+    const phi = (index / 6) * Math.PI * 2;
+    return Array.from({ length: 17 }, (_, segment): Point => {
+      const theta = .14 + (segment / 16) * (Math.PI - .3);
+      const taper = 1 - Math.max(0, -Math.cos(theta)) ** 2 * .12;
+      return [
+        Math.sin(theta) * Math.sin(phi) * .543 * taper,
+        -.805 + Math.cos(theta) * .763,
+        -.16 + Math.sin(theta) * Math.cos(phi) * .513 * taper,
+      ];
+    });
+  }), []);
+  const shell = useMemo(() => {
+    const geometry = new SphereGeometry(1, 40, 28);
+    const vertices = geometry.attributes.position;
+    for (let index = 0; index < vertices.count; index++) {
+      const x = vertices.getX(index), y = vertices.getY(index), z = vertices.getZ(index);
+      const taper = 1 - Math.max(0, -y) ** 2 * .12;
+      vertices.setXYZ(index, x * .54 * taper, y * .76, z * .51 * taper);
+    }
+    geometry.computeVertexNormals();
+    return geometry;
+  }, []);
+  useEffect(() => () => shell.dispose(), [shell]);
+  return (
+    <>
+      <mesh geometry={shell} position={[0, -.805, -.16]}>
+        <meshPhysicalMaterial color="#b8c99d" roughness={.34} metalness={.08} clearcoat={.42} clearcoatRoughness={.25} />
+      </mesh>
+      {seams.map((points, index) => <Stroke key={index} points={points} radius={.0045} color="#91a67a" />)}
+      <RoundedBox args={[.65, .075, .60]} radius={.035} smoothness={3}>
+        <meshStandardMaterial color="#283a48" roughness={.72} />
+      </RoundedBox>
+      <RoundedBox args={[.60, .035, .56]} radius={.016} smoothness={2} position={[0, .038, 0]}>
+        <meshStandardMaterial color="#d7d9c5" roughness={.8} />
+      </RoundedBox>
+      <Stroke points={[[-.29, -.06, -.19], [-.34, -.18, -.20], [-.41, -.32, -.19]]} radius={.014} color="#344e69" />
+      <Stroke points={[[.29, -.06, -.19], [.34, -.18, -.20], [.41, -.32, -.19]]} radius={.014} color="#344e69" />
+      <mesh position={[0, -1.615, -.16]}>
+        <coneGeometry args={[.051, .11, 16]} />
+        <meshStandardMaterial color="#8fa775" roughness={.52} />
+      </mesh>
+      <Stroke points={[[0, -1.655, -.16], [-.042, -1.755, -.14], [.046, -1.90, -.12], [.006, -2.01, -.10]]} radius={.010} color="#d8ddc6" />
+    </>
+  );
+}
+
 const expressions = {
   welcome: { tilt: -0.045, turn: -0.08, brow: 0, smile: 0.8, rightArm: -0.28, armX: 0, leftArm: 0.17 },
   thinking: { tilt: 0.10, turn: 0.16, brow: -0.12, smile: 0.25, rightArm: 2.58, armX: -0.72, leftArm: 0.15 },
@@ -183,6 +233,9 @@ const expressions = {
 } as const;
 
 function Character({ mood, reducedMotion = false, active = true, travel, interacting = false, onReady }: Props) {
+  const rideRig = useRef<Group>(null);
+  const balloon = useRef<Group>(null);
+  const groundShadow = useRef<Mesh>(null);
   const figure = useRef<Group>(null);
   const torso = useRef<Group>(null);
   const pelvis = useRef<Group>(null);
@@ -236,7 +289,7 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
   useEffect(() => { invalidate(); }, [mood, reducedMotion, active, invalidate]);
 
   useFrame(({ clock }, delta) => {
-    if (!figure.current || !torso.current || !pelvis.current || !rightElbow.current || !leftElbow.current || !rightAnkle.current || !leftAnkle.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current || !rightLeg.current || !leftLeg.current || !rightKnee.current || !leftKnee.current) return;
+    if (!rideRig.current || !balloon.current || !groundShadow.current || !figure.current || !torso.current || !pelvis.current || !rightElbow.current || !leftElbow.current || !rightAnkle.current || !leftAnkle.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current || !rightLeg.current || !leftLeg.current || !rightKnee.current || !leftKnee.current) return;
     const time = clock.elapsedTime;
     const still = reducedMotion || !active;
     const pose = expressions[mood];
@@ -250,8 +303,11 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     const pointing = !still && !interacting && Boolean(motion?.pointing);
     const pointDirection = (motion?.pointDirection ?? -1) < 0 ? -1 : 1;
     const pointElevation = MathUtils.clamp(motion?.pointElevation ?? 0, -1, 1);
-    gait.current.flight = ease(gait.current.flight, still || interacting ? 0 : MathUtils.clamp(motion?.flight ?? 0, 0, 1));
+    gait.current.flight = ease(gait.current.flight, still ? 0 : MathUtils.clamp(motion?.flight ?? 0, 0, 1));
     const flying = gait.current.flight;
+    const ride = MathUtils.smoothstep(flying, 0, .55);
+    const seated = MathUtils.smoothstep(ride, 0, .65);
+    const inflation = MathUtils.smoothstep(ride, .18, 1);
     gait.current.flightMotion = ease(gait.current.flightMotion, pointing ? 0 : MathUtils.clamp((speed - 6) / 75, 0, 1));
     const cruising = flying * gait.current.flightMotion;
     const hovering = flying - cruising;
@@ -259,7 +315,7 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     const targetAmount = speed < 6 || pointing ? 0 : Math.min(1, speed / 200);
     gait.current.amount = still ? 0 : MathUtils.damp(gait.current.amount, targetAmount, targetAmount > gait.current.amount ? 12 : 18, step);
     if (speed > 6) gait.current.direction = ease(gait.current.direction, Math.sign(velocity));
-    const walk = gait.current.amount * (1 - flying) * (pointing ? 0 : 1);
+    const walk = gait.current.amount * (1 - seated) * (pointing ? 0 : 1);
     if (speed > 6 && !pointing) {
       gait.current.phase += step * (7 + 7 * gait.current.amount) * Math.min(1, speed / 35);
       gait.current.flightPhase += step * 3.2;
@@ -268,25 +324,33 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     const locomotion = sampleAvatarStride(gait.current.phase, gait.current.amount);
     const direction = gait.current.direction;
     const breath = still ? 0 : Math.sin(time * 1.8) * .012;
-    const flightFlutter = still ? 0 : Math.sin(gait.current.flightPhase) * .022 * cruising;
-    const hoverFloat = still ? 0 : Math.sin(time * 1.7) * .017 * hovering;
-    figure.current.position.y = breath * (1 - walk) * (1 - flying) + locomotion.bodyY * walk + .025 * flying + hoverFloat;
+    const flightFlutter = still ? 0 : Math.sin(gait.current.flightPhase) * .018 * cruising;
+    const hoverFloat = still ? 0 : Math.sin(time * 1.7) * .020 * ride;
+    balloon.current.visible = inflation > .002;
+    balloon.current.scale.setScalar(Math.max(.001, inflation));
+    groundShadow.current.visible = ride < .05;
+    rideRig.current.position.y = hoverFloat;
+    rideRig.current.rotation.y = ease(rideRig.current.rotation.y, (pointDirection * .17 * (1 - gait.current.flightMotion) + direction * .24 * gait.current.flightMotion) * ride);
+    rideRig.current.rotation.z = ease(rideRig.current.rotation.z, (still ? 0 : Math.sin(time * 1.35) * .022 - direction * .035 * gait.current.flightMotion) * ride);
+    figure.current.position.y = breath * (1 - walk) * (1 - seated) + locomotion.bodyY * walk + .036 * seated;
+    figure.current.position.z = .30 * seated;
     figure.current.position.x = ease(figure.current.position.x, stride * .014 * walk);
-    figure.current.rotation.y = ease(figure.current.rotation.y, -.11 + direction * (1.02 * walk + 1.13 * cruising) + pointDirection * .18 * hovering);
-    figure.current.rotation.x = ease(figure.current.rotation.x, .38 * cruising + .015 * hovering);
-    figure.current.rotation.z = ease(figure.current.rotation.z, stride * .026 * walk - direction * (.14 + flightFlutter) * cruising);
-    figure.current.scale.setScalar(1 - .035 * flying);
+    figure.current.rotation.y = ease(figure.current.rotation.y, -.11 * (1 - seated) + direction * 1.02 * walk);
+    figure.current.rotation.x = ease(figure.current.rotation.x, 0);
+    figure.current.rotation.z = ease(figure.current.rotation.z, stride * .026 * walk);
     pelvis.current.rotation.y = ease(pelvis.current.rotation.y, stride * .13 * walk);
     pelvis.current.rotation.z = ease(pelvis.current.rotation.z, -stride * .025 * walk);
     torso.current.rotation.y = ease(torso.current.rotation.y, -stride * .105 * walk);
-    torso.current.rotation.x = ease(torso.current.rotation.x, (.07 + locomotion.running * .09) * walk);
+    torso.current.rotation.x = ease(torso.current.rotation.x, (.07 + locomotion.running * .09) * walk + .06 * gait.current.flightMotion * seated);
     torso.current.rotation.z = ease(torso.current.rotation.z, stride * .016 * walk);
-    rightLeg.current.rotation.x = locomotion.right.hip * walk + airPose(.045, .28 + flightFlutter) * flying;
-    leftLeg.current.rotation.x = locomotion.left.hip * walk + airPose(.075, .18 - flightFlutter) * flying;
-    rightKnee.current.rotation.x = locomotion.right.knee * walk + airPose(.26, .42) * flying;
-    leftKnee.current.rotation.x = locomotion.left.knee * walk + airPose(.31, .63) * flying;
-    rightAnkle.current.rotation.x = locomotion.right.ankle * walk + airPose(.08, .28) * flying;
-    leftAnkle.current.rotation.x = locomotion.left.ankle * walk + airPose(.1, .2) * flying;
+    rightLeg.current.position.x = -.155 - .155 * seated;
+    leftLeg.current.position.x = .155 + .155 * seated;
+    rightLeg.current.rotation.x = locomotion.right.hip * walk - 1.38 * seated;
+    leftLeg.current.rotation.x = locomotion.left.hip * walk - 1.38 * seated;
+    rightKnee.current.rotation.x = locomotion.right.knee * walk + (1.42 + flightFlutter) * seated;
+    leftKnee.current.rotation.x = locomotion.left.knee * walk + (1.42 - flightFlutter) * seated;
+    rightAnkle.current.rotation.x = locomotion.right.ankle * walk - .04 * seated;
+    leftAnkle.current.rotation.x = locomotion.left.ankle * walk - .04 * seated;
     head.current.rotation.z = ease(head.current.rotation.z, pose.tilt * (1 - flying) - stride * .012 * walk);
     head.current.rotation.y = ease(head.current.rotation.y, pointing ? pointDirection * .28 : MathUtils.lerp(pose.turn - direction * .24 * walk, pointDirection * .28, hovering));
     head.current.rotation.x = ease(head.current.rotation.x, pointing ? -.04 - pointElevation * .24 : MathUtils.lerp((mood === "grateful" ? .08 : -.025) - .2 * cruising - .06 * walk, -.04 - pointElevation * .24, hovering));
@@ -309,11 +373,11 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     const pointingAngle = Math.PI / 2 + pointElevation * .85;
     const pointRight = pointing && pointDirection < 0;
     const pointLeft = pointing && pointDirection > 0;
-    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, pointRight ? -pointingAngle : MathUtils.lerp(MathUtils.lerp(pose.rightArm + wave, -.12, walk), airPose(-.24, -.12), flying));
-    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, pointRight ? -.12 : MathUtils.lerp(MathUtils.lerp(pose.armX, armPhase * armSwing, walk), airPose(-.28, -1.65), flying));
+    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, pointRight ? -pointingAngle : MathUtils.lerp(MathUtils.lerp(pose.rightArm + wave, -.12, walk), airPose(-.24, -.12), mood === "wave" ? 0 : seated));
+    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, pointRight ? -.12 : MathUtils.lerp(MathUtils.lerp(pose.armX, armPhase * armSwing, walk), airPose(-.32, -.48), seated && mood !== "wave" ? seated : 0));
     leftArm.current.rotation.z = ease(leftArm.current.rotation.z, pointLeft ? pointingAngle : MathUtils.lerp(MathUtils.lerp(pose.leftArm, .12, walk), airPose(.24, .19), flying));
-    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, pointLeft ? -.12 : MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, -armPhase * armSwing, walk), airPose(-.25, -1.44), flying));
-    rightElbow.current.rotation.x = ease(rightElbow.current.rotation.x, pointRight ? -.08 : MathUtils.lerp(-elbowBend * walk - Math.max(0, -armPhase) * .14 * walk, airPose(-.6, -.18), flying));
+    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, pointLeft ? -.12 : MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, -armPhase * armSwing, walk), airPose(-.28, -.4), seated));
+    rightElbow.current.rotation.x = ease(rightElbow.current.rotation.x, pointRight ? -.08 : MathUtils.lerp(-elbowBend * walk - Math.max(0, -armPhase) * .14 * walk, airPose(-.6, -.4), mood === "wave" ? 0 : seated));
     leftElbow.current.rotation.x = ease(leftElbow.current.rotation.x, pointLeft ? -.08 : MathUtils.lerp(-elbowBend * walk - Math.max(0, armPhase) * .14 * walk, airPose(-.55, -.3), flying));
     if (!ready.current) {
       ready.current = true;
@@ -323,10 +387,12 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.185, 0]} scale={[0.7, 0.4, 1]}>
+      <mesh ref={groundShadow} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.185, 0]} scale={[0.7, 0.4, 1]}>
         <circleGeometry args={[1, 40]} />
         <meshBasicMaterial color="#101927" transparent opacity={0.13} depthWrite={false} />
       </mesh>
+      <group ref={rideRig}>
+      <group ref={balloon} position={[0, -.775, .10]} visible={false}><BalloonRide /></group>
       <group ref={figure}>
       <group ref={pelvis}>
       {[-1, 1].map((side) => (
@@ -402,23 +468,32 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
       </group>
       </group>
       </group>
+      </group>
     </group>
   );
 }
 
-function fitAvatarCamera(camera: OrthographicCamera, width: number, height: number) {
-  camera.zoom = Math.min(width / 1.92, height / 2.94);
-  camera.position.set(0.55, 0.33, 6);
-  camera.lookAt(0, 0.09, 0);
+function fitAvatarCamera(camera: OrthographicCamera, width: number, height: number, ride: number) {
+  camera.zoom = Math.min(width / 2.7, height / 4.6);
+  const bottom = MathUtils.lerp(-1.30, -2.94, ride);
+  const center = bottom + height / camera.zoom / 2;
+  camera.position.set(.55, center + .24, 6);
+  camera.lookAt(0, center, 0);
   camera.updateProjectionMatrix();
 }
 
-function CameraAndContext({ onUnavailable }: Pick<Props, "onUnavailable">) {
+function CameraAndContext({ onUnavailable, travel, reducedMotion, active }: Pick<Props, "onUnavailable" | "travel" | "reducedMotion" | "active">) {
   const { camera, size, gl, invalidate } = useThree();
+  const flight = useRef(0);
   useEffect(() => {
-    fitAvatarCamera(camera as OrthographicCamera, size.width, size.height);
+    fitAvatarCamera(camera as OrthographicCamera, size.width, size.height, MathUtils.smoothstep(flight.current, 0, .55));
     invalidate();
   }, [camera, size.width, size.height, invalidate]);
+  useFrame((_, delta) => {
+    const target = reducedMotion || !active ? 0 : MathUtils.clamp(travel?.current.flight ?? 0, 0, 1);
+    flight.current = reducedMotion || !active ? target : MathUtils.damp(flight.current, target, 9, Math.min(delta, .05));
+    fitAvatarCamera(camera as OrthographicCamera, size.width, size.height, MathUtils.smoothstep(flight.current, 0, .55));
+  });
   useEffect(() => {
     const canvas = gl.domElement;
     const contextLost = (event: Event) => {
@@ -455,7 +530,7 @@ export default function BuilderAvatar({ mood, reducedMotion = false, active = tr
         <directionalLight position={[-3, 5, 6]} color="#fff0db" intensity={3.4} />
         <directionalLight position={[4, 2, -3]} color="#b7d7ff" intensity={3} />
         <directionalLight position={[2, 0, 4]} color="#d4e1ff" intensity={0.6} />
-        <CameraAndContext onUnavailable={onUnavailable} />
+        <CameraAndContext onUnavailable={onUnavailable} travel={travel} reducedMotion={reducedMotion} active={active} />
         <Character mood={mood} reducedMotion={reducedMotion} active={active} travel={travel} interacting={interacting} onReady={onReady} />
       </Canvas>
     </AvatarBoundary>

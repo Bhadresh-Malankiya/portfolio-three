@@ -173,6 +173,54 @@ export function sampleCompanionRouteDistance(
   return rest(route.origin, -1, 0);
 }
 
+/**
+ * Skip obsolete loops after a scroll jump without changing the rendered position.
+ * Ground runs have an exact distance-to-x relationship, so the same point can be
+ * found analytically on a later (or earlier) run. Flights are only interchangeable
+ * at matching landing endpoints; an airborne sample must keep its current pose.
+ * Both inputs use the same endpoint clamping as the distance sampler.
+ */
+export function rebaseCompanionRouteDistance(
+  distance: number,
+  target: number,
+  route: CompiledCompanionRoute,
+): number {
+  if (Number.isNaN(distance) || Number.isNaN(target)) {
+    throw new Error("Companion route rebase distances cannot be NaN.");
+  }
+  const current = Math.max(0, Math.min(route.totalDistance, distance));
+  const destination = Math.max(0, Math.min(route.totalDistance, target));
+  if (current === destination || !route.legs.length) return current;
+  const position = sampleCompanionRouteDistance(current, route);
+  if (position.phase === "fly") return current;
+
+  const direction = Math.sign(destination - current);
+  const tolerance = 1e-7;
+  let best = current;
+  const consider = (candidate: number) => {
+    if ((candidate - current) * direction <= tolerance || (destination - candidate) * direction < 0) return;
+    if (Math.abs(destination - candidate) >= Math.abs(destination - best) - tolerance) return;
+    const point = sampleCompanionRouteDistance(candidate, route);
+    if (point.phase === "fly" || Math.hypot(point.x - position.x, point.y - position.y) > tolerance) return;
+    best = candidate;
+  };
+
+  for (const segment of route.legs) {
+    const { leg, startDistance, endDistance } = segment;
+    // Exact endpoints also allow skipping a completed out-and-back flight.
+    if (Math.hypot(leg.from.x - position.x, leg.from.y - position.y) <= tolerance) consider(startDistance);
+    if (Math.hypot(leg.to.x - position.x, leg.to.y - position.y) <= tolerance) consider(endDistance);
+    if (leg.mode !== "run" || Math.abs(leg.from.y - position.y) > tolerance) continue;
+    const width = leg.to.x - leg.from.x;
+    if (!width) continue;
+    const fraction = (position.x - leg.from.x) / width;
+    if (fraction > 0 && fraction < 1) {
+      consider(startDistance + fraction * (endDistance - startDistance));
+    }
+  }
+  return best;
+}
+
 export type CompanionJourneyRouteOptions = {
   sectionTops: { work?: number; mobile?: number; about?: number; experience?: number };
   /** Layout viewport width (document.documentElement.clientWidth). */

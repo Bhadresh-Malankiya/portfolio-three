@@ -12,6 +12,11 @@ for (const width of [320, 390, 768, 1024, 1440, 1920, 2560]) {
       const top = height - size.bottom - size.height + point.y;
       assert.ok(left >= 12 && left + size.width <= width - 12, `${width}×${height}: horizontal viewport clearance`);
       assert.ok(top >= 12 && top + size.height <= height - 12, `${width}×${height}: vertical viewport clearance`);
+      const canvas = width < 700 ? { width: 72, height: 118 } : height <= 560 ? { width: 108, height: 174 } : { width: 144, height: 236 };
+      const canvasLeft = left + (size.width - canvas.width) / 2;
+      const canvasTop = height - size.bottom - canvas.height + point.y;
+      assert.ok(canvasLeft >= 0 && canvasLeft + canvas.width <= width, "The expanded balloon canvas stays inside the viewport");
+      assert.ok(canvasTop >= 72 && canvasTop + canvas.height <= height - 12, "Balloon, rider and tether retain vertical clearance from navigation");
       positions++;
     };
     const fixed = buildCompanionJourneyRoute({ sectionTops, width, height, fixed: true });
