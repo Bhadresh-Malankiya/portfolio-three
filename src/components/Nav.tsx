@@ -56,7 +56,7 @@ export default function Nav() {
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
           ? "border-b border-line bg-ink/85 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent",
+          : "border-b border-white/10 bg-black/80 backdrop-blur-sm",
       )}
     >
       <motion.div
@@ -85,7 +85,7 @@ export default function Nav() {
                 href={l.href}
                 className={cn(
                   "font-mono text-xs uppercase tracking-[0.14em] transition-colors",
-                  active ? "text-gold" : "text-muted hover:text-fg",
+                  active ? "text-gold" : "text-fg/90 hover:text-gold",
                 )}
               >
                 {l.label}

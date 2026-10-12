@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import SectionHeading from "@/components/SectionHeading";
+import Link from "next/link";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import "@/app/project-worlds.css";
 import ProjectIndex from "@/components/ProjectIndex";
-import ContactCTA from "@/components/ContactCTA";
+import { profile } from "@/data/profile";
 import { portfolioProjects as projects } from "@/data/portfolio";
 
 export const metadata: Metadata = {
@@ -20,25 +22,14 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <>
-      <section className="pt-32 pb-14 sm:pt-40 sm:pb-16">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <SectionHeading
-            as="h1"
-            eyebrow={`// ${projects.length} projects`}
-            title="projects/"
-            description="Explore SaaS platforms, AI tools, and client products. Each project includes my contribution, the technology, and the results."
-          />
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-        <ProjectIndex />
-      </section>
-
-      <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-        <ContactCTA />
-      </section>
-    </>
+    <div className="work-directory-page">
+      <header className="directory-intro case-container">
+        <div className="directory-topline"><Link href="/"><ArrowLeft size={14} /> Back to the studio</Link><span>Product engineering / The collected work</span></div>
+        <div className="directory-title"><div><span className="case-label">The project index</span><h1>Different problems.<br /><em>Same curiosity.</em></h1></div><span className="directory-project-total" aria-label={`${projects.length} projects`}><b>{String(projects.length).padStart(2, "0")}</b><span>builds &<br />collaborations</span></span></div>
+        <div className="directory-intro-bottom"><p>Voice products, assessment platforms, client work and weekend experiments. The screens are the beginning; the decisions are in the details.</p><span>Explore by contribution ↓</span></div>
+      </header>
+      <section className="directory-body case-container" aria-label="Explore the project collection"><ProjectIndex /></section>
+      <div className="directory-closing"><div className="case-container"><p>What are you<br /><em>working on?</em></p><a href={`mailto:${profile.email}`}>Let’s talk about it <ArrowUpRight size={20} /></a></div></div>
+    </div>
   );
 }

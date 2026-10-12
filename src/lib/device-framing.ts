@@ -9,7 +9,9 @@ export function fitDeviceCamera(
   width: number,
   height: number,
 ) {
-  camera.aspect = Math.max(0.1, width / Math.max(1, height));
+  // A collapsed or not-yet-measured canvas must not reset an already fitted camera.
+  if (width <= 1 || height <= 1) return;
+  camera.aspect = Math.max(0.1, width / height);
   const target = new Vector3(0, kind === "phone" ? 0 : 0.6, 0);
   const direction = new Vector3(0, kind === "phone" ? 0.015 : 0.13, 1).normalize();
   const points: Vector3[] = [];
@@ -31,9 +33,9 @@ export function fitDeviceCamera(
               points.push(new Vector3(x, y, z).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation).add(new Vector3(0, lift, 0)));
         for (const x of [-1.94, 1.94])
           for (const y of [0, 2.46])
-            for (const z of [-0.05, 0.1])
+            for (const z of [-0.06, 0.1])
               points.push(new Vector3(x, y, z).applyEuler(new Euler(hinge, 0, 0))
-                .add(new Vector3(0, -0.52, -1.06)).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation).add(new Vector3(0, lift, 0)));
+                .add(new Vector3(0, -0.45, -1.06)).multiplyScalar(DEVICE_MAX_SCALE).applyEuler(rotation).add(new Vector3(0, lift, 0)));
       }
     }
   }

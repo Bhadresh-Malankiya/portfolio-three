@@ -25,6 +25,19 @@ export type PortfolioProject = Project & {
 // Keep historical routes/assets. The presentation layer distinguishes technical
 // responsibility from legal ownership and does not promote unverified statistics.
 const editorial: Record<string, Partial<PortfolioProject>> = {
+  "helpdesk-ai": { kind: "Personal build" },
+  jewelxi: {
+    problem: "A jewellery catalog needs to make the details easy to explore, from material and category to the individual piece.",
+    contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study.",
+    decisions: ["Give the product photography room, and keep the browsing controls close.", "Connect the catalog with product details and a custom-design enquiry path.", "Use 3D for a closer look at the piece, alongside a conventional shopping interface."],
+    narrative: ["Jewelxi is a public preview with an illustrative collection and test checkout."],
+    outcomes: ["A filterable jewellery catalog with search, material and category filters.", "A storefront, inspiration gallery and interactive product study."],
+  },
+  "hey-buddy": {
+    frame: "phone",
+    images: ["/images/heybuddy_4.png", "/images/heybuddy_1.jpeg", "/images/heybuddy_5.jpeg"],
+    imageCaptions: ["Mobile app launch screen.", "Product welcome and app download.", "Account and pet-profile onboarding."],
+  },
   "extendedforms-io": {
     kind: "Employer product",
     oneLiner:

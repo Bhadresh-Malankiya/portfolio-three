@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { useReducedMotion } from "framer-motion";
 import {
   ArrowUpRight,
   ChevronLeft,
@@ -41,6 +42,7 @@ type Props = {
   className?: string;
   mediaClassName?: string;
   fill?: boolean;
+  imageCaptions?: string[];
 };
 
 function ScreenshotViewer({
@@ -49,18 +51,21 @@ function ScreenshotViewer({
   index,
   go,
   onDismiss,
+  imageCaptions,
 }: {
   images: string[];
   name: string;
   index: number;
   go: (step: number) => void;
   onDismiss: () => void;
+  imageCaptions?: string[];
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [zoomed, setZoomed] = useState(false);
   const selected = images[index];
   const dimensions = imageDimensions[selected] ?? { w: 1600, h: 1000 };
+  const selectedCaption = imageCaptions?.[index] ?? caption(selected, index);
   useEffect(() => {
     const element = dialog.current;
     const previousOverflow = document.body.style.overflow;
@@ -98,7 +103,7 @@ function ScreenshotViewer({
             <span aria-live="polite">
               {String(index + 1).padStart(2, "0")} /{" "}
               {String(images.length).padStart(2, "0")} ·{" "}
-              {caption(selected, index)}
+              {selectedCaption}
             </span>
           </div>
           <button
@@ -111,11 +116,10 @@ function ScreenshotViewer({
         </div>
         <div
           className={`viewer-media ${zoomed ? "is-zoomed" : ""}`}
-          key={`${selected}-${zoomed}`}
         >
           <Image
             src={selected}
-            alt={`${name} — ${caption(selected, index)}`}
+            alt={`${name} — ${selectedCaption}`}
             width={dimensions.w}
             height={dimensions.h}
             unoptimized
@@ -176,13 +180,23 @@ export default function ProjectGallery({
   className = "",
   mediaClassName,
   fill = false,
+  imageCaptions,
 }: Props) {
+  const reducedMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [displayedIndex, setDisplayedIndex] = useState(0);
+  const [loadedSource, setLoadedSource] = useState<string | null>(null);
+  const selected = images[index] ?? images[0];
+  useEffect(() => {
+    if (loadedSource !== selected || index === displayedIndex) return;
+    const timeout = window.setTimeout(() => setDisplayedIndex(index), 280);
+    return () => window.clearTimeout(timeout);
+  }, [loadedSource, selected, index, displayedIndex]);
   const opener = useRef<HTMLButtonElement | null>(null);
   if (!images.length)
     return <div className="gallery-empty">Project imagery coming soon</div>;
-  const selected = images[index] ?? images[0];
+  const selectedCaption = imageCaptions?.[index] ?? caption(selected, index);
   const dimensions = imageDimensions[images[0]];
   const go = (step: number) =>
     setIndex((current) => (current + step + images.length) % images.length);
@@ -207,18 +221,29 @@ export default function ProjectGallery({
             : undefined
         }
       >
-        <Image
-          key={selected}
-          src={selected}
-          alt={`${name} — ${caption(selected, index)}`}
-          fill
-          sizes={
-            fill
-              ? "(min-width: 768px) 50vw, 100vw"
-              : "(min-width: 1024px) 850px, 100vw"
-          }
-          className="object-contain"
-        />
+        {[...new Set([displayedIndex, index])].map((imageIndex) => {
+          const source = images[imageIndex] ?? images[0];
+          const incoming = imageIndex !== displayedIndex;
+          return (
+            <Image
+              key={source}
+              src={source}
+              alt={imageIndex === index ? `${name} — ${selectedCaption}` : ""}
+              aria-hidden={imageIndex !== index}
+              fill
+              sizes={fill ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1440px) 1320px, 100vw"}
+              className="object-contain"
+              style={{
+                opacity: incoming && loadedSource !== source ? 0 : 1,
+                zIndex: incoming ? 1 : 0,
+                transition: reducedMotion ? "none" : "opacity 240ms ease",
+              }}
+              onLoad={() => {
+                if (imageIndex === index) setLoadedSource(source);
+              }}
+            />
+          );
+        })}
         {!fill && (
           <button
             className="gallery-inspect"
@@ -243,7 +268,7 @@ export default function ProjectGallery({
               {" "}
               / {String(images.length).padStart(2, "0")}
             </span>
-            <span className="gallery-caption">{caption(selected, index)}</span>
+            <span className="gallery-caption">{selectedCaption}</span>
           </p>
           {images.length > 1 && (
             <div className="flex items-center gap-2">
@@ -276,7 +301,7 @@ export default function ProjectGallery({
               <button
                 key={src}
                 onClick={() => setIndex(i)}
-                aria-label={`Show ${name} screenshot ${i + 1}: ${caption(src, i)}`}
+                aria-label={`Show ${name} screenshot ${i + 1}: ${imageCaptions?.[i] ?? caption(src, i)}`}
                 aria-pressed={index === i}
               >
                 <Image
@@ -297,6 +322,7 @@ export default function ProjectGallery({
           name={name}
           index={index}
           go={go}
+          imageCaptions={imageCaptions}
           onDismiss={() => {
             setViewerOpen(false);
             opener.current?.focus({ preventScroll: true });

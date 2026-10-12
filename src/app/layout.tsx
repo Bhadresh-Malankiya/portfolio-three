@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "./portfolio-theme.css";
+import "./exhibition.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingContactCard from "@/components/FloatingContactCard";
 import FloatingDownloads from "@/components/FloatingDownloads";
@@ -92,6 +93,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body className="relative overflow-x-clip portfolio-theme">
+        <noscript><style>{`.opening-curtain{display:none!important}.opening-title,.opening-title *,.workbench-poster{opacity:1!important;transform:none!important}.opening-story{height:auto}.opening-theatre{position:relative}`}</style></noscript>
         <JsonLd
           data={{
             "@context": "https://schema.org",

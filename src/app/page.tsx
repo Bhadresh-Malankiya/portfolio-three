@@ -11,11 +11,11 @@ export default function Home() {
       <DeviceGallery />
       <LifePanel />
       <ClientReviews />
-      <section id="downloads" className="page-shell take-home">
+      <section id="downloads" className="page-shell take-home exhibition-library">
         <div className="take-home-heading">
-          <p className="eyebrow">{"// take something with you"}</p>
+          <p className="eyebrow">06 / Off the screen</p>
           <h2>
-            The résumé.<em> The whole story.</em>
+            A few pages<em> to take with you.</em>
           </h2>
         </div>
         <DownloadsSection />

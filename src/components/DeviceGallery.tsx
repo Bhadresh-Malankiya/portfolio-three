@@ -13,7 +13,6 @@ import {
 } from "react";
 import {
   motion,
-  AnimatePresence,
   useInView,
   useMotionValueEvent,
   useScroll,
@@ -23,6 +22,8 @@ import {
 } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
 import { PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
+import ProductScenery from "@/components/ProductScenery";
+import WorkArchive from "@/components/WorkArchive";
 import { scrollToPosition } from "@/components/SmoothScroll";
 
 const DeviceScene = dynamic(() => import("@/components/three/DeviceScene"), {
@@ -83,9 +84,9 @@ const projects: GalleryProject[] = [
     role: "Mobile & mapping integration",
     features: ["GPS tracking", "Pet health", "NFC tags"],
     images: [
-      "/images/heybuddy_2.png",
-      "/images/heybuddy_3.png",
+      "/images/heybuddy_4.png",
       "/images/heybuddy_1.jpeg",
+      "/images/heybuddy_5.jpeg",
     ],
     phone: true,
     url: "https://heybuddy.io",
@@ -106,16 +107,16 @@ const snapshot = () => window.matchMedia(query).matches;
 const serverSnapshot = () => false;
 const mobileStories = [
   {
-    title: "A profile. A way home.",
+    title: "A small companion. A big connection.",
     description:
-      "Pet profiles and NFC tags put the right information in reach.",
-    label: "Pet profiles",
+      "The mobile companion for pets, their people, and their connected tags.",
+    label: "The companion app",
   },
   {
-    title: "Their health, in one place.",
+    title: "One tag. A way to connect.",
     description:
-      "Medical details stay with the pet’s profile, ready when needed.",
-    label: "Health records",
+      "A welcome experience that connects the physical product with the app.",
+    label: "Meet Hey Buddy",
   },
   {
     title: "From tag to app.",
@@ -211,14 +212,16 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     <section
       ref={ref}
       id={mobile ? "mobile-work" : "work"}
-      className={`device-chapter center-stage ${mobile ? "phone-chapter" : "web-chapter"}`}
+      className={`device-chapter center-stage product-world ${mobile ? "phone-chapter" : "web-chapter"}`}
       data-scroll={animated}
+      data-project={p.slug}
       aria-label={mobile ? "Mobile project showcase" : "Web project showcase"}
     >
       <div className="chapter-sticky">
+        <ProductScenery project={p.slug} name={mobile ? "A little closer." : p.name} />
         <div className="chapter-topline page-shell">
           <span>
-            {mobile ? "02 / MOBILE — iPhone Pro" : "01 / WEB — MacBook Pro"}
+            {mobile ? "02 / A COMPANION, IN YOUR POCKET" : "01 / PRODUCTS IN THE BROWSER"}
           </span>
           <span>
             {animated
@@ -300,17 +303,14 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             style={{ opacity: animated ? opacity : 1 }}
             inert={animated && closing}
           >
-            <AnimatePresence mode="wait" initial={false}>
               <motion.div className="chapter-caption" key={active}
-                initial={{ opacity: 0, y: reduced ? 0 : 8 }}
+                initial={{ opacity: 0.65, y: reduced ? 0 : 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: reduced ? 0 : -8 }}
                 transition={{ duration: reduced ? 0 : 0.18 }}>
                 <p className="eyebrow">{mobile ? `Hey Buddy / 0${active + 1}` : p.kind}</p>
                 <h3>{mobile ? mobileStories[active].title : p.name}</h3>
                 <p className="chapter-description">{mobile ? mobileStories[active].description : p.caption}</p>
               </motion.div>
-            </AnimatePresence>
             <div className="chapter-evidence">
               <div className="feature-pills">
                 {(mobile ? [mobileStories[active].label, "React Native"] : p.features).map((feature) => <span key={feature}>{feature}</span>)}
@@ -405,35 +405,19 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
 export default function DeviceGallery() {
   return (
     <>
-      <div className="work-heading page-shell">
-        <p className="eyebrow">Selected work / 01—02</p>
-        <h2>
-          Built for the way
-          <br />
-          <em>people use it.</em>
-        </h2>
-        <p>From the browser to the palm of your hand.</p>
+      <div className="work-prologue">
+        <p className="eyebrow">Selected work / A few things I’ve put into the world</p>
+        <span className="work-prologue-stamp" aria-hidden="true">DESIGNED TO<strong>work.</strong>BUILT TO BE USED</span>
+        <h2>Different problems.<br /><em>All the way to live.</em></h2>
+        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>My own ideas. Products built with teams. Tools that found their way into everyday work.</p></div>
       </div>
       <ProjectChapter />
-      <div className="mobile-chapter-heading page-shell">
-        <p className="eyebrow">A different screen. A different context.</p>
-        <h2>
-          Life happens
-          <br />
-          <em>away from the desk.</em>
-        </h2>
-        <p>One mobile project. Three everyday moments.</p>
+      <div className="mobile-interlude">
+        <div><p className="eyebrow">Different screen. Real lives.</p><h2>Some things belong<br /><em>closer to you.</em></h2><p>Hey Buddy connects pets, their people, and the information that matters.</p></div>
+        <div className="mobile-orbit" aria-hidden="true"><span>✳</span></div>
       </div>
       <ProjectChapter mobile />
-      <div className="gallery-end page-shell">
-        <p>
-          Also in the archive: <Link href="/projects/jewelxi">Jewelxi ↗</Link>
-          <Link href="/projects/zwopr">ZWOPR ↗</Link>
-        </p>
-        <Link className="button-secondary" href="/projects">
-          View all 15 projects <ArrowUpRight size={17} />
-        </Link>
-      </div>
+      <WorkArchive />
     </>
   );
 }

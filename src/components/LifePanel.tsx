@@ -2,208 +2,74 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
-import AchievementMark from "@/components/AchievementMark";
-import Reveal from "@/components/Reveal";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { ArrowDownRight, ArrowUpRight, Plus } from "lucide-react";
 import { deliveryExpertise } from "@/data/skills";
+import "@/app/human-story.css";
 
-const tabs = ["Journey", "Expertise", "Founder mindset"];
 const journey = [
-  {
-    year: "Now",
-    title: "AscendXI / VocalXI",
-    role: "Founder & product engineer",
-    detail: "Building VocalXI solo: product decisions, frontend, backend, voice AI and deployment. From the first idea to a working product.",
-  },
-  {
-    year: "2022–2026",
-    title: "ExpressTech Systems",
-    role: "Senior engineer / Technical lead",
-    detail: "Led engineering across ExtendedForms and Quzo. ExtendedForms serves 400K+ users and has supported 10M+ online exams.",
-  },
-  {
-    year: "2020–2022",
-    title: "MB Systems",
-    role: "Founder · side venture",
-    detail:
-      "Founded a studio alongside my engineering role. Owned client relationships, hiring and delivery; closed it in 2022 and carried the lessons forward.",
-  },
-  {
-    year: "2018–2022",
-    title: "HQ Infosystem",
-    role: "Full-stack developer",
-    detail:
-      "Built web applications, APIs and payment integrations with JavaScript, PHP and Laravel. The foundation for taking a problem from discovery to production.",
-  },
+  { year: "Now", title: "AscendXI / VocalXI", role: "Founder & product engineer", detail: "Building VocalXI solo — from customer conversations and voice AI to the interface, backend and deployment." },
+  { year: "2022–2026", title: "ExpressTech Systems", role: "Senior engineer / Technical lead", detail: "Led engineering across ExtendedForms and Quzo, and managed 10+ developers. ExtendedForms serves 400K+ users and has supported 10M+ online exams." },
+  { year: "2020–2022", title: "MB Systems", role: "Founder · side venture", detail: "Started a studio alongside my engineering role. Took responsibility for the clients, hiring and delivery. Closed it in 2022; kept the lessons." },
+  { year: "2018–2022", title: "HQ Infosystem", role: "Full-stack developer", detail: "Web applications, APIs and payment integrations with JavaScript, PHP and Laravel. Where I learned to follow a problem all the way to production." },
 ];
+const impact = [
+  { value: "400K+", label: "ExtendedForms users", href: "/projects/extendedforms-io" },
+  { value: "10M+", label: "Online exams on ExtendedForms", href: "/projects/extendedforms-io" },
+  { value: "10+", label: "Developers managed", href: "#experience" },
+  { value: "10 → 100K", label: "Users · experience scaling products", href: "/projects" },
+];
+
 export default function LifePanel() {
-  const [tab, setTab] = useState(0);
-  const [role, setRole] = useState(0);
-  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const [role, setRole] = useState<number | null>(0);
+  const section = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
-  useEffect(() => {
-    function sync() {
-      if (location.hash === "#experience") setTab(0);
-      if (location.hash === "#expertise") setTab(1);
-    }
-    sync();
-    function onAnchor(event: MouseEvent) {
-      const link = (event.target as Element).closest<HTMLAnchorElement>(
-        "a[href]",
-      );
-      if (!link) return;
-      const url = new URL(link.href);
-      if (url.origin !== location.origin || url.pathname !== location.pathname)
-        return;
-      if (url.hash === "#experience") setTab(0);
-      if (url.hash === "#expertise") setTab(1);
-    }
-    window.addEventListener("hashchange", sync);
-    document.addEventListener("click", onAnchor, true);
-    return () => {
-      window.removeEventListener("hashchange", sync);
-      document.removeEventListener("click", onAnchor, true);
-    };
-  }, []);
+  const { scrollYProgress } = useScroll({ target: section, offset: ["start end", "end start"] });
+  const orbitRotation = useTransform(scrollYProgress, [0, 1], [-18, 30]);
+  const portraitY = useTransform(scrollYProgress, [0, 1], [16, -16]);
   return (
-    <section className="life-section page-shell" id="about">
-      <span className="life-anchor" id="experience" />
-      <span className="life-anchor" id="expertise" />
-      <div className="life-heading">
-        <p className="eyebrow">{"// engineer. technical lead. founder."}</p>
-        <h2>
-          One person.
-          <br />
-          <em>A few different hats.</em>
-        </h2>
-      </div>
-      <div className="life-board glass-panel">
-        <Reveal className="life-portrait portrait-depth" tilt y={0}>
-          <Image
-            src="/images/profile.png"
-            alt="Bhadresh Malankiya"
-            fill
-            sizes="(min-width: 900px) 380px, 85vw"
-            className="object-contain object-bottom"
-          />
-          <span className="portrait-orbit" aria-hidden="true" />
-          <span className="portrait-floating-code" aria-hidden="true">build. ship. learn.</span>
-          <div className="life-signature">
-            <strong>Bhadresh.</strong>
-            <span>Surat, India · Building since 2018</span>
+    <section className="life-section page-shell field-journal" id="about" ref={section}>
+      <div className="journal-inner">
+        <div className="journal-folio"><span>04 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
+        <header className="journal-heading">
+          <h2>The code is only<br /><em>half the story.</em></h2>
+          <div className="journal-intro"><span className="journal-asterisk" aria-hidden="true">✳</span><p>I’m Bhadresh. An engineer who likes the customer conversation as much as the code that follows.</p><span className="journal-role">FORWARD DEPLOYED ENGINEER</span></div>
+        </header>
+        <div className="journal-spread">
+          <div className="journal-portrait-column">
+            <figure className="journal-portrait">
+              <div className="journal-portrait-disc" aria-hidden="true" />
+              <motion.div className="journal-portrait-orbit" aria-hidden="true" style={reduced ? undefined : { rotate: orbitRotation }}><svg viewBox="0 0 600 600">
+                <ellipse cx="300" cy="300" rx="281" ry="196" fill="none" stroke="currentColor" strokeWidth="1" />
+                <ellipse cx="300" cy="300" rx="281" ry="196" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(62 300 300)" />
+                <circle cx="38" cy="235" r="7" fill="currentColor" /><path d="M491 418h28m-14-14v28M90 437h18m-9-9v18" stroke="currentColor" strokeWidth="2" />
+              </svg></motion.div>
+              <span className="journal-portrait-number" aria-hidden="true">BM.</span>
+              <motion.div className="journal-portrait-image" style={reduced ? undefined : { y: portraitY }}><Image src="/images/profile.png" alt="Bhadresh Malankiya" fill sizes="(min-width: 900px) 45vw, 90vw" /></motion.div>
+              <div className="journal-portrait-note"><span>Builder by habit.</span><ArrowDownRight size={36} strokeWidth={1} /></div>
+              <figcaption><strong>Bhadresh Malankiya</strong><span>ENGINEER / TECHNICAL LEAD / FOUNDER</span></figcaption>
+              <span className="journal-portrait-stamp" aria-hidden="true">IDEAS<br />INTO<br /><b>PRODUCTION.</b></span>
+            </figure>
+            <div className="journal-founder-note"><span>NOTE TO SELF / 001</span><p>Own the problem.<br />Stay for the outcome.</p><small>MB Systems taught me the business side. Building VocalXI solo keeps me close to every product decision.</small><a href="https://vocalxi.com" target="_blank" rel="noopener noreferrer">See what I’m building <ArrowUpRight size={15} /></a></div>
           </div>
-        </Reveal>
-        <div className="life-content">
-          <div className="life-intro">
-            <p className="eyebrow">Forward Deployed Engineer</p>
-            <p>I work from the customer problem through to production — across frontend, backend and AI, with a founder’s eye for what matters.</p>
+          <div className="journal-career" id="experience">
+            <div className="journal-subheading"><span>THE LONG WAY ROUND</span><span>2018 → NOW</span></div><h3>A little more<br />ownership, every time.</h3>
+            <ol className="journal-timeline">{journey.map((item, index) => (
+              <li key={item.title} data-active={role === index}>
+                <button type="button" onClick={() => setRole(role === index ? null : index)} aria-expanded={role === index} aria-controls={role === index ? `career-detail-${index}` : undefined}><span className="journal-year">{item.year}</span><span className="journal-position"><strong>{item.title}</strong><small>{item.role}</small></span><Plus size={19} strokeWidth={1.5} aria-hidden="true" /></button>
+                <AnimatePresence initial={false}>{role === index && <motion.div id={`career-detail-${index}`} initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}><p>{item.detail}</p></motion.div>}</AnimatePresence>
+              </li>
+            ))}</ol>
+            <Link className="journal-story-link" href="/journey">Read the longer story <ArrowUpRight size={18} /></Link>
           </div>
-          <div role="tablist" aria-label="My background" className="life-tabs">
-            {tabs.map((name, i) => (
-              <button
-                key={name}
-                ref={(el) => {
-                  buttons.current[i] = el;
-                }}
-                id={`life-tab-${i}`}
-                role="tab"
-                aria-selected={tab === i}
-                aria-controls="life-panel"
-                tabIndex={tab === i ? 0 : -1}
-                onClick={() => setTab(i)}
-                onKeyDown={(e) => {
-                  let next = tab;
-                  if (e.key === "ArrowRight") next = (tab + 1) % 3;
-                  else if (e.key === "ArrowLeft") next = (tab + 2) % 3;
-                  else if (e.key === "Home") next = 0;
-                  else if (e.key === "End") next = 2;
-                  else return;
-                  e.preventDefault();
-                  setTab(next);
-                  buttons.current[next]?.focus();
-                }}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-          <div
-            id="life-panel"
-            role="tabpanel"
-            aria-labelledby={`life-tab-${tab}`}
-            tabIndex={0}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={tab}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: reduced ? 0 : 0.2 }}
-              >
-                {tab === 0 && (
-                  <>
-                    <div className="life-timeline">
-                      {journey.map((item, i) => (
-                        <button
-                          key={item.title}
-                          onClick={() => setRole(i)}
-                          aria-pressed={role === i}
-                        >
-                          <span>{item.year}</span>
-                          <i />
-                          <strong>
-                            {item.title}
-                            <small>{item.role}</small>
-                          </strong>
-                        </button>
-                      ))}
-                    </div>
-                    <p className="life-detail" aria-live="polite">
-                      {journey[role].detail}
-                    </p>
-                  </>
-                )}
-                {tab === 1 && (
-                  <div className="delivery-expertise">
-                    {deliveryExpertise.map((item) => (
-                      <div key={item.title}>
-                        <span className="expertise-index" aria-hidden="true">{item.code}</span>
-                        <h3>{item.title}</h3>
-                        <p>{item.detail}</p>
-                        <small>{item.tools}</small>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {tab === 2 && (
-                  <div className="life-beyond life-founder">
-                    <span className="life-large" aria-hidden="true">idea → live</span>
-                    <h3>I’ve been on both sides of the brief.</h3>
-                    <p>At MB Systems, I ran the business as well as the build. Today, I’m building VocalXI solo — a voice-first way to complete forms.</p>
-                    <p>That changes how I work: understand the customer, choose the scope, ship, and stay accountable after launch.</p>
-                    <div className="life-founder-links">
-                      <a href="https://vocalxi.com" target="_blank" rel="noopener noreferrer" className="text-link">Explore VocalXI <ArrowUpRight size={15} /></a>
-                      <a href="#downloads" className="text-link">The Weekend Builder <ArrowUpRight size={15} /></a>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          <Link className="life-story-link" href="/journey">
-            The longer story <ArrowUpRight size={14} />
-          </Link>
+        </div>
+        <dl className="journal-impact" aria-label="Experience and product impact">{impact.map((item, index) => <div key={item.label}><dt><Link href={item.href}><span className="journal-metric-index" aria-hidden="true">0{index + 1} /</span><strong>{item.value}</strong><ArrowUpRight size={20} /></Link></dt><dd>{item.label}</dd></div>)}</dl>
+        <div className="journal-toolbox" id="expertise">
+          <div className="journal-toolbox-heading"><div><span className="journal-kicker">THE WORKING TOOLBOX</span><h3>From the interface<br />to the infrastructure.</h3></div><p>One product, many moving parts.<br />I connect them.</p></div>
+          <div className="journal-capabilities">{deliveryExpertise.map((item, index) => <motion.div key={item.code} className="journal-capability" initial={reduced ? false : { y: 20 }} whileInView={{ y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6, delay: index % 3 * 0.06 }}><span>{item.code}</span><h4>{item.title}</h4><p>{item.detail}</p><small>{item.tools}</small></motion.div>)}</div>
         </div>
       </div>
-      <dl className="life-impact" aria-label="Experience and product impact">
-        <div><dt><Link href="/projects/extendedforms-io" aria-label="400K+ users — explore ExtendedForms"><AchievementMark kind="reach" /><span>400K+</span><ArrowUpRight size={15} /></Link></dt><dd>ExtendedForms users</dd></div>
-        <div><dt><Link href="/projects/extendedforms-io" aria-label="10M+ exams — explore ExtendedForms"><AchievementMark kind="exams" /><span>10M+</span><ArrowUpRight size={15} /></Link></dt><dd>Online exams on ExtendedForms</dd></div>
-        <div><dt><a href="#experience" aria-label="10+ developers managed — see my experience"><AchievementMark kind="team" /><span>10+</span><ArrowUpRight size={15} /></a></dt><dd>Developers managed</dd></div>
-        <div><dt><Link href="/projects" aria-label="From 10 to 100,000 users — explore my projects"><AchievementMark kind="growth" /><span>10 → 100K</span><ArrowUpRight size={15} /></Link></dt><dd>Users · experience scaling products</dd></div>
-      </dl>
     </section>
   );
 }

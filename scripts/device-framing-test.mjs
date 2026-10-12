@@ -5,6 +5,7 @@ import { fitDeviceCamera } from "../src/lib/device-framing.ts";
 
 let samples = 0;
 for (const [width, height] of [
+  [240, 360],
   [280, 300],
   [327, 300],
   [638, 346],
@@ -17,6 +18,8 @@ for (const [width, height] of [
   [1600, 1550],
   [900, 1400],
   [2700, 780],
+  [3440, 760],
+  [3840, 1800],
 ]) {
   for (const kind of ["laptop", "phone"]) {
     const camera = new PerspectiveCamera(
@@ -36,11 +39,11 @@ for (const [width, height] of [
             for (const z of [-1.2, 1.46]) points.push(new Vector3(x, y, z));
         for (const x of [-1.94, 1.94])
           for (const y of [0, 2.46])
-            for (const z of [-0.05, 0.08])
+            for (const z of [-0.06, 0.1])
               points.push(
                 new Vector3(x, y, z)
                   .applyEuler(new Euler(hinge, 0, 0))
-                  .add(new Vector3(0, -0.52, -1.06)),
+                  .add(new Vector3(0, -0.45, -1.06)),
               );
         points.forEach((p) => p.multiplyScalar(pose.scale).applyEuler(new Euler(0, pose.rotationY, pose.rotationZ)).add(new Vector3(0, pose.lift, 0)));
       } else {
@@ -61,9 +64,9 @@ for (const [width, height] of [
         if (kind === "laptop" && width >= 1000) {
           const screen = [];
           for (const x of [-1.79, 1.79]) for (const y of [-1.11875, 1.11875]) {
-            screen.push(new Vector3(x, y + 1.21, 0.063)
+            screen.push(new Vector3(x, y + 1.21, 0.071)
               .applyEuler(new Euler(pose.hinge, 0, 0))
-              .add(new Vector3(0, -0.52, -1.06)).multiplyScalar(pose.scale)
+              .add(new Vector3(0, -0.45, -1.06)).multiplyScalar(pose.scale)
               .applyEuler(new Euler(0, pose.rotationY, pose.rotationZ))
               .add(new Vector3(0, pose.lift, 0)).project(camera));
           }
@@ -76,7 +79,7 @@ for (const [width, height] of [
       for (const point of points) {
         const projected = point.project(camera);
         assert.ok(
-          Math.abs(projected.x) < 0.98 && Math.abs(projected.y) < 0.98,
+          Math.abs(projected.x) < 0.98 && Math.abs(projected.y) < 0.98 && projected.z > -1 && projected.z < 1,
           `${kind} clipped at ${width}×${height}, step ${step}: ${projected.toArray()}`,
         );
         samples++;
@@ -85,7 +88,7 @@ for (const [width, height] of [
   }
 }
 console.log(
-  `Passed: ${samples} projected device corners remain inside the frame across twelve viewport ratios and 101 scroll poses.`,
+  `Passed: ${samples} projected device corners remain inside the frame across fifteen viewport ratios and 101 scroll poses.`,
 );
 
 for (const stop of PROJECT_STOPS) {
@@ -104,3 +107,10 @@ console.log("Passed: readable project stops, continuous zoom, close-before-exit 
 
 assert.equal(devicePose(0.04, false).hinge, Math.PI / 2, "Lid waits until the section is pinned");
 assert.equal(devicePose(0.04, true).rotationY, devicePose(0, true).rotationY, "Phone waits until the section is pinned");
+
+const retainedCamera = new PerspectiveCamera(12, 2, 0.1, 100);
+fitDeviceCamera(retainedCamera, "laptop", 1200, 600);
+const measuredPosition = retainedCamera.position.clone();
+fitDeviceCamera(retainedCamera, "laptop", 0, 0);
+assert.deepEqual(retainedCamera.position, measuredPosition, "A transient zero-size layout must retain the fitted camera");
+console.log("Passed: an unmeasured canvas cannot reset the fitted camera.");

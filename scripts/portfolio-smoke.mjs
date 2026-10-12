@@ -174,14 +174,14 @@ try {
   // Switching to the non-scroll layout must clear the desktop exit transform.
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Health records", exact: true })
+    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
     .click();
   await page.waitForFunction(
     () =>
       document.querySelector("#mobile-work .device-canvas")?.dataset.ready ===
       "true",
   );
-  await page.getByRole("button", { name: "02 Quzo.ai", exact: true }).click();
+  await page.getByRole("link", { name: "about()", exact: true }).click();
   await page.waitForFunction(
     () =>
       document.querySelector("#mobile-work .device-canvas")?.style.opacity ===
@@ -201,6 +201,7 @@ try {
     "both visited scenes remain mounted",
   );
   await page.goto(base, { waitUntil: "networkidle" });
+  assert.equal(await page.locator(".opening-title").evaluate(el => getComputedStyle(el).opacity), "1", "mobile hero remains visible without a pinned scroll range");
   await page.getByRole("button", { name: "Open menu", exact: true }).click();
   await page
     .locator("#mobile-navigation")
@@ -215,10 +216,10 @@ try {
   );
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Health records", exact: true })
+    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
     .click();
   await page
-    .getByRole("heading", { name: "Their health, in one place.", exact: true })
+    .getByRole("heading", { name: "One tag. A way to connect.", exact: true })
     .waitFor();
   assert.ok(
     await page
@@ -261,7 +262,7 @@ try {
       "heading works without motion/JavaScript",
     );
     assert.ok(
-      await p.getByRole("link", { name: "View all 15 projects" }).isVisible(),
+      await p.getByRole("link", { name: "Explore all 15 projects" }).isVisible(),
       "CTA works without motion/JavaScript",
     );
     await p.goto(base + "/projects/quzo-ai", { waitUntil: "networkidle" });
