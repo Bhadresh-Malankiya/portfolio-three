@@ -17,6 +17,25 @@ const routes = [
   "/journey",
   "/field-guide",
 ];
+const guideLabels = {
+  "/": "The beginning",
+  "/projects": "More to explore",
+  "/journey": "The longer story",
+  "/field-guide": "For your journey",
+};
+
+async function assertCompanionRendered(page, message) {
+  // Canvas presence alone misses the regression where its fallback side effect
+  // permanently replaced a successfully mounted avatar with the portrait.
+  await page.waitForFunction(() => {
+    const canvas = document.querySelector(".companion-model canvas");
+    return canvas && canvas.width > 0 && canvas.height > 0
+      && !document.querySelector(".companion-fallback");
+  });
+  assert.equal(await page.locator(".companion-model canvas").count(), 1, message);
+  assert.equal(await page.locator(".companion-fallback").count(), 0, `${message}: first 3D frame is ready`);
+}
+
 try {
   for (const width of [360, 390, 768, 1024, 1440, 1920]) {
     const context = await browser.newContext({
@@ -32,6 +51,19 @@ try {
       assert.equal(response?.status(), 200, `${route} returns 200`);
       await page.evaluate(() => document.fonts.ready);
       assert.equal(await page.locator("h1").count(), 1, `${route}: one h1`);
+      const expectedGuide = guideLabels[route] ?? "Inside the work";
+      await page.waitForFunction(
+        (label) => document.querySelector(".companion-chapter-top > span")?.textContent === label,
+        expectedGuide,
+      );
+      assert.equal(
+        await page.locator(".companion-chapter-top > span").textContent(),
+        expectedGuide,
+        `${width}px ${route}: companion describes the current page`,
+      );
+      if (route === "/" && [390, 1440].includes(width)) {
+        await assertCompanionRendered(page, `${width}px: actual 3D companion renders`);
+      }
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > innerWidth + 1,
       );
@@ -141,6 +173,25 @@ try {
     "true",
   );
   await page.goto(base, { waitUntil: "networkidle" });
+  const desktopGuide = page.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true });
+  const desktopCard = page.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });
+  await desktopGuide.hover();
+  await desktopCard.waitFor({ state: "visible" });
+  await desktopGuide.click();
+  assert.equal(await desktopGuide.getAttribute("aria-expanded"), "true", "clicking an already-hovered guide pins its card instead of closing it");
+  await desktopGuide.click();
+  await desktopCard.waitFor({ state: "hidden" });
+  assert.equal(await desktopGuide.getAttribute("aria-expanded"), "false", "second explicit click closes a pinned card");
+  const openingStory = page.getByRole("group", { name: "Explore the opening story", exact: true });
+  await openingStory.getByRole("button", { name: /Make the pieces work/ }).click();
+  await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "1");
+  assert.equal(await openingStory.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "desktop chapter control scrolls to the build act");
+  assert.equal(await page.locator(".flight-narrative h2").textContent(), "A little less guessing. A working prototype.", "build act presents its story");
+  await openingStory.getByRole("button", { name: /Put it in the world/ }).click();
+  await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
+  assert.equal(await page.locator(".flight-narrative h2").textContent(), "Ship it. Watch it. Make it better.", "ship act presents its story");
+  await openingStory.getByRole("button", { name: /Find the question/ }).click();
+  await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "0");
   await page.getByRole("button", { name: "02 Quzo.ai", exact: true }).click();
   await page.waitForFunction(
     () =>
@@ -201,7 +252,7 @@ try {
     "both visited scenes remain mounted",
   );
   await page.goto(base, { waitUntil: "networkidle" });
-  assert.equal(await page.locator(".opening-title").evaluate(el => getComputedStyle(el).opacity), "1", "mobile hero remains visible without a pinned scroll range");
+  assert.equal(await page.locator(".flight-heading").evaluate(el => getComputedStyle(el).opacity), "1", "mobile hero remains visible without a pinned scroll range");
   await page.getByRole("button", { name: "Open menu", exact: true }).click();
   await page
     .locator("#mobile-navigation")
@@ -247,6 +298,50 @@ try {
   );
   await context.close();
 
+  // A real touch context prevents mouse-hover timing from pretending to test taps.
+  const touchContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const touchPage = await touchContext.newPage();
+  touchPage.on("pageerror", (error) => errors.push(`touch companion: ${error.message}`));
+  await touchPage.goto(base, { waitUntil: "networkidle" });
+  await assertCompanionRendered(touchPage, "touch: actual 3D companion renders");
+  const touchChapters = touchPage.getByRole("group", { name: "Explore the opening story", exact: true });
+  await touchChapters.getByRole("button", { name: /Make the pieces work/ }).tap();
+  await touchPage.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "1");
+  assert.equal(await touchChapters.getByRole("button", { name: /Make the pieces work/ }).getAttribute("aria-pressed"), "true", "mobile hero chapter works without a pinned scroll range");
+  await touchChapters.getByRole("button", { name: /Put it in the world/ }).tap();
+  await touchPage.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-act") === "2");
+  assert.equal(await touchPage.locator(".flight-narrative h2").textContent(), "Ship it. Watch it. Make it better.", "mobile hero updates its story");
+  const companionTrigger = touchPage.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true });
+  const identityCard = touchPage.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });
+  await companionTrigger.tap();
+  await identityCard.waitFor({ state: "visible" });
+  assert.equal(await companionTrigger.getAttribute("aria-expanded"), "true", "first touch opens the ID card");
+  const cardBounds = await identityCard.boundingBox();
+  assert.ok(cardBounds && cardBounds.x >= 0 && cardBounds.y >= 72 && cardBounds.x + cardBounds.width <= 390 && cardBounds.y + cardBounds.height <= 844, "mobile ID card fits below navigation and within the viewport");
+  const cardCV = identityCard.getByRole("link", { name: /Take my CV/ });
+  assert.equal(await cardCV.getAttribute("href"), "/downloads/bhadreshkumar-malankiya-resume.pdf", "ID card links to the downloadable CV");
+  assert.equal(await cardCV.getAttribute("download"), "Bhadreshkumar-Malankiya-Resume.pdf", "ID card provides a download filename");
+  const cardPDF = await touchContext.request.get(new URL(await cardCV.getAttribute("href"), base).href);
+  assert.equal(cardPDF.status(), 200, "ID card CV is reachable");
+  assert.equal((await cardPDF.body()).subarray(0, 5).toString(), "%PDF-", "ID card CV is a real PDF");
+  await companionTrigger.tap();
+  await identityCard.waitFor({ state: "hidden" });
+  assert.equal(await companionTrigger.getAttribute("aria-expanded"), "false", "second touch closes the ID card");
+  await companionTrigger.tap();
+  await identityCard.waitFor({ state: "visible" });
+  await touchPage.keyboard.press("Tab");
+  assert.equal(await identityCard.getByRole("button", { name: "Close profile card", exact: true }).evaluate((el) => el === document.activeElement), true, "Tab reaches the ID card actions from its trigger");
+  await touchPage.keyboard.press("Escape");
+  await identityCard.waitFor({ state: "hidden" });
+  assert.equal(await companionTrigger.evaluate((el) => el === document.activeElement), true, "Escape restores focus to the companion");
+  assert.equal(await companionTrigger.getAttribute("aria-expanded"), "false", "Escape does not immediately reopen the focused card");
+  findings.push({ mode: "touch", heroChapters: true, companionCanvas: true, profileCard: true, cvDownload: true });
+  await touchContext.close();
+
   for (const options of [
     { javaScriptEnabled: false },
     { reducedMotion: "reduce" },
@@ -261,6 +356,15 @@ try {
       await p.getByRole("heading", { level: 1 }).isVisible(),
       "heading works without motion/JavaScript",
     );
+    if (options.reducedMotion === "reduce") {
+      await assertCompanionRendered(p, "reduced motion: static 3D companion remains available");
+      await p.getByRole("button", { name: "Meet Bhadresh — profile and CV", exact: true }).click();
+      const reducedCard = p.getByRole("dialog", { name: "Bhadresh’s profile card", exact: true });
+      await reducedCard.waitFor({ state: "visible" });
+      assert.ok(await reducedCard.getByRole("link", { name: /Take my CV/ }).isVisible(), "reduced motion keeps the companion CV action available");
+      await p.keyboard.press("Escape");
+      await reducedCard.waitFor({ state: "hidden" });
+    }
     assert.ok(
       await p.getByRole("link", { name: "Explore all 15 projects" }).isVisible(),
       "CTA works without motion/JavaScript",

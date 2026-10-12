@@ -56,7 +56,7 @@ export default function FloatingDownloads() {
   const reduced = useReducedMotion();
   useEffect(() => {
     const controls = document.querySelectorAll(
-      ".builder-actions, #work, #mobile-work",
+      ".flight-story, .builder-actions, #work, #mobile-work",
     );
     if (!controls.length) return;
     const visible = new Set<Element>();

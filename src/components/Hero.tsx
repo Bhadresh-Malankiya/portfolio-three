@@ -1,13 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useRef, useSyncExternalStore } from "react";
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Component, useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring } from "framer-motion";
+import { ArrowDown, ArrowUpRight, MoveUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
+import { scrollToPosition } from "@/components/SmoothScroll";
+import "@/app/hero-story.css";
 
-const pinnedQuery = "(min-width: 900px) and (prefers-reduced-motion: no-preference)";
+const PaperPlaneScene = dynamic(() => import("@/components/three/PaperPlaneScene"), { ssr: false });
+const pinnedQuery = "(min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)";
 function subscribe(callback: () => void) {
   const media = window.matchMedia(pinnedQuery);
   media.addEventListener("change", callback);
@@ -15,46 +18,84 @@ function subscribe(callback: () => void) {
 }
 const pinnedSnapshot = () => window.matchMedia(pinnedQuery).matches;
 const serverSnapshot = () => false;
+const stops = [.08, .5, .86];
+const acts = [
+  { label: "Find the question", title: "Everything starts with “what if?”", detail: "Listen to the people. Find the problem worth solving.", note: "A rough idea is a good start.", word: "QUESTION" },
+  { label: "Make the pieces work", title: "A little less guessing. A working prototype.", detail: "Interface, backend, AI. I bring the pieces together.", note: "This is the hands-on part.", word: "BUILD" },
+  { label: "Put it in the world", title: "Ship it. Watch it. Make it better.", detail: "Real people teach you what the next version needs.", note: "Built to leave the sketchbook.", word: "SHIP" },
+];
+
+class FlightBoundary extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onError(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
+function PlaneSketch() {
+  return <svg viewBox="0 0 800 370" className="flight-fallback" aria-hidden="true"><path d="M145 210 668 65 454 315 371 211 145 210Z" fill="#ecebe2" stroke="#adb4a3" strokeWidth="2" /><path d="m668 65-297 146 35 94 48 10Z" fill="#c6d4f3" /><path d="m145 210 264 32 259-177-297 146Z" fill="#fffdf2" /><path d="m371 211 38 31-3 63Z" fill="#354eab" /><path d="m145 210 523-145-259 177M371 211l297-146M409 242l45 73" fill="none" stroke="#9fa8a0" strokeWidth="1.2" /></svg>;
+}
 
 export default function Hero() {
   const story = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const pinned = useSyncExternalStore(subscribe, pinnedSnapshot, serverSnapshot);
+  const activeInView = useInView(story, { margin: "100px" });
+  const [act, setAct] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const rawProgress = useMotionValue(stops[0]);
+  const progress = useSpring(rawProgress, { stiffness: 115, damping: 25, mass: .7 });
   const { scrollYProgress } = useScroll({ target: story, offset: ["start start", "end end"] });
-  const progress = useSpring(scrollYProgress, { stiffness: 130, damping: 30 });
-  const sceneScale = useTransform(progress, [0, 1], [1, 1.6]);
-  const titleY = useTransform(progress, [0, .8], [0, -100]);
-  const titleOpacity = useTransform(progress, [0, .65, 1], [1, 1, 0]);
-  const ringRotate = useTransform(progress, [0, 1], [0, 75]);
-  const rawX = useMotionValue(0), rawY = useMotionValue(0);
-  const x = useSpring(rawX, { stiffness: 65, damping: 22 });
-  const y = useSpring(rawY, { stiffness: 65, damping: 22 });
-  return <section ref={story} className="opening-story" aria-label="Meet Bhadresh">
-    <div className="opening-theatre" onPointerMove={event => {
-      if (reduced || event.pointerType !== "mouse") return;
-      const bounds = event.currentTarget.getBoundingClientRect();
-      rawX.set((event.clientX / bounds.width - .5) * 18);
-      rawY.set(((event.clientY - bounds.top) / bounds.height - .5) * 12);
-    }} onPointerLeave={() => { rawX.set(0); rawY.set(0); }}>
-      <motion.div className="opening-world" style={{ scale: pinned ? sceneScale : 1, x: reduced ? 0 : x, y: reduced ? 0 : y }}>
-        <Image src="/images/engineers-aperture.webp" alt="" fill sizes="100vw" priority className="opening-image" />
-      </motion.div>
-      <div className="opening-shade" aria-hidden="true" />
-      <motion.div className="opening-orbit" style={{ rotate: pinned ? ringRotate : 0 }} aria-hidden="true"><i /><i /><span>↗</span></motion.div>
-      <motion.div className="opening-title" style={{ y: pinned ? titleY : 0, opacity: pinned ? titleOpacity : 1 }}>
-        <motion.p className="opening-byline" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduced ? 0 : .7, delay: reduced ? 0 : .15 }}>Bhadresh Malankiya <span>Forward Deployed Engineer</span></motion.p>
-        <h1><span className="opening-line"><motion.span initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: reduced ? 0 : .9, ease: [.16,1,.3,1], delay: reduced ? 0 : .15 }}>I make</motion.span></span>
-          <span className="opening-line opening-question"><motion.em initial={{ y: "105%", rotate: -6 }} animate={{ y: 0, rotate: 0 }} transition={{ duration: reduced ? 0 : 1.1, ease: [.16,1,.3,1], delay: reduced ? 0 : .25 }}>“what if”</motion.em></span>
-          <span className="opening-line"><motion.span initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: reduced ? 0 : .9, ease: [.16,1,.3,1], delay: reduced ? 0 : .4 }}>work<span className="opening-period">.</span></motion.span></span></h1>
-        <motion.div className="opening-actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : .6, delay: reduced ? 0 : .8 }}>
-          <Link href="#work" className="opening-enter">Step into the work <ArrowDown size={16} /></Link>
-          <a href={downloads.resume.file} download={downloads.resume.filename}>The résumé <ArrowUpRight size={14} /></a>
-        </motion.div>
-      </motion.div>
-      <div className="opening-footnote"><p>Interfaces. Systems. Applied AI.<br />The whole journey, from question to production.</p><div><span className="live-dot" />Surat, India <span className="opening-footnote-separator">/</span> Building at AscendXI</div></div>
-      <span className="opening-coordinate coordinate-left" aria-hidden="true">01 / ENTER THE WORKSHOP</span>
-      <span className="opening-coordinate coordinate-right" aria-hidden="true">SCROLL TO EXPLORE ↓</span>
-      <motion.div className="opening-curtain" initial={{ scaleY: 1 }} animate={{ scaleY: 0 }} transition={{ duration: reduced ? 0 : .9, ease: [.76,0,.24,1] }} aria-hidden="true" />
+  useMotionValueEvent(scrollYProgress, "change", value => { if (pinned) rawProgress.set(value); });
+  useMotionValueEvent(progress, "change", value => {
+    if (!pinned) return;
+    const next = value < .32 ? 0 : value < .7 ? 1 : 2;
+    setAct(current => current === next ? current : next);
+  });
+  useEffect(() => {
+    rawProgress.set(pinned ? scrollYProgress.get() : stops[act]);
+  }, [pinned, act, rawProgress, scrollYProgress]);
+  const onReady = useCallback(() => setReady(true), []);
+  const onUnavailable = useCallback(() => setFailed(true), []);
+  function selectAct(index: number) {
+    if (pinned && story.current) {
+      const top = story.current.getBoundingClientRect().top + window.scrollY;
+      scrollToPosition(top + (story.current.offsetHeight - window.innerHeight) * stops[index]);
+    } else {
+      setAct(index);
+      rawProgress.set(stops[index]);
+    }
+  }
+  return <section ref={story} id="hero" className="flight-story" data-pinned={pinned} data-act={act} aria-label="From a question to a working product">
+    <div className="flight-theatre">
+      <div className="flight-rule" aria-hidden="true"><span>BH / 01</span><i /><span>IDEA → REALITY</span></div>
+      <header className="flight-heading">
+        <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span>/</span> Forward Deployed Engineer</motion.p>
+        <h1><span>Ideas don’t</span><em>ship themselves<span className="flight-fullstop">.</span></em></h1>
+        <p className="flight-introduction">That’s where I come in.</p>
+      </header>
+      <div className="flight-stage" role="img" aria-label={`A paper plane: ${acts[act].label.toLowerCase()}`}>
+        <div className="flight-stage-grid" aria-hidden="true" />
+        <svg className="flight-path" viewBox="0 0 1200 420" fill="none" aria-hidden="true">
+          <path className="flight-pencil-line" d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" />
+          <motion.path d="M55 320C155 350 328 320 310 245C294 183 176 230 231 278C293 332 496 276 612 209C773 116 891 107 1115 86" stroke="#d7eea8" strokeWidth="1.3" style={{ pathLength: reduced ? 1 : progress }} />
+          <path d="m1094 70 22 16-21 17M55 309v22m-11-11h22" stroke="#aab995" strokeWidth="1" />
+        </svg>
+        <div className="flight-object" data-ready={ready && !failed}>
+          <PlaneSketch />
+          {!failed && <FlightBoundary onError={onUnavailable}><PaperPlaneScene progress={progress} reducedMotion={!!reduced} active={activeInView} onReady={onReady} onUnavailable={onUnavailable} /></FlightBoundary>}
+        </div>
+        <div className="flight-annotation" aria-hidden="true"><span>{acts[act].note}</span><svg viewBox="0 0 90 50"><path d="M5 9C19 8 59 10 70 40m-16-8 17 10 5-19" fill="none" stroke="currentColor" /></svg></div>
+        <div className="flight-stamp" aria-hidden="true"><span>STILL</span><strong>building.</strong><MoveUpRight size={16} /></div>
+        <span className="flight-stage-caption" aria-hidden="true">0{act + 1} / {acts[act].word}</span>
+      </div>
+      <div className="flight-bottom">
+        <div className="flight-narrative" aria-live="polite"><span className="flight-act-number">0{act + 1}</span><div><h2>{acts[act].title}</h2><p>{acts[act].detail}</p></div></div>
+        <Link href="#work" className="flight-work-link">See what I’ve built <ArrowDown size={17} /></Link>
+        <a className="flight-resume" href={downloads.resume.file} download={downloads.resume.filename}>Take the résumé <ArrowUpRight size={14} /></a>
+      </div>
+      <div className="flight-chapters" role="group" aria-label="Explore the opening story">{acts.map((item,index) => <button key={item.label} onClick={() => selectAct(index)} aria-pressed={act === index}><span>0{index + 1}</span>{item.label}<i /></button>)}<span className="flight-scroll-note">{pinned ? "SCROLL TO UNFOLD ↓" : "PICK A CHAPTER ↗"}</span></div>
     </div>
   </section>;
 }

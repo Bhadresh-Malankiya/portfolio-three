@@ -1,36 +1,5 @@
 /* The workshop: cinematic entry, product worlds, and a tactile field journal. */
 .portfolio-theme { --exhibit-paper: #e9e7df; --exhibit-ink: #101214; --exhibit-lime: #d7f881; }
-.opening-story { position: relative; height: 160svh; background: #080b0d; }
-.opening-theatre { position: sticky; top: 0; height: 100svh; min-height: 680px; overflow: clip; display: grid; place-items: center; isolation: isolate; }
-.opening-world { position: absolute; inset: -2%; z-index: -3; will-change: transform; }
-.opening-image { object-fit: cover; object-position: 50% 57%; }
-.opening-shade { position: absolute; inset: 0; z-index: -2; background: linear-gradient(#03060875,transparent 40%,#03050792), radial-gradient(ellipse at 50% 48%,#070b0e78 0%,transparent 65%); }
-.opening-title { text-align: center; padding: 70px 24px 80px; position: relative; }
-.opening-byline { font: 11px/1.8 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 26px; }
-.opening-byline > span { display: block; color: #bfc4c6; font-size: 9px; letter-spacing: .15em; margin-top: 5px; }
-.opening-title h1 { font: 500 clamp(70px, 8.6vw, 140px)/.8 var(--font-sans); letter-spacing: -.075em; color: #f3f2e9; }
-.opening-line { display: block; overflow: hidden; padding: .085em .12em .1em; }
-.opening-line > span, .opening-line > em { display: inline-block; }
-.opening-question { margin-block: -.025em; }
-.opening-title h1 em { font-family: var(--font-fraunces); font-weight: 400; letter-spacing: -.065em; color: #dbeab6; }
-.opening-period { color: #d7f881; }
-.opening-actions { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 29px; font: 11px var(--font-mono); }
-.opening-actions a { display: inline-flex; align-items: center; gap: 13px; min-height: 44px; }
-.opening-enter { border: 1px solid #d6e7b74d; border-radius: 100px; padding: 15px 23px; background: #cbd5b50c; backdrop-filter: blur(14px); transition: background .3s, color .3s; }
-.opening-enter:hover { color: #121810; background: #d7f881; }
-.opening-footnote { position: absolute; bottom: 30px; left: 40px; right: 40px; display: flex; justify-content: space-between; align-items: end; gap: 30px; font: 11px/1.8 var(--font-mono); color: #d0d4d5; }
-.opening-footnote > p { max-width: 400px; }
-.opening-footnote > div { display: flex; align-items: center; gap: 10px; }
-.live-dot { width: 6px; height: 6px; display: inline-block; border-radius: 50%; background: #d7f881; box-shadow: 0 0 16px #d7f8818a; }
-.opening-footnote-separator { color: #6e7478; margin-inline: 8px; }
-.opening-coordinate { position: absolute; top: 48%; font: 9px var(--font-mono); color: #cbd3ca; letter-spacing: .12em; writing-mode: vertical-rl; }
-.coordinate-left { left: 30px; transform: rotate(180deg); }
-.coordinate-right { right: 30px; }
-.opening-orbit { position: absolute; width: min(71vh,660px); aspect-ratio: 1; border: 1px dashed #d7e3ce16; border-radius: 50%; z-index: -1; }
-.opening-orbit i { position: absolute; width: 5px; height: 5px; background: #d7f881; border-radius: 50%; left: 50%; top: -2px; }
-.opening-orbit i:nth-child(2) { top: auto; bottom: -2px; }
-.opening-orbit > span { position: absolute; top: 18%; right: 6%; font-size: 27px; color: #c5d2c2; }
-.opening-curtain { position: absolute; inset: 0; background: #0a0d0e; transform-origin: top; z-index: 8; pointer-events: none; }
 
 .work-prologue { background: var(--exhibit-paper); color: var(--exhibit-ink); position: relative; padding: 100px 7vw 90px; overflow: clip; }
 .work-prologue .eyebrow { color: #5a615a; font-size: 10px; }
@@ -80,14 +49,6 @@
 .mobile-orbit span { font-size: 65px; }
 
 @media (max-width: 899px) {
- .opening-story { height: auto; }
- .opening-theatre { position: relative; min-height: 850px; height: 100svh; }
- .opening-title { padding-bottom: 120px; }
- .opening-title h1 { font-size: clamp(75px,12vw,110px); }
- .opening-byline { font-size: 10px; }
- .opening-footnote { left: 24px; right: 24px; font-size: 10px; }
- .opening-footnote > div { flex-wrap: wrap; max-width: 180px; justify-content: end; }
- .opening-footnote-separator { display: none; }
  .work-prologue { padding: 70px 6vw; }
  .work-prologue-stamp { width: 80px; height: 80px; right: 5%; top: 30px; font-size: 8px; }
  .work-prologue-stamp strong { font-size: 25px; }
@@ -99,19 +60,6 @@
  .mobile-orbit { position: absolute; right: -45px; top: 20px; opacity: .45; }
 }
 @media (max-width: 600px) {
- .opening-theatre { min-height: 760px; max-height: 950px; }
- .opening-image { object-position: center; }
- .opening-title { width: 100%; padding: 70px 18px 135px; }
- .opening-title h1 { font-size: clamp(76px,18vw,103px); }
- .opening-byline { font-size: 9px; margin-bottom: 38px; }
- .opening-byline > span { font-size: 8px; }
- .opening-actions { gap: 19px; flex-direction: column; margin-top: 30px; }
- .opening-actions a { min-height: 32px; }
- .opening-enter { padding: 15px 23px; }
- .opening-footnote { bottom: 28px; display: block; }
- .opening-footnote > div { max-width: none; justify-content: start; margin-top: 15px; }
- .opening-coordinate { display: none; }
- .opening-orbit { width: 90vw; }
  .work-prologue h2 { font-size: clamp(46px,12vw,64px); margin-top: 50px; }
  .work-prologue-bottom { display: block; font-size: 10px; }
  .work-prologue-bottom p { margin-top: 16px; }
@@ -123,11 +71,6 @@
  .mobile-interlude h2 { font-size: 48px; }
 }
 @media (min-width: 900px) and (max-height: 780px) {
- .opening-theatre { min-height: 0; }
- .opening-title { padding-block: 70px 55px; }
- .opening-title h1 { font-size: min(12vh,100px); }
- .opening-byline { margin-bottom: 17px; }
- .opening-footnote { bottom: 20px; font-size: 9px; }
  .product-world .chapter-copy { padding-block: 12px; }
  .product-world .chapter-copy h3 { font-size: 28px; }
  .product-world .chapter-description { font-size: 12px; }
@@ -135,9 +78,6 @@
  .product-world .chapter-copy { grid-template-columns: 1fr auto; }
 }
 @media (prefers-reduced-motion: reduce) {
- .opening-story { height: auto; }
- .opening-theatre { position: relative; }
- .opening-world { will-change: auto; }
  .product-world .chapter-sticky { transition: none; }
 }
 .product-world .chapter-copy { min-height: 133px; }
@@ -203,4 +143,3 @@
 .resume-punch { position: absolute; width: 42px; height: 14px; border: 1px solid #9dab9b; border-radius: 8px; left: 24px; top: -6px; transform: rotate(-12deg); }
 @media(max-width:700px) { .workbench { padding-block: 65px; }.workbench-heading { align-items: start; }.workbench-navigation { margin-top: 35px; gap: 5px; }.workbench-navigation button { width: 36px; height: 36px; }.workbench-poster { flex-basis: 86vw; }.workbench-poster > a { padding: 24px; }.workbench-end { display: block; }.workbench-end a { margin-top: 24px; width: fit-content; }.reading-table { grid-template-columns: 1fr; padding: 35px 3% 0; gap: 55px; }.reading-book { width: 270px; }.reading-book strong { font-size: 46px; }.reading-notes { max-width: 440px; margin: auto; }.exhibition-library { padding-block: 70px; }.reading-object-note { margin-top: 30px; } }
 @media(prefers-reduced-motion:reduce) { .reading-book,.poster-screen { transition: none; } }
-@media(max-width:600px) { .opening-footnote { bottom: 76px; }.opening-title { padding-bottom: 165px; } }

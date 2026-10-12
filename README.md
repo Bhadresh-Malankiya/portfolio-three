@@ -2,7 +2,7 @@
 
 Next.js 16, React 19, TypeScript, Tailwind CSS, Framer Motion, Lenis and React Three Fiber.
 
-The homepage uses an open gold ribbon sculpture and a scroll-driven featured-project deck. On desktop, cards unfold from a stack into a horizontal carousel. Narrow/short screens and reduced-motion settings use the native swipeable carousel. Book downloads and the original ID card remain available.
+The homepage follows a question → build → ship story with a real 3D paper plane. Desktop scrolling unfolds the story; mobile and reduced-motion visitors can choose chapters directly. Separate MacBook and iPhone stages showcase the featured work. A small animated cartoon guide tracks each section and reveals the profile card and CV on hover, focus or tap. Book downloads remain available.
 
 ## Development
 
@@ -19,8 +19,9 @@ Use Node.js 22.13 or newer supported LTS. `npm run start` serves the production 
 
 - `src/data/portfolio.ts` is the public project presentation: employer contributions, founder ventures, public screenshots and current profile context. `src/data/projects.ts` retains the original project archive.
 - `src/data/profile.ts` contains identity/contact details; `src/data/experience.ts` contains the career timeline.
-- `Hero.tsx`, `ProductObject.tsx`, and `three/ProductCore.tsx` implement the hero and original ribbon geometry.
-- `ProjectShowcase.tsx` implements the stack/fan/carousel sequence, with keyboard controls and a skip link.
+- `Hero.tsx`, `three/PaperPlaneScene.tsx` and `app/hero-story.css` implement the opening story and folded-paper geometry.
+- `FloatingContactCard.tsx`, `three/BuilderAvatar.tsx`, `lib/companion-sections.ts` and `app/companion.css` implement the animated guide and downloadable CV card.
+- `DeviceGallery.tsx` and `three/DeviceScene.tsx` implement the separate scroll-driven desktop and mobile project chapters.
 - `ProjectGallery.tsx` provides screenshot inspection, zoom, keyboard navigation and focus restoration on case-study pages.
 - `public/downloads/` retains the résumé and memoir PDFs. Source working documents stay ignored.
 

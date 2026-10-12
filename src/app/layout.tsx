@@ -93,7 +93,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body className="relative overflow-x-clip portfolio-theme">
-        <noscript><style>{`.opening-curtain{display:none!important}.opening-title,.opening-title *,.workbench-poster{opacity:1!important;transform:none!important}.opening-story{height:auto}.opening-theatre{position:relative}`}</style></noscript>
+        <noscript><style>{`.workbench-poster{opacity:1!important;transform:none!important}.flight-story{height:auto!important}.flight-theatre{position:relative!important}`}</style></noscript>
         <JsonLd
           data={{
             "@context": "https://schema.org",

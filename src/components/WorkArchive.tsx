@@ -17,7 +17,7 @@ export default function WorkArchive() {
     const width = rail.current?.firstElementChild?.getBoundingClientRect().width ?? 600;
     rail.current?.scrollBy({ left: direction * (width + 28), behavior: reduced ? "instant" : "smooth" });
   }
-  return <section className="workbench" aria-labelledby="workbench-title">
+  return <section id="workbench" className="workbench" aria-labelledby="workbench-title">
     <div className="workbench-heading">
       <div><p className="eyebrow">03 / Other corners of my work</p><h2 id="workbench-title">Still curious?<br /><em>Pull up a project.</em></h2></div>
       <div className="workbench-navigation"><button onClick={() => move(-1)} aria-label="Previous projects"><ArrowLeft size={20} /></button><button onClick={() => move(1)} aria-label="Next projects"><ArrowRight size={20} /></button></div>

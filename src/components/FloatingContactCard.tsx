@@ -1,199 +1,187 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
-import { Mail, ArrowUpRight } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Download, Mail, MessageCircle, X } from "lucide-react";
 import { profile } from "@/data/profile";
+import { downloads } from "@/data/downloads";
+import { companionChapters, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
+import "@/app/companion.css";
 
-const MARGIN = 20;
-const BADGE_W = 60;
-const BADGE_H = 88;
-const CARD_W = 224;
-const CARD_H = 300;
+const BuilderAvatar = dynamic(() => import("@/components/three/BuilderAvatar"), { ssr: false });
+const BARCODE = [2, 1, 3, 1, 1, 4, 2, 1, 3, 2, 1, 1, 3, 1, 2, 4, 1, 2, 1, 3, 2, 1, 3];
 
-// A fixed (not random) bar-width pattern for the decorative barcode strip —
-// deterministic so it doesn't shift between server and client renders.
-const BARCODE = [3, 1, 2, 4, 1, 2, 1, 3, 2, 1, 4, 1, 2, 3, 1, 2, 1, 3];
-
-function Barcode({ className = "" }: { className?: string }) {
-  return (
-    <div className={`flex h-3.5 items-stretch gap-[1.5px] ${className}`} aria-hidden="true">
-      {BARCODE.map((w, i) => (
-        <span key={i} style={{ width: w }} className={i % 3 === 0 ? "bg-fg/45" : "bg-fg/20"} />
-      ))}
-    </div>
-  );
-}
-
-function LanyardHole() {
-  return (
-    <span
-      className="pointer-events-none absolute top-1.5 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full border border-line-strong bg-ink"
-      aria-hidden="true"
-    />
-  );
-}
-
-/**
- * A floating "ID badge" that lives on top of every page. Docked, it reads as
- * a small badge tab (photo + lanyard punch-hole) clipped to whichever screen
- * edge it's closest to; hovering (or tapping, on touch) pulls the full
- * badge into view — photo, name, a decorative barcode strip, and an
- * "open to work" status line. Draggable anywhere; releases spring it to the
- * nearest edge, the way a picture-in-picture window snaps back.
- *
- * The draggable hit target is always exactly the small badge's footprint —
- * the full card renders as an absolutely-positioned overlay next to it,
- * anchored top + toward whichever side has room, so expanding never pushes
- * anything off-screen (an earlier version grew the real draggable box and a
- * right-docked card grew straight off the right edge of the viewport).
- *
- * Skipped entirely under prefers-reduced-motion — a draggable floating
- * widget is a motion-first affordance with no good reduced-motion version.
- */
-export default function FloatingContactCard() {
-  const reduced = useReducedMotion();
-  const cardRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const [ready, setReady] = useState(false);
+function Companion({ pathname }: { pathname: string }) {
+  const reduced = Boolean(useReducedMotion());
+  const initialChapter = getCompanionChapter(pathname);
+  const [chapter, setChapter] = useState<CompanionChapter>(initialChapter);
   const [expanded, setExpanded] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [side, setSide] = useState<"left" | "right">("right");
+  const [speaking, setSpeaking] = useState(false);
+  const [avatarReady, setAvatarReady] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
+  const dock = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const currentChapter = useRef(initialChapter.id);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const speechTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const suppressFocus = useRef(false);
+  const pointerInside = useRef(false);
+  const openedByClick = useRef(false);
+
+  const cancelClose = useCallback(() => clearTimeout(closeTimer.current), []);
+  const closeCard = useCallback((restoreFocus = false) => {
+    clearTimeout(closeTimer.current);
+    clearTimeout(hoverTimer.current);
+    openedByClick.current = false;
+    setExpanded(false);
+    if (restoreFocus) {
+      suppressFocus.current = true;
+      trigger.current?.focus({ preventScroll: true });
+    }
+  }, []);
+  const showNote = useCallback(() => {
+    clearTimeout(speechTimer.current);
+    setSpeaking(true);
+    speechTimer.current = setTimeout(() => setSpeaking(false), 5500);
+  }, []);
 
   useEffect(() => {
-    if (reduced) return;
-    function place() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      x.set(vw - BADGE_W - MARGIN);
-      y.set(Math.max(MARGIN, Math.min(vh * 0.5, vh - CARD_H - MARGIN)));
-      setReady(true);
-    }
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced]);
+    let frame = 0;
+    let chapters: { chapter: CompanionChapter; element: Element }[] = [];
+    const collect = () => {
+      chapters = pathname === "/" ? companionChapters.flatMap((item) => {
+        const element = document.querySelector(item.selector);
+        return element ? [{ chapter: item, element }] : [];
+      }) : [];
+    };
+    const measure = () => {
+      frame = 0;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.max(0, Math.min(1, window.scrollY / scrollable)) : 1;
+      dock.current?.style.setProperty("--companion-progress", String(progress));
+      let next = initialChapter;
+      const readingLine = Math.min(window.innerHeight * 0.35, 260);
+      for (const item of chapters) {
+        if (item.element.getBoundingClientRect().top <= readingLine) next = item.chapter;
+      }
+      if (next.id !== currentChapter.current) {
+        currentChapter.current = next.id;
+        setChapter(next);
+        if (!reduced && window.matchMedia("(min-width: 700px)").matches) showNote();
+      }
+    };
+    const schedule = () => { if (!frame) frame = window.requestAnimationFrame(measure); };
+    const resize = () => { collect(); schedule(); };
+    collect();
+    schedule();
+    const observer = new ResizeObserver(resize);
+    observer.observe(document.body);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", resize, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", resize);
+    };
+  }, [pathname, initialChapter, reduced, showNote]);
 
-  function handleDragEnd() {
-    setDragging(false);
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const goRight = rect.left + rect.width / 2 > vw / 2;
-    setSide(goRight ? "right" : "left");
-    const targetX = goRight ? vw - BADGE_W - MARGIN : MARGIN;
-    // Clamped so the full card always fits below the docked point when it expands.
-    const targetY = Math.max(MARGIN, Math.min(rect.top, vh - CARD_H - MARGIN));
-    const spring = { type: "spring" as const, stiffness: 280, damping: 28 };
-    animate(x, targetX, spring);
-    animate(y, targetY, spring);
-  }
+  useEffect(() => {
+    const visibility = () => setPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", visibility);
+    return () => document.removeEventListener("visibilitychange", visibility);
+  }, []);
+  useEffect(() => {
+    if (!expanded) return;
+    const outside = (event: PointerEvent) => { if (!dock.current?.contains(event.target as Node)) closeCard(); };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); closeCard(true); }
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [expanded, closeCard]);
+  useEffect(() => () => {
+    clearTimeout(closeTimer.current);
+    clearTimeout(hoverTimer.current);
+    clearTimeout(speechTimer.current);
+  }, []);
+  const onAvatarReady = useCallback(() => setAvatarReady(true), []);
+  const onAvatarUnavailable = useCallback(() => setUnavailable(true), []);
 
-  if (reduced) return null;
-
-  return (
-    <motion.div
-      ref={cardRef}
-      drag
-      dragMomentum={false}
-      dragElastic={0.06}
-      onDragStart={() => setDragging(true)}
-      onDragEnd={handleDragEnd}
-      style={{ x, y, opacity: ready ? 1 : 0, width: BADGE_W, height: BADGE_H }}
-      className="fixed left-0 top-0 z-40 hidden touch-none select-none sm:block"
-      onHoverStart={() => !dragging && setExpanded(true)}
-      onHoverEnd={() => setExpanded(false)}
-      onTap={() => setExpanded((v) => !v)}
-    >
-      <div className="relative h-full w-full">
-        {/* Docked badge tab */}
-        <div
-          className="relative flex h-full w-full cursor-grab flex-col items-center overflow-hidden rounded-lg border border-line-strong bg-ink-2/95 pt-3 shadow-[0_20px_50px_-18px_rgba(0,0,0,0.75)] active:cursor-grabbing"
-          aria-hidden="true"
-        >
-          <LanyardHole />
-          <div className="h-8 w-8 overflow-hidden rounded-full border border-line-strong bg-ink-3">
-            <Image
-              src="/images/profile.png"
-              alt=""
-              width={64}
-              height={64}
-              className="h-full w-full object-cover object-top grayscale"
-            />
-          </div>
-          <p className="mt-1.5 font-mono text-[8px] uppercase tracking-wider text-muted">{profile.shortName}</p>
-          <div className="mt-auto h-1 w-full bg-gold" />
+  return <div className="builder-companion" data-expanded={expanded} ref={dock}
+    onPointerEnter={() => { pointerInside.current = true; cancelClose(); }}
+    onPointerLeave={() => {
+      pointerInside.current = false;
+      clearTimeout(hoverTimer.current);
+      if (!dock.current?.contains(document.activeElement)) closeTimer.current = setTimeout(() => closeCard(), 240);
+    }}
+    onBlur={(event) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+        suppressFocus.current = false;
+        if (!pointerInside.current) closeCard();
+      }
+    }}>
+    <AnimatePresence>
+      {speaking && !expanded && <motion.div className="companion-thought" key={chapter.id}
+        initial={{ opacity: 0, y: reduced ? 0 : 7, rotate: reduced ? 0 : -2 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
+        exit={{ opacity: 0, y: reduced ? 0 : 4 }} transition={{ duration: reduced ? 0 : 0.24 }}>
+        <span className="companion-thought-name">A note from Bhadresh</span><p>{chapter.note}</p>
+        <button type="button" onClick={() => setSpeaking(false)} aria-label="Dismiss guide note"><X size={12} /></button>
+      </motion.div>}
+    </AnimatePresence>
+    <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh — profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card"
+      onClick={() => {
+        clearTimeout(hoverTimer.current);
+        cancelClose();
+        if (openedByClick.current && expanded) closeCard();
+        else { openedByClick.current = true; setExpanded(true); }
+      }}
+      onFocus={() => { if (!suppressFocus.current && trigger.current?.matches(":focus-visible")) setExpanded(true); }}
+      onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 180); }}>
+      <span className="companion-model" aria-hidden="true">
+        {(!avatarReady || unavailable) && <span className="companion-fallback"><Image src="/images/profile.png" alt="" width={96} height={96} /><span>hi.</span></span>}
+        {!unavailable && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
+      </span>
+      <span className="companion-plinth" aria-hidden="true" /><span className="companion-character-hint" aria-hidden="true">Meet the builder ↗</span>
+    </button>
+    <AnimatePresence>
+      {expanded && <motion.section className="companion-id" id="builder-id-card" role="dialog" aria-label="Bhadresh’s profile card" data-lenis-prevent
+        initial={{ opacity: 0, y: reduced ? 0 : 12, rotate: reduced ? 0 : 2 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
+        exit={{ opacity: 0, y: reduced ? 0 : 8 }} transition={{ duration: reduced ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }} onPointerEnter={cancelClose}>
+        <div className="companion-id-punch" aria-hidden="true" />
+        <header className="companion-id-top"><span>THE WEEKEND BUILDER</span><button type="button" onClick={() => closeCard(true)} aria-label="Close profile card"><X size={16} /></button></header>
+        <div className="companion-id-person">
+          <div className="companion-id-photo"><Image src="/images/profile.png" alt="Bhadresh Malankiya" width={156} height={188} sizes="78px" /></div>
+          <div><span className="companion-id-number">BUILDER PASS / 001</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Forward Deployed<br />Engineer</p></div>
         </div>
+        <p className="companion-id-intro">The human behind the little guide.</p>
+        <div className="companion-id-facts"><span>Full stack · Applied AI</span><span>Surat, India ↗</span></div>
+        <div className="companion-id-bottom"><div className="companion-id-barcode" aria-hidden="true">{BARCODE.map((width, index) => <i key={index} style={{ width }} />)}</div><span>8+ YEARS<br />BUILDING THINGS</span></div>
+        <a className="companion-cv" href={downloads.resume.file} download={downloads.resume.filename}><Download size={16} /><span>Take my CV</span><span>PDF <ArrowUpRight size={13} /></span></a>
+        <a className="companion-email" href={`mailto:${profile.email}`}><Mail size={13} />Say hello<ArrowUpRight size={13} /></a>
+      </motion.section>}
+    </AnimatePresence>
+    <button className="companion-chapter" type="button" onClick={() => {
+      if (expanded) { closeCard(); showNote(); }
+      else if (speaking) setSpeaking(false);
+      else showNote();
+    }} aria-label={`${chapter.label}. ${speaking && !expanded ? "Hide" : "Show"} Bhadresh’s guide note`} aria-expanded={speaking && !expanded}>
+      <span className="companion-chapter-top"><MessageCircle size={11} /><span>{chapter.label}</span><b>{chapter.number}</b></span>
+      <span className="companion-journey" aria-hidden="true"><i /></span>
+    </button>
+  </div>;
+}
 
-        {/* Full badge, revealed on hover/tap */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              style={{ width: CARD_W }}
-              className={`absolute top-0 origin-top overflow-hidden rounded-xl border border-line-strong bg-ink-2/95 shadow-[0_25px_60px_-16px_rgba(0,0,0,0.8)] backdrop-blur ${
-                side === "right" ? "right-0" : "left-0"
-              }`}
-            >
-              <LanyardHole />
-              <div className="flex items-center justify-between border-b border-line px-4 pb-3 pt-4">
-                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-gold">The Weekend Builder</span>
-                <span className="font-mono text-[9px] text-muted">ID·01</span>
-              </div>
-
-              <div className="flex flex-col items-center px-4 pt-4">
-                <div className="h-16 w-16 overflow-hidden rounded-full border-2 border-gold/60 bg-ink-3">
-                  <Image
-                    src="/images/profile.png"
-                    alt={profile.name}
-                    width={128}
-                    height={128}
-                    className="h-full w-full object-cover object-top grayscale"
-                  />
-                </div>
-                <p className="mt-3 text-center font-display text-base leading-tight text-fg">{profile.name}</p>
-                <p className="mt-1 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
-                  Senior Full Stack Engineer
-                </p>
-              </div>
-
-              <Barcode className="mx-4 mt-4" />
-
-              <div className="mx-4 mt-3 flex items-center gap-1.5 border-t border-line pt-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_6px_1px_rgba(244,197,114,0.6)]" />
-                <p className="font-mono text-[10px] uppercase tracking-wide text-fg/80">Open to work</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-px bg-line mt-4">
-                <a
-                  href={`mailto:${profile.email}`}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-1.5 bg-ink-2 py-3 font-mono text-[10px] uppercase tracking-wide text-fg transition-colors hover:bg-ink-3 hover:text-gold"
-                >
-                  <Mail size={12} />
-                  Email
-                </a>
-                <Link
-                  href="/#contact"
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-1.5 bg-ink-2 py-3 font-mono text-[10px] uppercase tracking-wide text-fg transition-colors hover:bg-ink-3 hover:text-gold"
-                >
-                  Say hello
-                  <ArrowUpRight size={12} />
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
+export default function FloatingContactCard() {
+  const pathname = usePathname();
+  return <Companion key={pathname} pathname={pathname} />;
 }

@@ -12,13 +12,17 @@ Creative research references: Bruno Simon, Dennis Snellenberg and Lusion. These 
 
 ## Current section sequence
 
-1. **Enter the workshop** — `Hero.tsx` replaces the split hero with oversized “I make ‘what if’ work.” typography over a cinematic aperture. Desktop scrolling moves into the scene; pointer movement is subtle. Mobile and reduced-motion modes use a simpler presentation.
+1. **From a question to a working product** — `Hero.tsx` uses “Ideas don’t ship themselves.” above a genuine folded-paper model in `three/PaperPlaneScene.tsx`. Scrolling on large screens moves through question, build and ship; chapter buttons provide direct control, including mobile and reduced-motion modes. The detailed aperture image and zoom have been removed from the hero.
 2. **Selected work** — `DeviceGallery.tsx`, `three/DeviceScene.tsx` and `ProductScenery.tsx` provide separate laptop and phone chapters. Project screens, short explanations and background motifs change together. Device visibility, framing and screen transitions are handled independently so changing a screenshot does not remount the entire device.
 3. **Other corners of the work** — `WorkArchive.tsx` is a horizontally browsable poster rail featuring JewelXI, ZWOPR and HelpDesk AI. It links to the full project index rather than repeating the featured device projects.
 4. **The person behind the build** — `LifePanel.tsx` presents the actual portrait as a cobalt-and-paper collage, a single expandable career timeline, four large linked impact figures and a visible six-part expertise index.
 5. **After the handover** — `ClientReviews.tsx` presents three existing Upwork quotes in a large manual spotlight, with previous/next buttons and keyboard-operable review tabs. Quote text remains unchanged.
 6. **Take something with you** — `DownloadsSection.tsx` retains the existing book and résumé files while fitting the new editorial presentation.
 7. **The next chapter** — `ContactCTA.tsx` closes with the large “Let’s build.” email link and a résumé download. `Nav.tsx` uses stronger foreground contrast and a translucent dark background over the hero.
+
+## Persistent guide
+
+`FloatingContactCard.tsx` now presents a small cartoon engineer from `three/BuilderAvatar.tsx`. Six moods accompany section changes, with short optional contextual notes and a reading-progress indicator. Hover, keyboard focus or tap reveals the existing real portrait and CV. Escape and the close control restore focus; outside interaction dismisses the card. Reduced motion renders a static character, and unavailable WebGL falls back to the portrait. Project, memoir and field-guide routes each have their own label.
 
 ## Project pages
 
@@ -28,14 +32,16 @@ Project-specific themes include the warm voice-product palette for VocalXI, lila
 
 ## Asset provenance
 
-- **`public/images/engineers-aperture.webp`** is one generated decorative image: a chrome-and-glass architectural aperture. It was produced with the built-in image-generation tool and converted from its native output to WebP for the page. It is visual atmosphere, not a photograph of an actual installation or a project screenshot.
+- **`public/images/engineers-aperture.webp`** is a retained, currently unused decorative image from the earlier hero: a chrome-and-glass architectural aperture. It was produced with the built-in image-generation tool and converted from its native output to WebP for the page. It is visual atmosphere, not a photograph of an actual installation or a project screenshot.
 - **`public/images/profile.png`** remains the user's existing portrait. Its new borders, orbit lines, labels and print treatment are native HTML/CSS/SVG decoration; the person's likeness was not regenerated.
 - The laptop and phone are **procedural Three.js devices**, constructed in `src/components/three/DeviceScene.tsx`. They are MacBook- and iPhone-inspired geometry, not downloaded Apple CAD assets. No external 3D model files or additional external-model licences were introduced.
-- Existing real project screenshots and downloadable PDFs remain in use. The generated aperture does not stand in for evidence of shipped product work.
+- The paper plane and cartoon guide are original procedural Three.js geometry, with no external model assets. The guide is a stylized character, not an exact likeness. Existing real project screenshots and downloadable PDFs remain in use.
 
 ## Styling and animation ownership
 
-- `src/app/exhibition.css`: opening, work stages, archive and overarching exhibition presentation.
+- `src/app/hero-story.css`: opening narrative, plane theatre and responsive chapter controls.
+- `src/app/companion.css`: persistent cartoon guide, chapter indicator and profile card.
+- `src/app/exhibition.css`: work stages, archive and overarching exhibition presentation.
 - `src/app/human-story.css`: scoped paper journal, cobalt reviews and contact finale.
 - `src/app/project-worlds.css`: project-specific case studies and project index presentation.
 - `src/lib/device-framing.ts`: camera fitting and safe model bounds.

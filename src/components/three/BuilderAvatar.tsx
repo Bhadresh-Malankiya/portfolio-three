@@ -1,0 +1,369 @@
+"use client";
+
+import { Component, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { RoundedBox } from "@react-three/drei";
+import {
+  BufferGeometry,
+  CatmullRomCurve3,
+  Float32BufferAttribute,
+  Group,
+  MathUtils,
+  OrthographicCamera,
+  SphereGeometry,
+  TubeGeometry,
+  Vector3,
+} from "three";
+
+export type AvatarMood = "welcome" | "thinking" | "proud" | "curious" | "grateful" | "wave";
+
+type Props = {
+  mood: AvatarMood;
+  reducedMotion?: boolean;
+  active?: boolean;
+  onReady?: () => void;
+  onUnavailable?: () => void;
+};
+
+const SKIN = "#cf9067";
+const HAIR = "#171d26";
+const JACKET = "#2452b7";
+type Point = [number, number, number];
+
+function surfacePoint(theta: number, phi: number, offset = 0): Vector3 {
+  const lower = Math.max(0, -Math.cos(theta));
+  const jaw = 1 - lower * 0.15;
+  return new Vector3(
+    (0.555 + offset) * Math.sin(theta) * Math.sin(phi) * jaw,
+    (0.625 + offset) * Math.cos(theta),
+    (0.48 + offset) * Math.sin(theta) * Math.cos(phi),
+  );
+}
+
+/** A continuous sculpted surface follows the head, including its narrower jaw. */
+function headSurface(kind: "hair" | "beard") {
+  const points: number[] = [];
+  const indices: number[] = [];
+  const columns = 48;
+  const rows = 24;
+  for (let row = 0; row <= rows; row++) {
+    for (let column = 0; column <= columns; column++) {
+      const phi = kind === "hair"
+        ? (column / columns) * Math.PI * 2 - Math.PI
+        : (column / columns) * Math.PI * 1.05 - Math.PI * 0.525;
+      const front = Math.max(0, Math.cos(phi));
+      const start = kind === "hair" ? 0 : 1.68 + 0.35 * front;
+      const end = kind === "hair"
+        ? 1.7 - 0.57 * front + Math.sin(phi * 2) * 0.045
+        : 2.91;
+      const point = surfacePoint(MathUtils.lerp(start, end, row / rows), phi, kind === "hair" ? 0.029 : 0.014);
+      points.push(point.x, point.y, point.z);
+      if (row < rows && column < columns) {
+        const a = row * (columns + 1) + column;
+        const b = a + columns + 1;
+        indices.push(a, b, a + 1, b, b + 1, a + 1);
+      }
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new Float32BufferAttribute(points, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/** Tapered, swept locks create one deliberate hairstyle instead of a ball cluster. */
+function sweptLock(points: Point[], width: number, thickness: number) {
+  const curve = new CatmullRomCurve3(points.map((point) => new Vector3(...point)));
+  const frames = curve.computeFrenetFrames(26, false);
+  const vertices: number[] = [];
+  const indices: number[] = [];
+  for (let section = 0; section <= 26; section++) {
+    const t = section / 26;
+    const center = curve.getPoint(t);
+    const taper = Math.max(0.025, Math.pow(Math.sin(Math.PI * t), 0.6));
+    for (let side = 0; side <= 10; side++) {
+      const angle = (side / 10) * Math.PI * 2;
+      const point = center.clone()
+        .addScaledVector(frames.normals[section], Math.cos(angle) * width * taper)
+        .addScaledVector(frames.binormals[section], Math.sin(angle) * thickness * taper);
+      vertices.push(point.x, point.y, point.z);
+      if (section < 26 && side < 10) {
+        const a = section * 11 + side;
+        const b = a + 11;
+        indices.push(a, a + 1, b, b, a + 1, b + 1);
+      }
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function Stroke({ points, radius, color }: { points: Point[]; radius: number; color: string }) {
+  const coordinates = points.flat().join(",");
+  const geometry = useMemo(() => {
+    const values = coordinates.split(",").map(Number);
+    const vertices: Vector3[] = [];
+    for (let index = 0; index < values.length; index += 3) vertices.push(new Vector3(...values.slice(index, index + 3) as Point));
+    return new TubeGeometry(new CatmullRomCurve3(vertices), 18, radius, 7, false);
+  }, [coordinates, radius]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh geometry={geometry}><meshStandardMaterial color={color} roughness={0.68} /></mesh>;
+}
+
+function Pebble({ position, scale, color, glossy = false }: {
+  position: Point;
+  scale: Point;
+  color: string;
+  glossy?: boolean;
+}) {
+  return (
+    <mesh position={position} scale={scale}>
+      <sphereGeometry args={[1, 24, 18]} />
+      <meshPhysicalMaterial color={color} roughness={glossy ? 0.24 : 0.68} clearcoat={glossy ? 0.45 : 0.08} />
+    </mesh>
+  );
+}
+
+function Hand() {
+  return (
+    <group position={[0, -0.45, 0.025]}>
+      <Pebble position={[0, -0.035, 0]} scale={[0.098, 0.119, 0.073]} color={SKIN} />
+      <Pebble position={[0.082, -0.013, 0.027]} scale={[0.043, 0.074, 0.047]} color={SKIN} />
+      <Stroke points={[[-0.033, -0.054, 0.066], [-0.028, -0.088, 0.059]]} radius={0.006} color="#b57450" />
+      <Stroke points={[[0.014, -0.06, 0.071], [0.016, -0.095, 0.054]]} radius={0.006} color="#b57450" />
+    </group>
+  );
+}
+
+function Arm() {
+  return (
+    <>
+      <mesh position={[0, -0.20, 0]}>
+        <capsuleGeometry args={[0.105, 0.23, 6, 12]} />
+        <meshStandardMaterial color={JACKET} roughness={0.73} />
+      </mesh>
+      <mesh position={[0, -0.37, 0.01]}>
+        <cylinderGeometry args={[0.091, 0.086, 0.065, 16]} />
+        <meshStandardMaterial color="#163472" roughness={0.7} />
+      </mesh>
+      <Hand />
+    </>
+  );
+}
+
+const expressions = {
+  welcome: { tilt: -0.045, turn: -0.08, brow: 0, smile: 0.8, rightArm: -0.28, armX: 0, leftArm: 0.17 },
+  thinking: { tilt: 0.10, turn: 0.16, brow: -0.12, smile: 0.25, rightArm: 2.58, armX: -0.72, leftArm: 0.15 },
+  proud: { tilt: -0.035, turn: -0.1, brow: 0.04, smile: 1.25, rightArm: -0.48, armX: 0, leftArm: 0.48 },
+  curious: { tilt: -0.16, turn: -0.06, brow: 0.17, smile: 0.45, rightArm: -0.60, armX: -0.12, leftArm: 0.22 },
+  grateful: { tilt: 0.09, turn: 0.06, brow: 0.045, smile: 1.18, rightArm: 0.63, armX: -0.72, leftArm: -0.63 },
+  wave: { tilt: -0.09, turn: -0.04, brow: 0.075, smile: 1.12, rightArm: -2.12, armX: -0.05, leftArm: 0.22 },
+} as const;
+
+function Character({ mood, reducedMotion = false, active = true, onReady }: Props) {
+  const figure = useRef<Group>(null);
+  const head = useRef<Group>(null);
+  const eyes = useRef<Group>(null);
+  const pupils = useRef<Group>(null);
+  const brows = useRef<Group>(null);
+  const mouth = useRef<Group>(null);
+  const rightArm = useRef<Group>(null);
+  const leftArm = useRef<Group>(null);
+  const ready = useRef(false);
+  const invalidate = useThree((state) => state.invalidate);
+  const geometries = useMemo(() => {
+    const face = new SphereGeometry(1, 48, 32);
+    const positions = face.attributes.position;
+    for (let index = 0; index < positions.count; index++) {
+      const x = positions.getX(index), y = positions.getY(index), z = positions.getZ(index);
+      positions.setXYZ(index, x * 0.555 * (1 - Math.max(0, -y) * 0.15), y * 0.625, z * 0.48);
+    }
+    face.computeVertexNormals();
+    return {
+      face,
+      cap: headSurface("hair"),
+      beard: headSurface("beard"),
+      locks: Array.from({ length: 5 }, (_, index) => {
+        const shift = index * 0.08;
+        return sweptLock([
+          [-0.49 + shift * 0.16, 0.16 + shift * 0.85, 0.22 - shift * 0.9],
+          [-0.35 + shift * 0.4, 0.58 + shift * 0.4, 0.35 - shift * 0.9],
+          [0.11 + shift * 0.3, 0.69 - shift * 0.12, 0.28 - shift],
+          [0.47 - shift * 0.2, 0.46 - shift * 0.18, 0.10 - shift],
+        ], 0.105, 0.078);
+      }),
+    };
+  }, []);
+  useEffect(() => () => {
+    geometries.face.dispose();
+    geometries.cap.dispose();
+    geometries.beard.dispose();
+    geometries.locks.forEach((geometry) => geometry.dispose());
+  }, [geometries]);
+  useEffect(() => { invalidate(); }, [mood, reducedMotion, active, invalidate]);
+
+  useFrame(({ clock }, delta) => {
+    if (!figure.current || !head.current || !eyes.current || !pupils.current || !brows.current || !mouth.current || !rightArm.current || !leftArm.current) return;
+    const time = clock.elapsedTime;
+    const still = reducedMotion || !active;
+    const pose = expressions[mood];
+    const ease = (current: number, target: number) => still ? target : MathUtils.damp(current, target, 9, Math.min(delta, 0.05));
+    const breath = still ? 0 : Math.sin(time * 1.8) * 0.012;
+    figure.current.position.y = breath;
+    figure.current.rotation.y = still ? -0.11 : -0.11 + Math.sin(time * 0.65) * 0.035;
+    head.current.rotation.z = ease(head.current.rotation.z, pose.tilt);
+    head.current.rotation.y = ease(head.current.rotation.y, pose.turn);
+    head.current.rotation.x = ease(head.current.rotation.x, mood === "grateful" ? 0.08 : -0.025);
+    const blinkCycle = time % 5.2;
+    const blink = !still && blinkCycle > 4.94 ? Math.max(0.09, Math.abs(blinkCycle - 5.07) / 0.13) : 1;
+    eyes.current.scale.y = blink * (mood === "proud" || mood === "grateful" ? 0.85 : 1);
+    pupils.current.position.x = ease(pupils.current.position.x, mood === "thinking" ? 0.022 : mood === "curious" ? -0.014 : 0);
+    pupils.current.position.y = ease(pupils.current.position.y, mood === "thinking" ? 0.015 : 0);
+    brows.current.rotation.z = ease(brows.current.rotation.z, pose.brow);
+    brows.current.position.y = ease(brows.current.position.y, mood === "curious" ? 0.055 : mood === "wave" ? 0.026 : 0);
+    mouth.current.scale.y = ease(mouth.current.scale.y, pose.smile);
+    mouth.current.scale.x = ease(mouth.current.scale.x, mood === "proud" ? 1.12 : 1);
+    const wave = !still && mood === "wave" ? Math.sin(time * 7) * 0.16 : 0;
+    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, pose.rightArm + wave);
+    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, pose.armX);
+    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, pose.leftArm);
+    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, mood === "grateful" ? -0.72 : 0);
+    if (!ready.current) {
+      ready.current = true;
+      onReady?.();
+    }
+  });
+
+  return (
+    <group ref={figure}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.185, 0]} scale={[0.7, 0.4, 1]}>
+        <circleGeometry args={[1, 40]} />
+        <meshBasicMaterial color="#101927" transparent opacity={0.13} depthWrite={false} />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 0.155, -0.91, 0]}>
+          <mesh><capsuleGeometry args={[0.108, 0.26, 6, 14]} /><meshStandardMaterial color="#1a273c" roughness={0.83} /></mesh>
+          <RoundedBox args={[0.25, 0.14, 0.37]} radius={0.065} smoothness={3} position={[0, -0.19, 0.07]}>
+            <meshStandardMaterial color="#eee9df" roughness={0.56} />
+          </RoundedBox>
+          <RoundedBox args={[0.255, 0.041, 0.374]} radius={0.016} smoothness={2} position={[0, -0.246, 0.07]}>
+            <meshStandardMaterial color="#b7c2ce" roughness={0.65} />
+          </RoundedBox>
+        </group>
+      ))}
+      <Pebble position={[0, -0.34, 0]} scale={[0.365, 0.415, 0.23]} color={JACKET} />
+      <RoundedBox args={[0.145, 0.49, 0.027]} radius={0.025} smoothness={3} position={[0, -0.32, 0.221]}>
+        <meshStandardMaterial color="#e5e2d6" roughness={0.88} />
+      </RoundedBox>
+      <Stroke points={[[-0.13, 0.01, 0.16], [-0.17, -0.12, 0.23], [-0.085, -0.27, 0.24], [-0.079, -0.60, 0.19]]} radius={0.018} color="#122c61" />
+      <Stroke points={[[0.13, 0.01, 0.16], [0.17, -0.12, 0.23], [0.085, -0.27, 0.24], [0.079, -0.60, 0.19]]} radius={0.018} color="#122c61" />
+      <RoundedBox args={[0.088, 0.064, 0.022]} radius={0.012} smoothness={2} position={[0.235, -0.20, 0.187]} rotation={[0, 0.3, 0]}>
+        <meshStandardMaterial color="#d8f085" roughness={0.44} metalness={0.12} />
+      </RoundedBox>
+      <Stroke points={[[0.212, -0.198, 0.211], [0.224, -0.210, 0.211], [0.245, -0.185, 0.205]]} radius={0.006} color="#163d2c" />
+      <Pebble position={[0, 0.08, 0]} scale={[0.15, 0.19, 0.14]} color={SKIN} />
+      <group ref={rightArm} position={[-0.31, -0.085, 0]}><Arm /></group>
+      <group ref={leftArm} position={[0.31, -0.085, 0]}><Arm /></group>
+      <group ref={head} position={[0, 0.65, 0]}>
+        <mesh geometry={geometries.face}><meshPhysicalMaterial color={SKIN} roughness={0.66} clearcoat={0.07} /></mesh>
+        <mesh geometry={geometries.cap}><meshStandardMaterial color={HAIR} roughness={0.56} /></mesh>
+        {geometries.locks.map((geometry, index) => <mesh key={index} geometry={geometry}><meshStandardMaterial color={index % 2 ? "#202a35" : "#1b232e"} roughness={0.52} /></mesh>)}
+        <mesh geometry={geometries.beard}><meshStandardMaterial color="#252934" roughness={0.88} /></mesh>
+        {[-1, 1].map((side) => (
+          <group key={side}>
+            <Pebble position={[side * 0.542, -0.023, -0.014]} scale={[0.112, 0.169, 0.10]} color={SKIN} />
+            <Pebble position={[side * 0.579, -0.02, 0.064]} scale={[0.054, 0.096, 0.023]} color="#b67455" />
+            <Pebble position={[side * 0.343, -0.12, 0.369]} scale={[0.069, 0.033, 0.022]} color="#ca7d66" />
+          </group>
+        ))}
+        <group position={[0, 0.055, 0]}>
+          <group ref={eyes}>
+            {[-1, 1].map((side) => <Pebble key={side} position={[side * 0.211, 0, 0.431]} scale={[0.114, 0.136, 0.063]} color="#fff7e6" glossy />)}
+            <group ref={pupils}>
+              {[-1, 1].map((side) => (
+                <group key={side}>
+                  <Pebble position={[side * 0.203, -0.006, 0.486]} scale={[0.068, 0.086, 0.035]} color="#292522" glossy />
+                  <Pebble position={[side * 0.203 - 0.021, 0.022, 0.515]} scale={[0.020, 0.023, 0.010]} color="#ffffff" />
+                </group>
+              ))}
+            </group>
+          </group>
+        </group>
+        <group ref={brows}>
+          <Stroke points={[[-0.32, 0.246, 0.392], [-0.23, 0.274, 0.433], [-0.12, 0.252, 0.461]]} radius={0.029} color={HAIR} />
+          <Stroke points={[[0.12, 0.252, 0.461], [0.23, 0.274, 0.433], [0.32, 0.246, 0.392]]} radius={0.029} color={HAIR} />
+        </group>
+        <Pebble position={[0, -0.057, 0.473]} scale={[0.074, 0.124, 0.081]} color={SKIN} />
+        <Pebble position={[0, -0.121, 0.513]} scale={[0.099, 0.068, 0.085]} color="#d79a74" />
+        <Pebble position={[0, -0.263, 0.414]} scale={[0.203, 0.127, 0.071]} color={SKIN} />
+        <Stroke points={[[-0.155, -0.225, 0.458], [-0.077, -0.191, 0.491], [0, -0.219, 0.500]]} radius={0.032} color="#252934" />
+        <Stroke points={[[0, -0.219, 0.500], [0.077, -0.191, 0.491], [0.155, -0.225, 0.458]]} radius={0.032} color="#252934" />
+        <group ref={mouth} position={[0, -0.276, 0.483]}>
+          <Stroke points={[[-0.103, 0.006, -0.004], [0, -0.034, 0.012], [0.103, 0.006, -0.004]]} radius={0.021} color="#652f27" />
+          <Stroke points={[[-0.076, 0, 0.014], [0, -0.019, 0.029], [0.076, 0, 0.014]]} radius={0.009} color="#fff2db" />
+        </group>
+        <Pebble position={[0, -0.398, 0.398]} scale={[0.053, 0.055, 0.024]} color="#252934" />
+      </group>
+    </group>
+  );
+}
+
+function fitAvatarCamera(camera: OrthographicCamera, width: number, height: number) {
+  camera.zoom = Math.min(width / 1.92, height / 2.94);
+  camera.position.set(0.55, 0.33, 6);
+  camera.lookAt(0, 0.09, 0);
+  camera.updateProjectionMatrix();
+}
+
+function CameraAndContext({ onUnavailable }: Pick<Props, "onUnavailable">) {
+  const { camera, size, gl, invalidate } = useThree();
+  useEffect(() => {
+    fitAvatarCamera(camera as OrthographicCamera, size.width, size.height);
+    invalidate();
+  }, [camera, size.width, size.height, invalidate]);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const contextLost = (event: Event) => {
+      event.preventDefault();
+      onUnavailable?.();
+    };
+    canvas.addEventListener("webglcontextlost", contextLost);
+    return () => canvas.removeEventListener("webglcontextlost", contextLost);
+  }, [gl, onUnavailable]);
+  return null;
+}
+
+class AvatarBoundary extends Component<{ children: ReactNode; onUnavailable?: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onUnavailable?.(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
+/** A small, asset-free 3D host. The containing button supplies accessible meaning. */
+export default function BuilderAvatar({ mood, reducedMotion = false, active = true, onReady, onUnavailable }: Props) {
+  return (
+    <AvatarBoundary onUnavailable={onUnavailable}>
+      <Canvas
+        orthographic
+        camera={{ position: [0.55, 0.33, 6], zoom: 48, near: 0.1, far: 20 }}
+        dpr={[1, 1.5]}
+        frameloop={active && !reducedMotion ? "always" : "demand"}
+        gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+        style={{ width: "100%", height: "100%", pointerEvents: "none" }}
+        fallback={null}
+      >
+        <hemisphereLight args={["#e4eeff", "#bc9b7c", 2.0]} />
+        <directionalLight position={[-3, 5, 6]} color="#fff0db" intensity={3.4} />
+        <directionalLight position={[4, 2, -3]} color="#b7d7ff" intensity={3} />
+        <directionalLight position={[2, 0, 4]} color="#d4e1ff" intensity={0.6} />
+        <CameraAndContext onUnavailable={onUnavailable} />
+        <Character mood={mood} reducedMotion={reducedMotion} active={active} onReady={onReady} />
+      </Canvas>
+    </AvatarBoundary>
+  );
+}
