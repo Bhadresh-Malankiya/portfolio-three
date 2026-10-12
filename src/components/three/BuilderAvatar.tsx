@@ -17,7 +17,15 @@ import {
 } from "three";
 
 export type AvatarMood = "welcome" | "thinking" | "proud" | "curious" | "grateful" | "wave";
-export type CompanionTravel = { velocity: number; updatedAt: number; arrivedAt: number; journeyVelocity: number; flight: number; pointDirection: number };
+export type CompanionTravel = {
+  journeyVelocity: number;
+  flight: number;
+  pointDirection: number;
+  pointing?: boolean;
+  /** Positive elevation points upward; negative elevation points downward. */
+  pointElevation?: number;
+  speaking?: boolean;
+};
 
 type Props = {
   mood: AvatarMood;
@@ -193,7 +201,7 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
   const leftLeg = useRef<Group>(null);
   const rightKnee = useRef<Group>(null);
   const leftKnee = useRef<Group>(null);
-  const gait = useRef({ phase: 0, amount: 0, direction: 1, flight: 0 });
+  const gait = useRef({ phase: 0, amount: 0, direction: 1, flight: 0, flightPhase: 0, flightMotion: 0 });
   const ready = useRef(false);
   const invalidate = useThree((state) => state.invalidate);
   const geometries = useMemo(() => {
@@ -234,65 +242,79 @@ function Character({ mood, reducedMotion = false, active = true, travel, interac
     const pose = expressions[mood];
     const step = Math.min(delta, 0.05);
     const ease = (current: number, target: number) => still ? target : MathUtils.damp(current, target, 9, step);
-    const now = performance.now();
     const motion = travel?.current;
-    const age = motion ? Math.max(0, now - motion.updatedAt) : Infinity;
-    const velocity = still || interacting || !motion ? 0 : Math.abs(motion.journeyVelocity) > 1
-      ? motion.journeyVelocity
-      : motion.velocity * motion.pointDirection * Math.exp(-Math.max(0, age - 55) / 105);
-    gait.current.flight = ease(gait.current.flight, still || interacting ? 0 : motion?.flight ?? 0);
+    // Screen-space travel drives the joints. Scrolling alone must never make the
+    // character run in place when its route is waiting at a storytelling cue.
+    const velocity = still || interacting || !motion || !Number.isFinite(motion.journeyVelocity) ? 0 : motion.journeyVelocity;
+    const speed = Math.abs(velocity);
+    const pointing = !still && !interacting && Boolean(motion?.pointing);
+    const pointDirection = (motion?.pointDirection ?? -1) < 0 ? -1 : 1;
+    const pointElevation = MathUtils.clamp(motion?.pointElevation ?? 0, -1, 1);
+    gait.current.flight = ease(gait.current.flight, still || interacting ? 0 : MathUtils.clamp(motion?.flight ?? 0, 0, 1));
     const flying = gait.current.flight;
-    const pointDirection = motion?.pointDirection ?? -1;
-    const targetAmount = Math.abs(velocity) < 18 ? 0 : Math.min(1, Math.abs(velocity) / 920);
-    gait.current.amount = still ? 0 : MathUtils.damp(gait.current.amount, targetAmount, targetAmount > gait.current.amount ? 12 : 7, step);
-    if (Math.abs(velocity) > 22) gait.current.direction = ease(gait.current.direction, Math.sign(velocity));
-    const walk = gait.current.amount * (1 - flying);
-    if (gait.current.amount > .005) gait.current.phase += step * (7 + 7 * gait.current.amount);
+    gait.current.flightMotion = ease(gait.current.flightMotion, pointing ? 0 : MathUtils.clamp((speed - 6) / 75, 0, 1));
+    const cruising = flying * gait.current.flightMotion;
+    const hovering = flying - cruising;
+    const airPose = (rest: number, moving: number) => MathUtils.lerp(rest, moving, gait.current.flightMotion);
+    const targetAmount = speed < 6 || pointing ? 0 : Math.min(1, speed / 200);
+    gait.current.amount = still ? 0 : MathUtils.damp(gait.current.amount, targetAmount, targetAmount > gait.current.amount ? 12 : 18, step);
+    if (speed > 6) gait.current.direction = ease(gait.current.direction, Math.sign(velocity));
+    const walk = gait.current.amount * (1 - flying) * (pointing ? 0 : 1);
+    if (speed > 6 && !pointing) {
+      gait.current.phase += step * (7 + 7 * gait.current.amount) * Math.min(1, speed / 35);
+      gait.current.flightPhase += step * 3.2;
+    }
     const stride = Math.sin(gait.current.phase);
     const locomotion = sampleAvatarStride(gait.current.phase, gait.current.amount);
     const direction = gait.current.direction;
-    const arriving = !still && !interacting && motion && motion.arrivedAt > 0 && now - motion.arrivedAt < 4200 && walk < .12 && flying < .1 && mood !== "wave" && mood !== "grateful";
     const breath = still ? 0 : Math.sin(time * 1.8) * .012;
-    const flightFlutter = still ? 0 : Math.sin(time * 3.2) * .022 * flying;
-    figure.current.position.y = breath * (1 - walk) * (1 - flying) + locomotion.bodyY * walk + .025 * flying;
+    const flightFlutter = still ? 0 : Math.sin(gait.current.flightPhase) * .022 * cruising;
+    const hoverFloat = still ? 0 : Math.sin(time * 1.7) * .017 * hovering;
+    figure.current.position.y = breath * (1 - walk) * (1 - flying) + locomotion.bodyY * walk + .025 * flying + hoverFloat;
     figure.current.position.x = ease(figure.current.position.x, stride * .014 * walk);
-    figure.current.rotation.y = ease(figure.current.rotation.y, -.11 + direction * (1.02 * walk + 1.13 * flying));
-    figure.current.rotation.x = ease(figure.current.rotation.x, .38 * flying);
-    figure.current.rotation.z = ease(figure.current.rotation.z, stride * .026 * walk - direction * (.14 + flightFlutter) * flying);
+    figure.current.rotation.y = ease(figure.current.rotation.y, -.11 + direction * (1.02 * walk + 1.13 * cruising) + pointDirection * .18 * hovering);
+    figure.current.rotation.x = ease(figure.current.rotation.x, .38 * cruising + .015 * hovering);
+    figure.current.rotation.z = ease(figure.current.rotation.z, stride * .026 * walk - direction * (.14 + flightFlutter) * cruising);
     figure.current.scale.setScalar(1 - .035 * flying);
     pelvis.current.rotation.y = ease(pelvis.current.rotation.y, stride * .13 * walk);
     pelvis.current.rotation.z = ease(pelvis.current.rotation.z, -stride * .025 * walk);
     torso.current.rotation.y = ease(torso.current.rotation.y, -stride * .105 * walk);
     torso.current.rotation.x = ease(torso.current.rotation.x, (.07 + locomotion.running * .09) * walk);
     torso.current.rotation.z = ease(torso.current.rotation.z, stride * .016 * walk);
-    rightLeg.current.rotation.x = locomotion.right.hip * walk + (.28 + flightFlutter) * flying;
-    leftLeg.current.rotation.x = locomotion.left.hip * walk + (.18 - flightFlutter) * flying;
-    rightKnee.current.rotation.x = locomotion.right.knee * walk + .42 * flying;
-    leftKnee.current.rotation.x = locomotion.left.knee * walk + .63 * flying;
-    rightAnkle.current.rotation.x = locomotion.right.ankle * walk + .28 * flying;
-    leftAnkle.current.rotation.x = locomotion.left.ankle * walk + .2 * flying;
+    rightLeg.current.rotation.x = locomotion.right.hip * walk + airPose(.045, .28 + flightFlutter) * flying;
+    leftLeg.current.rotation.x = locomotion.left.hip * walk + airPose(.075, .18 - flightFlutter) * flying;
+    rightKnee.current.rotation.x = locomotion.right.knee * walk + airPose(.26, .42) * flying;
+    leftKnee.current.rotation.x = locomotion.left.knee * walk + airPose(.31, .63) * flying;
+    rightAnkle.current.rotation.x = locomotion.right.ankle * walk + airPose(.08, .28) * flying;
+    leftAnkle.current.rotation.x = locomotion.left.ankle * walk + airPose(.1, .2) * flying;
     head.current.rotation.z = ease(head.current.rotation.z, pose.tilt * (1 - flying) - stride * .012 * walk);
-    head.current.rotation.y = ease(head.current.rotation.y, arriving ? pointDirection * .26 : pose.turn - direction * .24 * walk);
-    head.current.rotation.x = ease(head.current.rotation.x, (mood === "grateful" ? .08 : -.025) - .2 * flying - .06 * walk);
+    head.current.rotation.y = ease(head.current.rotation.y, pointing ? pointDirection * .28 : MathUtils.lerp(pose.turn - direction * .24 * walk, pointDirection * .28, hovering));
+    head.current.rotation.x = ease(head.current.rotation.x, pointing ? -.04 - pointElevation * .24 : MathUtils.lerp((mood === "grateful" ? .08 : -.025) - .2 * cruising - .06 * walk, -.04 - pointElevation * .24, hovering));
     const blinkCycle = time % 5.2;
     const blink = !still && blinkCycle > 4.94 ? Math.max(0.09, Math.abs(blinkCycle - 5.07) / 0.13) : 1;
     eyes.current.scale.y = blink * (mood === "proud" || mood === "grateful" ? 0.85 : 1);
-    pupils.current.position.x = ease(pupils.current.position.x, arriving ? pointDirection * .024 : mood === "thinking" ? .022 : mood === "curious" ? -.014 : 0);
-    pupils.current.position.y = ease(pupils.current.position.y, mood === "thinking" ? 0.015 : 0);
+    pupils.current.position.x = ease(pupils.current.position.x, pointing ? pointDirection * .024 : MathUtils.lerp(mood === "thinking" ? .022 : mood === "curious" ? -.014 : 0, pointDirection * .024, hovering));
+    pupils.current.position.y = ease(pupils.current.position.y, pointing ? pointElevation * .028 : MathUtils.lerp(mood === "thinking" ? .015 : 0, pointElevation * .028, hovering));
     brows.current.rotation.z = ease(brows.current.rotation.z, pose.brow);
     brows.current.position.y = ease(brows.current.position.y, mood === "curious" ? 0.055 : mood === "wave" ? 0.026 : 0);
-    mouth.current.scale.y = ease(mouth.current.scale.y, pose.smile);
-    mouth.current.scale.x = ease(mouth.current.scale.x, mood === "proud" ? 1.12 : 1);
+    const speaking = !still && Boolean(motion?.speaking);
+    const syllable = speaking ? Math.pow(Math.max(0, Math.sin(time * 11.5)), 1.4) * (.65 + .35 * Math.sin(time * 3.1) ** 2) : 0;
+    mouth.current.scale.y = ease(mouth.current.scale.y, pose.smile + syllable * .52);
+    mouth.current.scale.x = ease(mouth.current.scale.x, (mood === "proud" ? 1.12 : 1) - syllable * .075);
+    mouth.current.position.y = ease(mouth.current.position.y, -.276 - syllable * .012);
     const wave = !still && mood === "wave" ? Math.sin(time * 7) * .16 : 0;
     const armSwing = .38 + .22 * locomotion.running;
     const armPhase = Math.cos(gait.current.phase);
     const elbowBend = .38 + .55 * locomotion.running;
-    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection < 0 ? -1.28 : pose.rightArm + wave, -.12, walk), -.12, flying));
-    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(arriving ? -.14 : pose.armX, armPhase * armSwing, walk), -1.65, flying));
-    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, MathUtils.lerp(MathUtils.lerp(arriving && pointDirection > 0 ? 1.28 : pose.leftArm, .12, walk), .19, flying));
-    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, -armPhase * armSwing, walk), -1.44, flying));
-    rightElbow.current.rotation.x = ease(rightElbow.current.rotation.x, MathUtils.lerp(-elbowBend * walk - Math.max(0, -armPhase) * .14 * walk, -.18, flying));
-    leftElbow.current.rotation.x = ease(leftElbow.current.rotation.x, MathUtils.lerp(-elbowBend * walk - Math.max(0, armPhase) * .14 * walk, -.3, flying));
+    const pointingAngle = Math.PI / 2 + pointElevation * .85;
+    const pointRight = pointing && pointDirection < 0;
+    const pointLeft = pointing && pointDirection > 0;
+    rightArm.current.rotation.z = ease(rightArm.current.rotation.z, pointRight ? -pointingAngle : MathUtils.lerp(MathUtils.lerp(pose.rightArm + wave, -.12, walk), airPose(-.24, -.12), flying));
+    rightArm.current.rotation.x = ease(rightArm.current.rotation.x, pointRight ? -.12 : MathUtils.lerp(MathUtils.lerp(pose.armX, armPhase * armSwing, walk), airPose(-.28, -1.65), flying));
+    leftArm.current.rotation.z = ease(leftArm.current.rotation.z, pointLeft ? pointingAngle : MathUtils.lerp(MathUtils.lerp(pose.leftArm, .12, walk), airPose(.24, .19), flying));
+    leftArm.current.rotation.x = ease(leftArm.current.rotation.x, pointLeft ? -.12 : MathUtils.lerp(MathUtils.lerp(mood === "grateful" ? -.72 : 0, -armPhase * armSwing, walk), airPose(-.25, -1.44), flying));
+    rightElbow.current.rotation.x = ease(rightElbow.current.rotation.x, pointRight ? -.08 : MathUtils.lerp(-elbowBend * walk - Math.max(0, -armPhase) * .14 * walk, airPose(-.6, -.18), flying));
+    leftElbow.current.rotation.x = ease(leftElbow.current.rotation.x, pointLeft ? -.08 : MathUtils.lerp(-elbowBend * walk - Math.max(0, armPhase) * .14 * walk, airPose(-.55, -.3), flying));
     if (!ready.current) {
       ready.current = true;
       onReady?.();

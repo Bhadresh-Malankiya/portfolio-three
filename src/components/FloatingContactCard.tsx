@@ -5,11 +5,12 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
-import { ArrowUpLeft, ArrowUpRight, Download, Mail, X } from "lucide-react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Download, Mail, X } from "lucide-react";
 import { downloads } from "@/data/downloads";
-import { companionChapters, companionDestination, getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
+import { getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
 import type { CompanionTravel } from "@/components/three/BuilderAvatar";
+import { useCompanionJourney } from "@/components/useCompanionJourney";
 import "@/app/companion.css";
 
 const BuilderAvatar = dynamic(() => import("@/components/three/BuilderAvatar"), { ssr: false });
@@ -23,7 +24,6 @@ function Companion({ pathname }: { pathname: string }) {
   const [speaking, setSpeaking] = useState(false);
   const [side, setSide] = useState<"left" | "right">("right");
   const [downloadsOpen, setDownloadsOpen] = useState(false);
-  const lastViewportWidth = useRef(0);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -33,7 +33,6 @@ function Companion({ pathname }: { pathname: string }) {
   const [compactContact, setCompactContact] = useState(false);
   const dock = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const currentChapter = useRef(initialChapter.id);
   const currentSide = useRef<"left" | "right">("right");
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const speechTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -41,7 +40,7 @@ function Companion({ pathname }: { pathname: string }) {
   const suppressFocus = useRef(false);
   const pointerInside = useRef(false);
   const openedByClick = useRef(false);
-  const travel = useRef<CompanionTravel>({ velocity: 0, updatedAt: 0, arrivedAt: 0, flight: 0, journeyVelocity: 0, pointDirection: -1 });
+  const travel = useRef<CompanionTravel>({ flight: 0, journeyVelocity: 0, pointDirection: -1, pointElevation: 0, pointing: false, speaking: false });
 
   const cancelClose = useCallback(() => clearTimeout(closeTimer.current), []);
   const closeCard = useCallback((restoreFocus = false) => {
@@ -57,7 +56,7 @@ function Companion({ pathname }: { pathname: string }) {
   const showNote = useCallback(() => {
     clearTimeout(speechTimer.current);
     setSpeaking(true);
-    speechTimer.current = setTimeout(() => setSpeaking(false), 3200);
+    speechTimer.current = setTimeout(() => setSpeaking(false), 6200);
   }, []);
 
   useEffect(() => {
@@ -70,74 +69,31 @@ function Companion({ pathname }: { pathname: string }) {
     return () => window.removeEventListener("resize", update);
   }, [pathname]);
 
+  const updateChapter = useCallback((next: CompanionChapter) => {
+    clearTimeout(speechTimer.current);
+    setSpeaking(false);
+    setChapter(next);
+  }, []);
+  const updateSide = useCallback((next: "left" | "right") => {
+    currentSide.current = next;
+    setSide(next);
+  }, []);
+  useCompanionJourney({ pathname, viewport, reduced, paused: !pageVisible, expanded, downloadsOpen, dock, travel, x, y, onChapter: updateChapter, onSide: updateSide, onCue: showNote });
   useEffect(() => {
-    const travelState = travel.current;
-    const dockElement = dock.current;
-    let frame = 0;
-    let stopTimer: ReturnType<typeof setTimeout> | undefined;
-    let previousY = window.scrollY;
-    let previousTime = performance.now();
-    let chapters: { chapter: CompanionChapter; element: Element }[] = [];
-    const collect = () => {
-      chapters = pathname === "/" ? companionChapters.flatMap((item) => {
-        const element = document.querySelector(item.selector);
-        return element ? [{ chapter: item, element }] : [];
-      }) : [];
-    };
-    const measure = () => {
-      frame = 0;
-      if (document.hidden) return;
-      const now = performance.now();
-      const distance = window.scrollY - previousY;
-      const elapsed = Math.max(16, now - previousTime);
-      const velocity = Math.max(-2400, Math.min(2400, distance / elapsed * 1000));
-      previousY = window.scrollY;
-      previousTime = now;
-      travelState.velocity = reduced ? 0 : velocity;
-      travelState.updatedAt = now;
-      if (dockElement && !reduced && Math.abs(velocity) > 22) {
-        dockElement.dataset.walking = "true";
-        dockElement.dataset.direction = velocity > 0 ? "forward" : "back";
-        clearTimeout(stopTimer);
-        stopTimer = setTimeout(() => { dockElement.dataset.walking = "false"; }, 240);
-      }
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollable > 0 ? Math.max(0, Math.min(1, window.scrollY / scrollable)) : 1;
-      dockElement?.style.setProperty("--companion-progress", String(progress));
-      let next = initialChapter;
-      const readingLine = Math.min(window.innerHeight * 0.35, 260);
-      if (chapters.some(item => !item.element.isConnected)) collect();
-      for (const item of chapters) {
-        if (item.element.getBoundingClientRect().top <= readingLine) next = item.chapter;
-      }
-      if (next.id !== currentChapter.current) {
-        currentChapter.current = next.id;
-        setChapter(next);
-      }
-    };
-    const schedule = () => { if (!frame) frame = window.requestAnimationFrame(measure); };
-    const resize = () => { collect(); schedule(); };
-    collect();
-    schedule();
-    const observer = new ResizeObserver(resize);
-    observer.observe(document.body);
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", resize, { passive: true });
-    return () => {
-      window.cancelAnimationFrame(frame);
-      clearTimeout(stopTimer);
-      travelState.velocity = 0;
-      if (dockElement) dockElement.dataset.walking = "false";
-      observer.disconnect();
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", resize);
-    };
-  }, [pathname, initialChapter, reduced]);
+    travel.current.speaking = speaking && !expanded;
+    if (!speaking || expanded) travel.current.pointing = false;
+    else {
+      const element = chapter.target ? document.querySelector(chapter.target) : null;
+      const target = element?.getBoundingClientRect();
+      travel.current.pointing = Boolean(target && !element?.closest("[inert]") && target.bottom > 100 && target.top < viewport.height * .82 && Math.abs(travel.current.journeyVelocity) < 4);
+    }
+  }, [speaking, expanded, chapter, viewport.height]);
 
   useEffect(() => {
     const downloads = document.querySelector('button[aria-label="Résumé and book downloads"]');
     if (!downloads) return;
     const update = () => setDownloadsOpen(downloads.getAttribute("aria-expanded") === "true");
+    update();
     const observer = new MutationObserver(update);
     observer.observe(downloads, { attributes: true, attributeFilter: ["aria-expanded"] });
     return () => observer.disconnect();
@@ -146,99 +102,30 @@ function Companion({ pathname }: { pathname: string }) {
   useEffect(() => {
     if (!viewport.width || !dock.current) return;
     const element = dock.current;
-    const state = travel.current;
-    let controls: { stop: () => void } | undefined;
-    const stop = () => {
-      controls?.stop();
-      state.journeyVelocity = 0;
-      state.flight = 0;
-      element.dataset.travelling = "false";
-      element.dataset.flying = "false";
-      element.style.setProperty("--companion-flight", "0");
-    };
-    const frame = window.requestAnimationFrame(() => {
-      // An open CV card stays where the visitor put it, even while the page scrolls.
-      if (expanded) {
-        const mobile = viewport.width < 700;
-        const availableWidth = document.documentElement.clientWidth;
-        const styles = window.getComputedStyle(element);
-        const dockWidth = element.offsetWidth;
-        const rightInset = Number.parseFloat(styles.right);
-        // A viewport resize may change the available margin while the card is open.
-        const boundedX = mobile ? 0 : Math.max(-(availableWidth - dockWidth - rightInset - 20), Math.min(0, x.get()));
-        x.set(boundedX);
-        const cardClearance = mobile ? 126 : viewport.height <= 560 ? 158 : 196;
-        const maximumLift = Math.max(0, viewport.height - cardClearance - 120);
-        const boundedY = Math.max(-maximumLift, Math.min(0, y.get()));
-        y.set(boundedY);
-        element.style.setProperty("--companion-lift", `${-boundedY}px`);
-        if (mobile) { currentSide.current = "right"; setSide("right"); }
-        const left = availableWidth - rightInset - dockWidth + boundedX;
-        const cardWidth = Math.min(288, availableWidth - 24);
-        const preferred = currentSide.current === "left" ? 0 : dockWidth - cardWidth;
-        const offset = Math.max(12 - left, Math.min(preferred, availableWidth - 12 - cardWidth - left));
-        element.style.setProperty("--companion-card-left", `${offset}px`);
-        return;
-      }
-      element.style.removeProperty("--companion-card-left");
-      const resized = lastViewportWidth.current !== viewport.width;
-      lastViewportWidth.current = viewport.width;
-      const downloads = document.querySelector<HTMLButtonElement>('button[aria-label="Résumé and book downloads"]');
-      const downloadsVisible = Boolean(downloads?.getClientRects().length && downloads.offsetWidth);
-      const location = downloadsOpen ? { ...chapter, side: "right" as const } : chapter;
-      const target = companionDestination(location, viewport.width, viewport.height, downloadsVisible, reduced);
-      if (target.side === "left") target.x += viewport.width - document.documentElement.clientWidth;
-      currentSide.current = target.side;
-      setSide(target.side);
-      state.pointDirection = target.side === "left" ? 1 : -1;
-      setSpeaking(false);
-      element.style.setProperty("--companion-lift", `${-target.y}px`);
-      const finish = () => {
-        stop();
-        state.arrivedAt = performance.now();
-        if (!reduced && pageVisible && viewport.width >= 700) showNote();
-      };
-      const distance = target.x - x.get();
-      if (reduced || !pageVisible || resized) {
-        x.set(target.x);
-        y.set(target.y);
-        finish();
-        return;
-      }
-      const fromX = x.get();
-      const fromY = y.get();
-      const crossing = Math.abs(distance) >= 8;
-      element.dataset.travelling = crossing ? "true" : "false";
-      const duration = crossing ? Math.min(2.4, Math.max(1.6, Math.abs(distance) / 620)) : .65;
-      const lift = crossing ? Math.min(44, viewport.height * .055) : 0;
-      let previousX = fromX;
-      let previousTime = performance.now();
-      controls = animate(0, 1, {
-        duration,
-        ease: [0.4, 0, 0.25, 1],
-        onUpdate: (progress) => {
-          const nextX = fromX + distance * progress;
-          const now = performance.now();
-          state.journeyVelocity = crossing ? Math.max(-1800, Math.min(1800, (nextX - previousX) / Math.max(1, now - previousTime) * 1000)) : 0;
-          previousX = nextX;
-          previousTime = now;
-          x.set(nextX);
-          y.set(fromY + (target.y - fromY) * progress - Math.sin(progress * Math.PI) * lift);
-          state.flight = crossing ? Math.sin(progress * Math.PI) ** 2 : 0;
-          element.dataset.flying = state.flight > .3 ? "true" : "false";
-          element.style.setProperty("--companion-flight", String(state.flight));
-        },
-        onComplete: finish,
-      });
-    });
-    return () => { window.cancelAnimationFrame(frame); stop(); };
-  }, [chapter, viewport, expanded, reduced, pageVisible, downloadsOpen, showNote, x, y]);
+    if (!expanded) { element.style.removeProperty("--companion-card-left"); return; }
+    // An open CV card stays put and remains reachable after a viewport resize.
+    const availableWidth = document.documentElement.clientWidth;
+    const mobile = viewport.width < 700;
+    const rightInset = Number.parseFloat(window.getComputedStyle(element).right);
+    const dockWidth = element.offsetWidth;
+    const boundedX = mobile ? 0 : Math.max(-(availableWidth - dockWidth - rightInset - 20), Math.min(0, x.get()));
+    const clearance = mobile ? 126 : viewport.height <= 560 ? 158 : 196;
+    const boundedY = Math.max(-Math.max(0, viewport.height - clearance - 120), Math.min(0, y.get()));
+    x.set(boundedX);
+    y.set(boundedY);
+    element.style.setProperty("--companion-lift", `${-boundedY}px`);
+    const left = availableWidth - rightInset - dockWidth + boundedX;
+    const cardWidth = Math.min(288, availableWidth - 24);
+    const preferred = currentSide.current === "left" ? 0 : dockWidth - cardWidth;
+    const offset = Math.max(12 - left, Math.min(preferred, availableWidth - 12 - cardWidth - left));
+    element.style.setProperty("--companion-card-left", `${offset}px`);
+  }, [viewport, expanded, x, y]);
 
   useEffect(() => {
     const visibility = () => {
       setPageVisible(!document.hidden);
       if (document.hidden) {
-        travel.current.velocity = 0;
+        travel.current.journeyVelocity = 0;
         if (dock.current) dock.current.dataset.walking = "false";
       }
     };
@@ -266,7 +153,7 @@ function Companion({ pathname }: { pathname: string }) {
   const onAvatarReady = useCallback(() => setAvatarReady(true), []);
   const onAvatarUnavailable = useCallback(() => setUnavailable(true), []);
 
-  return <motion.div className="builder-companion" style={{ x, y }} data-side={side} data-chapter={chapter.id} data-section-label={chapter.label} data-expanded={expanded} data-contact-page={pathname === "/contact"} ref={dock}
+  return <motion.div className="builder-companion" style={{ x, y }} data-side={side} data-chapter={chapter.id} data-section-label={chapter.label} data-expanded={expanded} data-speaking={speaking && !expanded} data-contact-page={pathname === "/contact"} ref={dock}
     onPointerEnter={() => { pointerInside.current = true; cancelClose(); if (!expanded) showNote(); }}
     onPointerLeave={() => {
       pointerInside.current = false;
@@ -283,7 +170,8 @@ function Companion({ pathname }: { pathname: string }) {
       {speaking && !expanded && <motion.div className="companion-tooltip" id="companion-tooltip" role="tooltip" key={chapter.id}
         initial={{ opacity: 0, x: reduced ? 0 : side === "left" ? -5 : 5 }} animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0 }} transition={{ duration: reduced ? 0 : 0.2 }}>
-        {side === "right" && <ArrowUpLeft size={14} aria-hidden="true" />}<span>{chapter.note}</span>{side === "left" && <ArrowUpRight size={14} aria-hidden="true" />}
+        <span className="companion-tooltip-label">{chapter.label}</span>
+        <span className="companion-tooltip-message">{chapter.note}</span>
       </motion.div>}
     </AnimatePresence>
     <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh — profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card" aria-describedby={speaking && !expanded ? "companion-tooltip" : undefined}

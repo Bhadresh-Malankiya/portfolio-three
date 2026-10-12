@@ -1,17 +1,17 @@
 export type AvatarMood = "welcome" | "thinking" | "proud" | "curious" | "grateful" | "wave";
-export type CompanionChapter = { id: string; selector: string; label: string; number: string; mood: AvatarMood; note: string; side?: "left" | "right"; };
+export type CompanionChapter = { id: string; selector: string; label: string; number: string; mood: AvatarMood; note: string; target?: string; side?: "left" | "right"; };
 
 export const companionChapters: CompanionChapter[] = [
-  { id: "hello", selector: "#hero", label: "The beginning", number: "01", mood: "welcome", note: "Scroll to follow the idea." },
-  { id: "work", side: "left", selector: "#work", label: "Web products", number: "02", mood: "proud", note: "Three products. Start here." },
-  { id: "mobile", selector: "#mobile-work", label: "In your pocket", number: "03", mood: "curious", note: "Take a closer look at the app." },
-  { id: "workbench", selector: "#workbench, .workbench", label: "The workbench", number: "04", mood: "thinking", note: "A few more things I’ve built." },
-  { id: "about", side: "left", selector: "#about", label: "The human part", number: "05", mood: "welcome", note: "The person behind the work." },
-  { id: "experience", selector: "#experience", label: "Along the way", number: "06", mood: "thinking", note: "Follow the steps that got me here." },
-  { id: "expertise", side: "left", selector: "#expertise", label: "In my toolkit", number: "07", mood: "curious", note: "See how the pieces connect." },
-  { id: "reviews", selector: "#reviews", label: "Their words", number: "08", mood: "grateful", note: "Hear from the people I work with." },
-  { id: "downloads", selector: "#downloads", label: "Take a page", number: "09", mood: "proud", note: "Take my CV or a book with you." },
-  { id: "contact", selector: "#contact", label: "Your next idea", number: "10", mood: "wave", note: "Your next idea starts here." },
+  { id: "hello", selector: "#hero", label: "Hello, I’m Bhadresh", number: "01", mood: "welcome", note: "Come along. I’ll show you what I’ve been building.", target: "#hero h1" },
+  { id: "work", side: "left", selector: "#work", label: "Made it to the real world", number: "02", mood: "proud", note: "Three different problems. Open a project to see how I solved it.", target: "#work h3" },
+  { id: "mobile", selector: "#mobile-work", label: "A smaller screen", number: "03", mood: "curious", note: "Meet Hey Buddy. A little app for pets and their people.", target: "#mobile-work h3" },
+  { id: "workbench", selector: "#workbench, .workbench", label: "Still curious?", number: "04", mood: "thinking", note: "There’s more on the workbench. Pick something that interests you.", target: "#workbench a" },
+  { id: "about", selector: "#about", label: "A little about me", number: "05", mood: "welcome", note: "This is the other half: the person behind the projects.", target: ".journal-heading h2" },
+  { id: "experience", selector: "#experience", label: "How I got here", number: "06", mood: "thinking", note: "From developer to founder. Tap a chapter to follow the journey.", target: "#experience h3" },
+  { id: "expertise", selector: "#expertise", label: "Joining the dots", number: "07", mood: "curious", note: "Interfaces, systems, AI—and the team that brings them together.", target: "#expertise h3" },
+  { id: "reviews", selector: "#reviews", label: "I’ll let them tell you", number: "08", mood: "grateful", note: "A few words from the people I’ve built things with.", target: "#reviews h2" },
+  { id: "downloads", selector: "#downloads", label: "Something to take away", number: "09", mood: "proud", note: "My résumé for the short version. A book for the longer one.", target: "#downloads h2" },
+  { id: "contact", selector: "#contact", label: "Your turn", number: "10", mood: "wave", note: "Have a project or a role in mind? I’d love to hear about it.", target: "#contact a" },
 ];
 
 export const projectChapter: CompanionChapter = {
@@ -38,13 +38,4 @@ export function getCompanionChapter(pathname: string): CompanionChapter {
   if (pathname === "/journey" || pathname.startsWith("/journey/")) return journeyChapter;
   if (pathname === "/field-guide" || pathname.startsWith("/field-guide/")) return fieldGuideChapter;
   return projectChapter;
-}
-
-/** The guide travels in the bottom margin; small screens keep a clear reading lane. */
-export function companionDestination(chapter: CompanionChapter, width: number, height: number, downloadsVisible = false, reduced = false) {
-  const mobile = width < 700;
-  const left = !mobile && !reduced && chapter.side === "left";
-  const lift = reduced ? 0 : mobile ? (chapter.id === "hello" ? 0 : 14) : left && downloadsVisible ? 76 : 0;
-  const safeLift = Math.min(lift, Math.max(0, height - (mobile ? 100 : 180)));
-  return { x: left ? -Math.max(0, width - 152) : 0, y: -safeLift, side: left ? "left" as const : "right" as const };
 }

@@ -29,6 +29,7 @@ jobs:
       - name: Companion motion and viewport checks
         run: |
           node --experimental-strip-types scripts/companion-journey-test.mjs
+          node --experimental-strip-types scripts/companion-route-test.mjs
           node --experimental-strip-types scripts/avatar-locomotion-test.mjs
       - name: Hero flight story timing
         run: node --experimental-strip-types scripts/hero-flight-test.mjs
