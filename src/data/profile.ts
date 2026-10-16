@@ -12,7 +12,7 @@ export const profile = {
   currentRole: "Forward Deployed Engineer · Founder, AscendXI",
   yearsExperience: 8,
   summary:
-    "Forward Deployed Engineer with 8+ years across full-stack development, system design, AI integration and production delivery. Managed 10+ developers and helped scale products from 10 to 100,000 users. Led engineering on ExtendedForms at ExpressTech Systems, serving 400K+ users and supporting 10M+ online exams. Previously founded MB Systems; now building VocalXI solo through AscendXI.",
+    "Full-stack and applied-AI engineer with 8+ years across client delivery, backend systems and production products. At ExpressTech Systems, I led engineering work on ExtendedForms and created Quzo for enterprise assessment needs. I founded MB Systems alongside my earlier full-time role at HQ Infosystem, leading 5–6 developers and supporting trainees before closing in mid-2022. I now build VocalXI through AscendXI.",
   coreStrengths: [
     "Finds and frames problems before writing code, then builds the solution end to end",
     "Thinks about product decisions the way a business owner would, not only as an engineer",
@@ -23,7 +23,7 @@ export const profile = {
   ],
   headlineStats: [
     { value: 8, suffix: "+", label: "years shipping production software" },
-    { value: 10, suffix: "+", label: "developers managed" },
+    { value: 6, suffix: "", label: "developers on MB Systems projects (5–6)" },
     { value: 400, suffix: "K+", label: "ExtendedForms users" },
     { value: 10, suffix: "M+", label: "online exams on ExtendedForms" },
   ],
@@ -31,13 +31,12 @@ export const profile = {
     "400K+ users on ExtendedForms.io",
     "10M+ online exams on ExtendedForms",
     "579K forms analyzed",
-    "Experience scaling products from 10 to 100,000 users",
-    "400K+ exams proctored on Quzo.ai",
+    "Architecture and performance work on high-traffic SaaS",
     "3x revenue growth at ExpressTech",
     "question generation cut from 30 min to 30 sec",
     "page load cut from 3.2s to 1.2s",
-    "support resolution time cut ~90% on HelpDesk AI",
-    "10+ developers managed",
+    "HelpDesk AI: ~90% less effort for eligible ticket types (author-reported)",
+    "5–6 developers on MB Systems projects",
     "10K+ users, $2M+ volume on BPS Trading",
     "1 startup founded, closed honestly, lessons kept",
   ],
@@ -52,7 +51,7 @@ export const profile = {
   ],
   education: {
     degree: "Bachelor of Engineering, Information Technology",
-    school: "Gujarat Technological University — SSGEC",
-    detail: "CGPA 9.0/10.0 · First Class with Distinction · highest campus placement package in his batch",
+    school: "Gujarat Technological University — SSGEC · 2022",
+    detail: "CGPA 9.0/10.0 · First Class with Distinction",
   },
 };

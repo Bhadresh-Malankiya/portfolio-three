@@ -70,7 +70,7 @@ export const projects: Project[] = [
     name: "VocalXI",
     url: "https://vocalxi.com",
     category: "Voice AI / Personal product",
-    kind: "Personal build",
+    kind: "Founder venture",
     oneLiner:
       "My voice-form product: share a browser link, collect spoken answers, and let respondents review before submitting.",
     motif: "proctor",
@@ -79,17 +79,17 @@ export const projects: Project[] = [
     tech: [
       "Browser voice agents",
       "Form builder",
-      "Google Forms",
+      "Google Forms connector (staging)",
       "Response review",
     ],
     metrics: [],
     narrative: [
       "VocalXI is a product I am building personally. It turns a set of form questions into a browser voice conversation, so respondents can speak their answers instead of filling every field by hand.",
       "The workflow starts with native forms or a Google Forms connection, continues through a shareable respondent link, and ends with an answer review before submission. The product also includes a workspace for forms and responses.",
-      "Browser voice is available and the product is onboarding its first users. The Google Forms connector has limited staging access. Phone calling is planned, not a released feature.",
+      "VocalXI is pre-launch, with browser voice workflows in development and the Google Forms connector in staging. Telephone calling is planned; production readiness has not been verified.",
     ],
     role: "Personal product — building and developing VocalXI",
-    status: "Early release — browser voice; Google Forms connector in staging",
+    status: "Pre-launch · browser voice in development; Google Forms connector in staging; telephone calling planned",
     images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
   },
   {
@@ -97,7 +97,7 @@ export const projects: Project[] = [
     name: "Quzo.ai",
     url: "https://quzo.ai",
     category: "AI SaaS",
-    kind: "Sole ownership",
+    kind: "Employer product",
     oneLiner:
       "AI-powered quizzes and proctored exams, built from idea to production.",
     motif: "proctor",
@@ -114,17 +114,16 @@ export const projects: Project[] = [
       "Stripe",
     ],
     metrics: [
-      { value: "400K+", label: "student exams handled" },
       { value: "30s", label: "question creation, down from 30 min" },
       { value: "3", label: "AI providers, one credit system" },
     ],
     narrative: [
-      "I built Quzo.ai from scratch as an AI-powered quiz and exam platform. My work covers the application, the AI integrations, the credit system, and deployment.",
+      "I created Quzo.ai at ExpressTech Systems as a modular-monolith assessment platform for enterprise clients in the ExtendedForms context. My work covers the application, the AI integrations, the credit system, and deployment.",
       "The credit system routes tasks across OpenAI, Claude, and Gemini based on the task and its cost. A retrieval pipeline using pgvector supports question-bank generation, reducing the recorded authoring time from around 30 minutes to 30 seconds.",
       "The exam workflow includes proctoring and response reporting. I have also developed photo, video, and conversation features as smaller experiments within the product.",
     ],
-    role: "Founder, sole engineer, architecture, AI systems, growth & SEO",
-    status: "Live — growing every term",
+    role: "Senior Software Engineer at ExpressTech Systems; full-stack implementation and technical direction",
+    status: "Recently launched employer product · contribution through September 2026",
     images: [
       "/images/quzo_landing_page.png",
       "/images/quzo_dashboard.png",
@@ -139,7 +138,7 @@ export const projects: Project[] = [
     name: "ExtendedForms.io",
     url: "https://extendedforms.io",
     category: "B2B SaaS",
-    kind: "Sole ownership",
+    kind: "Employer product",
     oneLiner:
       "Google Forms analytics and AI extension platform, inside the Google Workspace ecosystem.",
     motif: "forms",
@@ -162,11 +161,11 @@ export const projects: Project[] = [
       { value: "3x", label: "revenue growth" },
     ],
     narrative: [
-      "At ExpressTech, I own the technical side of ExtendedForms.io: architecture, feature delivery, performance, and production support.",
+      "At ExpressTech, I led engineering on ExtendedForms.io: architecture, feature delivery, performance, and production support.",
       "I rebuilt performance-critical paths to reduce page load from 3.2 seconds to 1.2 seconds. On a separate high-traffic page, caching and TanStack Query reduced loading from 30–35 seconds to around 5–6 seconds.",
       "I also developed AI Watchers with face detection for exam proctoring. The implementation needed to account for false positives as well as suspicious activity.",
     ],
-    role: "Sole technical owner — architecture, performance, AI features, growth",
+    role: "Engineering leadership at ExpressTech — architecture, performance, AI features and delivery",
     status: "Live — 400K+ users and growing",
     // Public landing page captured from extendedforms.io on 2026-10-02.
     images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
@@ -175,14 +174,14 @@ export const projects: Project[] = [
     slug: "helpdesk-ai",
     name: "HelpDesk AI",
     category: "AI SaaS",
-    kind: "Sole ownership",
+    kind: "Personal build",
     oneLiner:
       "Multi-tenant AI support agent platform with threshold-based auto-reply — built solo, on weekends.",
     motif: "inbox",
     featured: false,
     tech: ["Node.js", "IMAP IDLE", "AES-256", "JWT", "PostgreSQL"],
     metrics: [
-      { value: "~90%", label: "less support engineer time" },
+      { value: "~90%", label: "less effort for eligible ticket types (author-reported)" },
       { value: "hours", label: "resolution, down from 1–2 days" },
       { value: "100%", label: "weekend-built" },
     ],
@@ -291,7 +290,7 @@ export const projects: Project[] = [
       "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections — built during the MB Systems period, the technical high point of a venture that ultimately didn't survive the studio around it.",
     ],
     role: "Founder & lead engineer",
-    status: "Built under MB Systems (2020–2022)",
+    status: "Built under MB Systems · mid-2020–mid-2022; studio closed",
     frame: "phone",
     images: [
       "/images/bps_1.png",
@@ -322,17 +321,13 @@ export const projects: Project[] = [
     oneLiner: "Frontend dashboard for Da Vinci Xi and SP surgical systems.",
     motif: "medical",
     featured: false,
-    tech: ["React.js", "TypeScript", "Redux", "WebSocket", "HIPAA compliance"],
-    metrics: [
-      { value: "50K+", label: "hospitals worldwide" },
-      { value: "99.99%", label: "uptime" },
-      { value: "HIPAA", label: "compliant" },
-    ],
+    tech: ["React", "TypeScript", "Liferay", "SSO integration"],
+    metrics: [],
     narrative: [
-      "The kind of build where a bug isn't an inconvenient reload — HIPAA-compliant, internationalized into multiple languages including Japanese, running across 50,000+ hospitals at 99.99% uptime.",
+      "Contributed React/TypeScript dashboard features and SSO integration within a Liferay-based enterprise environment.",
     ],
-    role: "Frontend dashboard engineering",
-    status: "Live worldwide",
+    role: "Frontend dashboard and integration engineering",
+    status: "Enterprise client contribution",
     images: [
       "/images/intuitive.png",
       "/images/intuitive_dashboard.png",

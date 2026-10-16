@@ -1,7 +1,7 @@
 /**
  * The two take-home artifacts, rendered from `source-material/` (see
- * README) into print-ready PDFs at `public/downloads/`. Sizes/page counts
- * are real — update them if the source files change and you regenerate.
+ * README) into selectable-text PDFs at `public/downloads/`. Measure sizes
+ * and page counts again whenever the documents are regenerated.
  */
 export const downloads = {
   ebook: {
@@ -10,18 +10,20 @@ export const downloads = {
     subtitle: "A Life in Code, Ownership, and the Habit of Starting Again",
     file: "/downloads/the-weekend-builder.pdf",
     filename: "The-Weekend-Builder-Bhadreshkumar-Malankiya.pdf",
-    sizeLabel: "330 KB",
-    stats: ["Foreword + 16 chapters", "32 pages", "~20,000 words"],
+    sizeLabel: "480 KiB",
+    pages: 87,
+    stats: ["Foreword + 16 chapters", "87 pages", "~20,000 words"],
     cta: "Download the book",
   },
   resume: {
     kicker: "The résumé",
     title: "Bhadreshkumar Malankiya",
-    subtitle: "Senior Full Stack Engineer · Software Architect · Technical Lead",
+    subtitle: "Senior Full-Stack Engineer · Node.js, TypeScript & Applied AI",
     file: "/downloads/bhadreshkumar-malankiya-resume.pdf",
     filename: "Bhadreshkumar-Malankiya-Resume.pdf",
-    sizeLabel: "143 KB",
-    stats: ["3 pages", "8+ years, condensed"],
+    sizeLabel: "7 KiB",
+    pages: 2,
+    stats: ["2 pages", "8+ years, condensed"],
     cta: "Download the résumé",
   },
 } as const;

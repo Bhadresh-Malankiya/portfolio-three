@@ -3,7 +3,7 @@ import Reveal from "@/components/Reveal";
 
 type Row = {
   name: string;
-  status: "live" | "weekend" | "closed";
+  status: "live" | "weekend" | "closed" | "past";
   detail: string;
   metrics: { value: number; suffix?: string; label: string }[];
 };
@@ -12,19 +12,17 @@ const ROWS: Row[] = [
   {
     name: "extendedforms.io",
     status: "live",
-    detail: "sole technical owner · Google Forms analytics + AI",
+    detail: "employer product · engineering through September 2026; author-reported figures",
     metrics: [
       { value: 400, suffix: "K+", label: "users" },
       { value: 10, suffix: "M+", label: "online exams" },
-      { value: 99, suffix: ".8%", label: "uptime" },
     ],
   },
   {
     name: "quzo.ai",
     status: "live",
-    detail: "engineering at ExpressTech · AI exams & proctoring",
+    detail: "created at ExpressTech · recently launched modular monolith",
     metrics: [
-      { value: 400, suffix: "K+", label: "exams run" },
       { value: 30, suffix: "s", label: "per question, was 30 min" },
     ],
   },
@@ -32,24 +30,23 @@ const ROWS: Row[] = [
     name: "helpdesk-ai",
     status: "weekend",
     detail: "solo, weekends only · AI support agent",
-    metrics: [{ value: 90, suffix: "%", label: "less support time" }],
+    metrics: [{ value: 90, suffix: "%", label: "less effort, eligible tickets (author-reported)" }],
   },
   {
     name: "expresstech systems",
-    status: "live",
-    detail: "technical lead, 2022–2026 · platform engineering",
+    status: "past",
+    detail: "Senior Software Engineer, June 2022–September 2026 · technical-lead responsibilities",
     metrics: [
-      { value: 10, suffix: "+", label: "developers managed" },
-      { value: 3, suffix: "x", label: "revenue growth" },
+      { value: 3, suffix: "x", label: "revenue growth (author-reported)" },
     ],
   },
   {
     name: "mb systems",
     status: "closed",
-    detail: "founder, 2020–2022 · startup studio",
+    detail: "founder, mid-2020–mid-2022 · parallel HQ collaboration",
     metrics: [
       { value: 10, suffix: "K+", label: "users on BPS trading" },
-      { value: 7, suffix: "", label: "interns trained, all placed" },
+      { value: 6, suffix: "", label: "developers on projects (5–6)" },
     ],
   },
 ];
@@ -58,12 +55,14 @@ const DOT: Record<Row["status"], string> = {
   live: "bg-fg shadow-[0_0_8px_2px_rgba(242,241,238,0.55)]",
   weekend: "bg-gold shadow-[0_0_8px_2px_rgba(227,168,87,0.6)]",
   closed: "bg-muted/50",
+  past: "bg-muted/50",
 };
 
 const STATUS_LABEL: Record<Row["status"], string> = {
   live: "live",
   weekend: "weekend build",
   closed: "closed — lesson kept",
+  past: "past employment",
 };
 
 export default function StatusBoard() {

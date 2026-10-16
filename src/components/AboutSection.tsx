@@ -33,7 +33,7 @@ export default function AboutSection() {
         </h2>
         <p>
           I’m Bhadresh, an engineer from Surat. Since 2018, I’ve moved from
-          building web apps to leading product engineering at ExpressTech.
+          building web apps to leading product engineering at ExpressTech, where I worked until September 2026.
         </p>
         <p>
           Now I’m building VocalXI through AscendXI. The weekend habit stuck:
@@ -42,7 +42,7 @@ export default function AboutSection() {
         <dl className="about-details">
           <div>
             <dt>Currently</dt>
-            <dd>Senior Full-Stack & AI Engineer · AscendXI</dd>
+            <dd>Founder & Product Engineer · AscendXI</dd>
           </div>
           <div>
             <dt>My focus</dt>

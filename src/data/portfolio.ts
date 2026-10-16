@@ -54,7 +54,7 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Design proctoring feedback with attention to false positives and student experience.",
     ],
     outcomes: [
-      "Production assessment workflows in the Google Workspace ecosystem.",
+      "Production assessment workflows in the Google Workspace ecosystem. Historical product figures are author-reported; they are not independently audited benchmarks.",
       "Performance improvements across high-traffic pages.",
       "Technical leadership across development and product delivery.",
     ],
@@ -73,16 +73,17 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
   "quzo-ai": {
     kind: "Employer product",
     oneLiner:
-      "AI-assisted question creation, assessment delivery and response reporting.",
+      "An ExpressTech assessment platform built for enterprise ExtendedForms clients.",
     role: "Full-stack and AI engineering at ExpressTech Systems",
     status: "Employer product · contribution through September 2026",
     problem:
       "Creating and running an assessment involves more than generating a list of questions: educators also need delivery, controls and useful reporting.",
     contribution:
-      "I worked across the assessment interface, AI integrations, backend workflows and product delivery.",
+      "I created Quzo at ExpressTech Systems, taking responsibility for full-stack implementation through its recent launch. Its modular-monolith architecture was designed for enterprise clients in the ExtendedForms context.",
     decisions: [
       "Connect question generation to the assessment workflow rather than treating AI as a separate chat window.",
       "Support different model providers behind a shared credit system.",
+      "Use modular-monolith applications with clear boundaries between administration and exam delivery.",
       "Keep exam delivery, proctoring and reporting understandable for both educators and respondents.",
     ],
     outcomes: [
@@ -110,6 +111,10 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "In-app billing and credits.",
       "Public product introduction.",
     ],
+  },
+  "bps-trading": {
+    status: "Built under MB Systems · mid-2020–mid-2022; studio closed",
+    narrative: ["Built through MB Systems alongside HQ Infosystem under a service and collaboration arrangement. Historical product figures are author-reported."],
   },
   zwopr: {
     images: [2, 3, 4, 5, 6, 7, 1].map((n) => `/images/zwopr_${n}.png`),
@@ -166,7 +171,7 @@ const vocalxi: PortfolioProject = {
   featured: true,
   oneLiner: "A voice-first way to answer forms through a guided conversation.",
   role: "Founder and product engineer · AscendXI",
-  status: "Browser voice product · additional integrations evolving",
+  status: "Pre-launch · Google Forms connector in staging; telephone calling planned",
   tech: ["TypeScript", "Next.js", "Voice AI", "Form workflows"],
   metrics: [],
   problem:
@@ -179,12 +184,12 @@ const vocalxi: PortfolioProject = {
     "Separate browser voice capabilities from telephone calling and integrations still in development.",
   ],
   outcomes: [
-    "A public voice-to-forms product.",
+    "A browser voice-to-forms experience under development.",
     "Product design, application engineering and voice experience in one founder-led project.",
   ],
   narrative: [
     "VocalXI is my own product under AscendXI. It explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
-    "For current availability, use the live product website. Planned calling capabilities are not represented as shipped features in this portfolio.",
+    "The product is pre-launch. Google Forms integration is in staging, telephone calling is planned, and production readiness has not been verified.",
   ],
   images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
   imageCaptions: ["Public product website.", "Answer review preview."],

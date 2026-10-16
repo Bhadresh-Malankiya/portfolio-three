@@ -10,15 +10,15 @@ import "@/app/human-story.css";
 
 const journey = [
   { year: "Now", title: "AscendXI / VocalXI", role: "Founder & product engineer", detail: "Building VocalXI solo — from customer conversations and voice AI to the interface, backend and deployment." },
-  { year: "2022–2026", title: "ExpressTech Systems", role: "Senior engineer / Technical lead", detail: "Led engineering across ExtendedForms and Quzo, and managed 10+ developers. ExtendedForms serves 400K+ users and has supported 10M+ online exams." },
-  { year: "2020–2022", title: "MB Systems", role: "Founder · side venture", detail: "Started a studio alongside my engineering role. Took responsibility for the clients, hiring and delivery. Closed it in 2022; kept the lessons." },
-  { year: "2018–2022", title: "HQ Infosystem", role: "Full-stack developer", detail: "Web applications, APIs and payment integrations with JavaScript, PHP and Laravel. Where I learned to follow a problem all the way to production." },
+  { year: "2022–2026", title: "ExpressTech Systems", role: "Senior Software Engineer · technical leadership", detail: "Led engineering across ExtendedForms and created Quzo as an ExpressTech product. Employment ended September 2026. Author-reported product totals: 400K+ users and 10M+ online exams on ExtendedForms." },
+  { year: "2020–2022", title: "MB Systems", role: "Founder · side venture", detail: "Ran venture projects with 5–6 developers alongside HQ through a service and collaboration arrangement, from mid-2020 to mid-2022. Spent about a year winding down and helping people find their next jobs." },
+  { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Web applications, APIs and payment integrations with JavaScript, PHP and Laravel. Where I learned to follow a problem all the way to production." },
 ];
 const impact = [
-  { value: "400K+", label: "ExtendedForms users", href: "/projects/extendedforms-io" },
-  { value: "10M+", label: "Online exams on ExtendedForms", href: "/projects/extendedforms-io" },
-  { value: "10+", label: "Developers managed", href: "#experience" },
-  { value: "10 → 100K", label: "Users · experience scaling products", href: "/projects" },
+  { value: "400K+", label: "ExtendedForms users · author-reported", href: "/projects/extendedforms-io" },
+  { value: "10M+", label: "ExtendedForms exams · author-reported", href: "/projects/extendedforms-io" },
+  { value: "5–6", label: "Developers on MB Systems projects", href: "#experience" },
+  { value: "8+", label: "Years building production software", href: "/projects" },
 ];
 
 export default function LifePanel() {

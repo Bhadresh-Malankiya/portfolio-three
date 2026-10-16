@@ -30,7 +30,7 @@ export const impactMetrics: ImpactMetric[] = [
   },
   {
     label: "Support ticket resolution",
-    context: "HelpDesk AI — threshold-based auto-reply, built on weekends",
+    context: "HelpDesk AI — author-reported improvement for eligible tickets; weekend build",
     before: "1–2 days",
     after: "hours",
     pct: 8,
@@ -52,9 +52,9 @@ export const impactMetrics: ImpactMetric[] = [
 ];
 
 export const uniquenessBadges: string[] = [
-  "Sole owner — not a contributor",
-  "Two products, built from zero",
-  "One founder year, told straight — no dressing up the ending",
+  "Technical leadership across employer products",
+  "Employer products and independent builds",
+  "MB Systems, mid-2020 to mid-2022",
   "8+ years, zero career gaps",
-  "12+ engineers mentored, on top of a full-time build load",
+  "Developer mentorship and trainee support",
 ];

@@ -41,7 +41,7 @@ export default function JourneyPage() {
             name: profile.name,
             url: `https://${profile.site}`,
           },
-          numberOfPages: chapters.length,
+          numberOfPages: downloads.ebook.pages,
           bookFormat: "https://schema.org/EBook",
         }}
       />

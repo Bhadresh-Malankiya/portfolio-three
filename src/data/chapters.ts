@@ -30,7 +30,7 @@ export const foreword = {
   quote: "Close enough to be true, far enough to be useful.",
   body: [
     'I have spent most of my adult life building things that other people use without ever thinking about the person who built them. A form loads in under a second, an exam runs without a single glitch, a support ticket gets answered before the customer has finished their coffee, and nobody claps. That is what "it works" means. The absence of complaint is the applause, and you learn, slowly, to hear it that way.',
-    "This is not a story about a straight line. There is a college placement season that went better than I expected, a first job that taught me more than any course did, a pandemic that became an opening instead of a setback, a genuine detour into cybersecurity that never became my career but shaped how I think about every system I've built since, a leadership role I grew into rather than arrived in fully formed, two products I built and own outside of anyone else's permission, and one startup that did not survive a year. I'm including that startup in as much detail as the ones that worked, because leaving it out would make this a highlight reel instead of a record.",
+    "This is not a story about a straight line. There is a college placement season that went better than I expected, a first job that taught me more than any course did, a pandemic that became an opening instead of a setback, a genuine detour into cybersecurity that never became my career but shaped how I think about every system I've built since, a leadership role I grew into rather than arrived in fully formed, employer products I helped build and lead, independent weekend projects, and a venture that operated from mid-2020 to mid-2022. I'm including that startup in as much detail as the ones that worked, because leaving it out would make this a highlight reel instead of a record.",
   ],
 };
 
@@ -56,14 +56,15 @@ export const chapters: Chapter[] = [
     icon: "graduation-cap",
     number: "II",
     title: "The Distinction Years — College and the Placement Season",
-    era: "2014 – 2018 · GTU, SSGEC",
+    era: "Graduated 2022 · GTU, SSGEC",
     quote:
       "A 9.0 CGPA didn't make me employable. Four straight years of refusing to cut corners did.",
     summary:
-      "B.E. in Information Technology, CGPA 9.0/10, First Class with Distinction — and the highest placement package offered in my batch. Not from one brilliant semester, but from treating consistency, quietly, as a competitive advantage.",
+      "B.E. in Information Technology, CGPA 9.0/10, First Class with Distinction. Not from one brilliant semester, but from treating consistency, quietly, as a competitive advantage.",
     body: [
+      "My degree and first full-time job overlapped. College required full attendance, while HQ provided flexible working hours; remote study during COVID helped me manage both. I graduated in 2022.",
       "College, for me, was less about any single brilliant class and more about a compounding routine. I was not the student who crammed the night before and pulled off a miracle. I was the student who treated consistency as a competitive advantage.",
-      "The placement season is where that accumulation showed its return. I received the highest package offered to any student in my college that year — the first piece of external evidence that the way I'd chosen to spend my college years mapped to something the market valued.",
+      "The placement season is where that accumulation showed its return. It gave me evidence that the way I had chosen to spend my college years mapped to something the market valued; my first employment had already begun in 2018, before graduation in 2022.",
       "Do not wait for placement season to start caring about how you spend your time. By the time it arrives, the work is already done, one way or the other.",
     ],
   },
@@ -88,7 +89,7 @@ export const chapters: Chapter[] = [
     icon: "building",
     number: "IV",
     title: "Learning to Build — The HQ Infosystem Years",
-    era: "2018 – 2022 · Full Stack → Senior Full Stack Developer",
+    era: "July 2018 – June 2022 · Backend Developer",
     quote:
       "Fifteen client projects taught me the same lesson fifteen times: edtech, logistics, and fintech are the same problem, wearing three different costumes.",
     summary:
@@ -140,7 +141,7 @@ export const chapters: Chapter[] = [
     quote:
       "Nobody promoted me into leadership. I just started making the decisions nobody else wanted to own, and the title eventually agreed with me.",
     summary:
-      "The shift from developer to lead isn't a shift in code difficulty — it's a shift in how many decisions other people are waiting on you to make, and how far a wrong one travels. Managed 10+ developers and helped scale products from 10 to 100,000 users.",
+      "The shift from developer to lead isn't a shift in code difficulty — it's a shift in how many decisions other people are waiting on you to make, and how far a wrong one travels. Provided technical direction and mentoring, and improved architecture and performance on high-traffic products.",
     body: [
       "As an individual contributor, a bad choice mostly costs you time. As a technical lead, a bad choice can cost your whole team time, and if it reaches production, real money and real trust with customers.",
       "I pushed Jest coverage above 90% and layered in Cypress end-to-end tests — not because coverage numbers are inherently meaningful, but because getting a team to care about coverage is really getting them to care about whoever maintains this code next. That cut our bug escape rate by 75%.",
@@ -151,14 +152,14 @@ export const chapters: Chapter[] = [
     id: "owning-extendedforms",
     icon: "sheet",
     number: "VIII",
-    title: "Owning ExtendedForms.io",
-    era: "2022 – 2026 · Technical owner at ExpressTech Systems",
+    title: "Leading Engineering on ExtendedForms.io",
+    era: "2022 – 2026 · Engineering leadership at ExpressTech Systems",
     quote:
       "400,000+ users experience the work through the product. They only notice when the page loads in 1.2 seconds instead of 3.2.",
     summary:
       "ExtendedForms brings timed assessments, proctoring and reporting to Google Forms. At ExpressTech Systems, I led engineering on a platform serving 400K+ users and supporting 10M+ online exams, with responsibility across architecture, performance and delivery.",
     body: [
-      "When I say I own this product technically, decisions about architecture, performance, and where engineering effort goes next do not get handed to me from someone else's roadmap. They start with me.",
+      "Technical ownership meant leading architecture, performance and delivery within ExpressTech Systems. It did not mean owning the company or product.",
       "I rebuilt performance-critical paths, taking page load from 3.2s to 1.2s, and later cut our highest-traffic page from 30–35 seconds down to 5–6 using smarter caching and TanStack Query. Nobody filed a ticket demanding it. I noticed it, and treated it as urgent because I was the one who'd live with the consequences of ignoring it.",
       "The feature I'm proudest of is AI Watchers with face detection, protecting exam integrity. It required thinking hard about false positives — about the difference between a feature that's technically accurate and one that's fair to the student on the other end of it.",
     ],
@@ -172,7 +173,7 @@ export const chapters: Chapter[] = [
     quote:
       "I gave a machine the job of writing exam questions. It took thirty seconds. It used to take thirty minutes, and none of those minutes were mine to spare.",
     summary:
-      "An AI-first exam and quiz platform with proctoring, now handling 400K+ student exams. My work at ExpressTech connected the assessment workflow with model-agnostic AI integration across OpenAI, Claude and Gemini.",
+      "A recently launched ExpressTech assessment product, built as a modular monolith for enterprise clients in the ExtendedForms context. My work connected the assessment workflow with model-agnostic AI integration across OpenAI, Claude and Gemini.",
     body: [
       "I built a credit management and optimization system that lets the underlying AI model be selected based on task and cost — rather than locking the whole product to a single provider's pricing curve. I didn't fully appreciate how important that decision was until later.",
       "A retrieval-augmented generation pipeline on pgvector powers AI-generated question banks: what used to take an educator thirty minutes now takes about thirty seconds.",
@@ -188,7 +189,7 @@ export const chapters: Chapter[] = [
     quote:
       "Nobody assigned me a support ticket problem. I just couldn't stand watching a customer wait two days for something a weekend could fix.",
     summary:
-      "A multi-tenant AI support agent platform, built entirely on weekends for no reason except curiosity. Cuts support engineer time by ~90%; tickets resolved in hours instead of one to two days.",
+      "A multi-tenant AI support agent platform, built entirely on weekends for no reason except curiosity. Author-reported ~90% less support effort for ticket types it could handle; tickets resolved in hours instead of one to two days.",
     body: [
       "Most support tickets follow recognizable patterns, and a well-designed system can recognize those patterns and resolve or route them instantly instead of making a customer wait in a queue.",
       "I built it multi-tenant from the start: per-client subdomains, JWT-based data isolation, AES-256 encrypted mailbox credentials, and a dedicated WatcherManager reliably watching each mailbox over IMAP. None of that complexity was required by any contract. I built it that way because anything less wouldn't have been something I was proud to call finished.",
@@ -200,11 +201,11 @@ export const chapters: Chapter[] = [
     icon: "flame",
     number: "XI",
     title: "MB Systems — Founding, Failing, and What It Taught Me",
-    era: "2020 – 2022 · Founder",
+    era: "mid-2020 – mid-2022 · Founder alongside HQ",
     quote:
       "A startup doesn't fail in one dramatic moment. It fails the same quiet way it almost succeeds: one ordinary week at a time.",
     summary:
-      "A startup studio in Surat, run alongside my full-time development work. Built the BPS crypto trading platform (10K+ users, $2M+ volume) and trained 6–7 interns, all now well-settled. The studio later closed. It did not survive — and I'm not going to pretend otherwise.",
+      "A venture in Surat, run alongside HQ Infosystem through a service and collaboration arrangement, with 5–6 developers on my projects. Built the BPS crypto trading platform (author-reported 10K+ users, $2M+ volume) and trained interns and trainees. I spent approximately a year winding down responsibly and helping people settle into other jobs before closing.",
     body: [
       "As an employee, even a technical lead, you're shielded from a lot of market reality by the structure around you. As a founder, there's no structure between you and the market's actual response to what you built. Demand does not arrive because you worked hard.",
       "I took on data and security decisions personally, as the person ultimately accountable. That single shift, from shared accountability to personal accountability, changed how carefully I thought about every technical decision — and it's stayed with me since.",
@@ -232,7 +233,7 @@ export const chapters: Chapter[] = [
     icon: "users",
     number: "XIII",
     title: "Leading Without a Title — Mentorship Lessons",
-    era: "Ongoing · 12+ engineers mentored",
+    era: "Ongoing · Developer and trainee mentorship",
     quote:
       "The fastest way to help someone is to hand them the answer. The only way to actually help them is to resist that urge.",
     summary:
@@ -252,7 +253,7 @@ export const chapters: Chapter[] = [
     quote:
       "I don't know what I'm building next. I know exactly how I'll start: badly, immediately, and without waiting to feel ready.",
     summary:
-      "ExtendedForms.io keeps growing. Quzo.ai keeps handling more exams every term. MB Systems is closed, and its lessons are still being processed with each new decision. No tidy resolution — just a clear statement of what comes next.",
+      "My ExpressTech chapter ended in September 2026, after engineering work on ExtendedForms and the recent launch of Quzo. I am now building VocalXI through AscendXI. MB Systems is closed, and its lessons are still being processed with each new decision. No tidy resolution — just a clear statement of what comes next.",
     body: [
       "I want to keep building the kind of judgment that comes from thinking like a business owner even when my formal role is purely technical — that dual lens is the source of most of the decisions in this story I'm still glad I made.",
       "I want to keep the security-minded lens from the Kali Linux years alive in everything I build, even though it never became a formal career.",

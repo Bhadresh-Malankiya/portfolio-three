@@ -293,14 +293,15 @@ try {
     "phone screenshot opens",
   );
   await page.keyboard.press("Escape");
-  const resume = await context.request.get(
-    base + "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
-  );
-  assert.equal(resume.status(), 200, "resume downloads");
-  assert.ok(
-    (await resume.body()).subarray(0, 5).toString() === "%PDF-",
-    "resume is a PDF",
-  );
+  for (const file of [
+    "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
+    "/downloads/bhadreshkumar-malankiya-resume.pdf",
+    "/downloads/the-weekend-builder.pdf",
+  ]) {
+    const download = await context.request.get(base + file);
+    assert.equal(download.status(), 200, `${file} downloads`);
+    assert.ok((await download.body()).subarray(0, 5).toString() === "%PDF-", `${file} is a PDF`);
+  }
   await context.close();
 
   const architecturePage = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

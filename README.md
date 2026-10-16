@@ -18,7 +18,7 @@ Use Node.js 22.13 or newer supported LTS. `npm run start` serves the production 
 ## Content and components
 
 - `src/data/portfolio.ts` is the public project presentation: employer contributions, founder ventures, public screenshots and current profile context. `src/data/projects.ts` retains the original project archive.
-- `src/data/profile.ts` contains identity/contact details; `src/data/experience.ts` contains the career timeline.
+- `src/data/profile.ts` contains identity/contact details; `src/data/experience.ts` contains the career timeline. Run `node scripts/sync-profile-data.mjs` after content edits to refresh the generated legacy reference in `PROFILE-DATA.md` (`--check` verifies it is current).
 - `Hero.tsx`, `three/PaperPlaneScene.tsx` and `app/hero-story.css` implement the opening story and folded-paper geometry.
 - `FloatingContactCard.tsx`, `three/BuilderAvatar.tsx`, `lib/companion-sections.ts` and `app/companion.css` implement the animated guide and downloadable CV card.
 - `DeviceGallery.tsx` and `three/DeviceScene.tsx` implement the separate scroll-driven desktop and mobile project chapters.

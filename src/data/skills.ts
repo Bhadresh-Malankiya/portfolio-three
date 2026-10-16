@@ -8,7 +8,12 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "languages",
     label: "Languages",
-    items: ["JavaScript", "TypeScript", "Python", "PHP", "Java", "SQL", "HTML5", "CSS3"],
+    items: ["TypeScript", "JavaScript", "SQL", "PHP", "HTML5", "CSS3"],
+  },
+  {
+    id: "historical-languages",
+    label: "Limited historical exposure",
+    items: ["Java", "Python"],
   },
   {
     id: "frontend",
@@ -75,9 +80,9 @@ export const skillGroups: SkillGroup[] = [
 // A concise view of the capabilities used across customer-facing delivery.
 export const deliveryExpertise = [
   { code: "01 / UI", title: "Frontend", detail: "Clear interfaces for real workflows.", tools: "JavaScript · TypeScript · React · Next.js" },
-  { code: "02 / API", title: "Backend", detail: "APIs, business logic and integrations.", tools: "PHP · Laravel · Node.js · PostgreSQL" },
+  { code: "02 / API", title: "Backend", detail: "APIs, business logic and integrations.", tools: "TypeScript · Node.js · PostgreSQL · Redis" },
   { code: "03 / AI", title: "AI integration", detail: "Connect models to product context.", tools: "LLMs · RAG · OpenAI · pgvector" },
   { code: "04 / ADOPT", title: "AI adoption", detail: "Make AI useful in day-to-day work.", tools: "Prompt engineering · AI workflows · Claude" },
   { code: "05 / SHIP", title: "Systems & deployment", detail: "Design for traffic, reliability and growth.", tools: "System design · AWS · Kafka · Docker" },
-  { code: "06 / LEAD", title: "Technical leadership", detail: "Managed 10+ developers, with delivery ownership.", tools: "Team management · Mentoring · Product scope" },
+  { code: "06 / LEAD", title: "Technical leadership", detail: "Technical direction, code reviews and developer mentoring.", tools: "Team management · Mentoring · Product scope" },
 ];
