@@ -75,7 +75,7 @@ Source: src/data/profile.ts
       "60+ technical courses across AI, DevOps, cybersecurity, analytics, web development",
       "20+ technical articles on Medium, 2K+ followers",
       "Open-source contributor in the React ecosystem",
-      "Speaker, \"Scalable Architecture,\" GDG Meetup 2022"
+      "GitHub Copilot Logical Contributor (via Upwork)"
     ],
     "education": {
       "degree": "Bachelor of Engineering, Information Technology",
@@ -102,7 +102,8 @@ Source: src/data/experience.ts
       "bullets": [
         "Building VocalXI solo, from product discovery and interface design to backend services, voice AI and deployment.",
         "Designing the complete workflow: questions, spoken answers, review, and structured responses.",
-        "Working across product decisions, full-stack engineering, and applied AI."
+        "Working across product decisions, full-stack engineering, and applied AI.",
+        "Started AscendXI as a side venture to build outcome-driven products for the AI era: voice agents, AI agents and automations."
       ]
     },
     {
@@ -118,6 +119,10 @@ Source: src/data/experience.ts
         "Created Quzo at ExpressTech as a modular-monolith assessment platform designed for enterprise clients in the ExtendedForms context",
         "Cut user churn by 40% and grew organic traffic 150% through an SEO-focused content and performance strategy",
         "Provided technical direction, code reviews and mentoring; established Jest and Cypress testing practices",
+        "Ran a release cadence of 2 releases a month plus a major release every 1 to 1.5 months, with hotfixes, customer issue resolution and ongoing query handling",
+        "Resolved an enterprise client's concern about user load with batched exam sessions and rate limits, working closely with the customer on custom solutions",
+        "Built the public API for customers (forms data, response data, webhooks, invitations), shipped as a small-scope v1 and a larger-scope v2",
+        "Carried ExtendedForms.io through its peak users and peak revenue periods",
         "Cut the bug escape rate by 75% and built a CDN strategy delivering sub-100ms response times globally",
         "Fixed a high-traffic page loading in 30–35 seconds down to 5–6 seconds using caching and TanStack Query"
       ]
@@ -1764,7 +1769,10 @@ Source: src/data/skills.ts
         "Express.js",
         "NestJS",
         "Laravel",
-        "CakePHP"
+        "CakePHP",
+        "GraphQL",
+        "Socket.io (rooms and groups)",
+        "Throttling and funneling of high-frequency data"
       ]
     },
     {
@@ -1844,7 +1852,9 @@ Source: src/data/skills.ts
         "Windsurf",
         "Cursor",
         "Antigravity",
-        "Claude Code"
+        "Claude Code",
+        "Mastra",
+        "MCP"
       ]
     },
     {
@@ -1857,6 +1867,8 @@ Source: src/data/skills.ts
         "LLM integration",
         "RAG pipelines with pgvector",
         "Prompt engineering",
+        "Model selection by task",
+        "AI agent systems",
         "AI workflow adoption"
       ]
     },
@@ -1883,7 +1895,10 @@ Source: src/data/skills.ts
         "SSO",
         "JWT-based auth",
         "AES-256 encryption",
-        "RFC-compliant security standards"
+        "RFC-compliant security standards",
+        "Vulnerability scanning",
+        "Packet sniffing",
+        "Kali Linux"
       ]
     }
   ],
@@ -2013,13 +2028,13 @@ Source: src/data/downloads.ts
     "resume": {
       "kicker": "The résumé",
       "title": "Bhadreshkumar Malankiya",
-      "subtitle": "Senior Full-Stack Engineer · Node.js, TypeScript & Applied AI",
+      "subtitle": "Forward Deployed Engineer · Full Stack · Technical Lead · AI Engineer",
       "file": "/downloads/bhadreshkumar-malankiya-resume.pdf",
       "filename": "Bhadreshkumar-Malankiya-Resume.pdf",
-      "sizeLabel": "7 KiB",
-      "pages": 2,
+      "sizeLabel": "6 KiB",
+      "pages": 1,
       "stats": [
-        "2 pages",
+        "1 page",
         "8+ years, condensed"
       ],
       "cta": "Download the résumé"

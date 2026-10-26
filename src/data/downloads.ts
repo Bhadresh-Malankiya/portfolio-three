@@ -18,12 +18,12 @@ export const downloads = {
   resume: {
     kicker: "The résumé",
     title: "Bhadreshkumar Malankiya",
-    subtitle: "Senior Full-Stack Engineer · Node.js, TypeScript & Applied AI",
+    subtitle: "Forward Deployed Engineer · Full Stack · Technical Lead · AI Engineer",
     file: "/downloads/bhadreshkumar-malankiya-resume.pdf",
     filename: "Bhadreshkumar-Malankiya-Resume.pdf",
-    sizeLabel: "7 KiB",
-    pages: 2,
-    stats: ["2 pages", "8+ years, condensed"],
+    sizeLabel: "6 KiB",
+    pages: 1,
+    stats: ["1 page", "8+ years, condensed"],
     cta: "Download the résumé",
   },
 } as const;

@@ -19,6 +19,7 @@ export const experience: ExperienceEntry[] = [
       "Building VocalXI solo, from product discovery and interface design to backend services, voice AI and deployment.",
       "Designing the complete workflow: questions, spoken answers, review, and structured responses.",
       "Working across product decisions, full-stack engineering, and applied AI.",
+      "Started AscendXI as a side venture to build outcome-driven products for the AI era: voice agents, AI agents and automations.",
     ],
   },
   {
@@ -34,6 +35,10 @@ export const experience: ExperienceEntry[] = [
       "Created Quzo at ExpressTech as a modular-monolith assessment platform designed for enterprise clients in the ExtendedForms context",
       "Cut user churn by 40% and grew organic traffic 150% through an SEO-focused content and performance strategy",
       "Provided technical direction, code reviews and mentoring; established Jest and Cypress testing practices",
+      "Ran a release cadence of 2 releases a month plus a major release every 1 to 1.5 months, with hotfixes, customer issue resolution and ongoing query handling",
+      "Resolved an enterprise client's concern about user load with batched exam sessions and rate limits, working closely with the customer on custom solutions",
+      "Built the public API for customers (forms data, response data, webhooks, invitations), shipped as a small-scope v1 and a larger-scope v2",
+      "Carried ExtendedForms.io through its peak users and peak revenue periods",
       "Cut the bug escape rate by 75% and built a CDN strategy delivering sub-100ms response times globally",
       "Fixed a high-traffic page loading in 30–35 seconds down to 5–6 seconds using caching and TanStack Query",
     ],

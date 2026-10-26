@@ -23,7 +23,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "backend",
     label: "Backend",
-    items: ["Node.js", "Express.js", "NestJS", "Laravel", "CakePHP"],
+    items: ["Node.js", "Express.js", "NestJS", "Laravel", "CakePHP", "GraphQL", "Socket.io (rooms and groups)", "Throttling and funneling of high-frequency data"],
   },
   {
     id: "mobile",
@@ -58,12 +58,12 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "ai-tools",
     label: "AI-Native Dev Tools",
-    items: ["v0.dev", "Windsurf", "Cursor", "Antigravity", "Claude Code"],
+    items: ["v0.dev", "Windsurf", "Cursor", "Antigravity", "Claude Code", "Mastra", "MCP"],
   },
   {
     id: "ai",
     label: "Applied AI & Adoption",
-    items: ["OpenAI", "Claude (Anthropic)", "Gemini", "LLM integration", "RAG pipelines with pgvector", "Prompt engineering", "AI workflow adoption"],
+    items: ["OpenAI", "Claude (Anthropic)", "Gemini", "LLM integration", "RAG pipelines with pgvector", "Prompt engineering", "Model selection by task", "AI agent systems", "AI workflow adoption"],
   },
   {
     id: "business",
@@ -73,7 +73,7 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "security",
     label: "Security & Auth",
-    items: ["SSO", "JWT-based auth", "AES-256 encryption", "RFC-compliant security standards"],
+    items: ["SSO", "JWT-based auth", "AES-256 encryption", "RFC-compliant security standards", "Vulnerability scanning", "Packet sniffing", "Kali Linux"],
   },
 ];
 

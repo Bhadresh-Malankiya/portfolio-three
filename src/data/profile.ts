@@ -47,7 +47,7 @@ export const profile = {
     "60+ technical courses across AI, DevOps, cybersecurity, analytics, web development",
     "20+ technical articles on Medium, 2K+ followers",
     "Open-source contributor in the React ecosystem",
-    "Speaker, \"Scalable Architecture,\" GDG Meetup 2022",
+    "GitHub Copilot Logical Contributor (via Upwork)",
   ],
   education: {
     degree: "Bachelor of Engineering, Information Technology",
