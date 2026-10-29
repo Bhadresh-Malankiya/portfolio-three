@@ -38,7 +38,7 @@ export const experience: ExperienceEntry[] = [
     kind: "employment",
     bullets: [
       "Delivered 15+ full-stack applications across edtech, logistics, fintech, and e-commerce",
-      "Worked full-time with flexible hours while attending college; approximately two years office-based, followed by remote work",
+      "Worked full time while completing an engineering degree",
       "Built enterprise backend systems handling millions of transactions",
       "Integrated Stripe, Razorpay, Twilio, Mapbox, and Binance APIs across client projects",
       "Built REST APIs with Node.js, Express, and Laravel handling 50K+ daily requests",

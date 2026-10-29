@@ -11,7 +11,7 @@ export const profile = {
   site: "bhadresh-malankiya.ascendxi.com",
   linkedin: "https://www.linkedin.com/in/bhadresh-malankiya",
   github: "https://github.com/Bhadresh-Malankiya",
-  availability: "Available immediately · Open to relocation (UAE and beyond) or remote",
+  availability: "Available immediately",
   currentRole: "Senior Full Stack Engineer · Technical Lead",
   yearsExperience: 8,
   summary:
