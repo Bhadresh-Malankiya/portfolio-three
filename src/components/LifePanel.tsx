@@ -31,7 +31,7 @@ export default function LifePanel() {
   return (
     <section className="life-section page-shell field-journal" id="about" ref={section}>
       <div className="journal-inner">
-        <div className="journal-folio"><span>04 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
+        <div className="journal-folio"><span>06 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
         <header className="journal-heading">
           <h2>The code is only<br /><em>half the story.</em></h2>
           <div className="journal-intro"><span className="journal-asterisk" aria-hidden="true">✳</span><p>I’m Bhadresh. A senior engineer who leads teams, talks to customers and owns what ships to production.</p><span className="journal-role">SENIOR FULL STACK ENGINEER · TECH LEAD</span></div>

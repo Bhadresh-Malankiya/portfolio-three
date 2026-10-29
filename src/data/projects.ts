@@ -39,12 +39,15 @@ export type Project = {
   images?: string[];
   /** "phone" renders screenshots in a phone frame instead of a browser window. */
   frame?: "browser" | "phone";
+  /** Prototype, R&D or side build that is not a launched product. */
+  experiment?: boolean;
 };
 
 export const projects: Project[] = [
   {
     slug: "jewelxi",
     name: "Jewelxi",
+    experiment: true,
     url: "https://jewelxi.vercel.app/",
     category: "E-commerce",
     kind: "Personal build",
@@ -67,6 +70,7 @@ export const projects: Project[] = [
   {
     slug: "vocalxi",
     name: "VocalXI",
+    experiment: true,
     url: "https://vocalxi.com",
     category: "Voice AI",
     kind: "Personal build",
@@ -171,7 +175,8 @@ export const projects: Project[] = [
   },
   {
     slug: "helpdesk-ai",
-    name: "HelpDesk AI",
+    name: "HelpXI (HelpDesk AI)",
+    experiment: true,
     category: "AI SaaS",
     kind: "Personal build",
     oneLiner:
@@ -189,7 +194,7 @@ export const projects: Project[] = [
       "None of that complexity was required by a contract. It's there because a year and a half of thinking like an attacker on Kali Linux made it hard to design credential handling any other way — and because a weekend project with no committee in the middle is where the cleanest decisions get made.",
     ],
     role: "Solo build: architecture, security and backend",
-    status: "Live",
+    status: "Side project · core flows working",
     images: [
       "/images/helpdesk_1.png",
       "/images/helpdesk_2.png",
@@ -405,6 +410,103 @@ export const projects: Project[] = [
     role: "Frontend architecture & accessibility",
     status: "Live",
     images: ["/images/rightful.png"],
+  },
+  {
+    slug: "compassrt",
+    name: "CompassRT",
+    category: "Fintech",
+    kind: "Client project",
+    oneLiner:
+      "Live stock dashboard: one shared market feed, batched each second and pushed only to people watching that symbol.",
+    motif: "ticker",
+    featured: true,
+    tech: ["Node.js", "RxJS", "Socket.IO", "React", "AG Grid", "MongoDB"],
+    metrics: [],
+    narrative: [
+      "A real-time stock watchlist that stays smooth while trades stream in from the market feed.",
+    ],
+    role: "Full-stack engineering: Node.js streaming backend and React trading grid",
+    status: "Delivered",
+  },
+  {
+    slug: "co-founder-agents",
+    name: "Co-founder agents",
+    category: "AI agents",
+    kind: "Personal build",
+    experiment: true,
+    oneLiner:
+      "Multi-agent system on Mastra that runs the project lifecycle for product and client work.",
+    motif: "pm",
+    featured: false,
+    tech: ["Mastra", "TypeScript", "Node.js", "PostgreSQL", "Claude"],
+    metrics: [],
+    narrative: [
+      "Research, planning and task agents that share memory and work through approved actions.",
+    ],
+    role: "Design and build: agents, tools, memory and approval flow",
+    status: "R&D · multi-agent experiments",
+  },
+  {
+    slug: "opportunity-agents",
+    name: "Opportunity agents",
+    category: "AI automation",
+    kind: "Personal build",
+    experiment: true,
+    oneLiner:
+      "Eleven scheduled agents in hourly batches that find roles and client work abroad, verify, score, track and follow up.",
+    motif: "map",
+    featured: false,
+    tech: ["Scheduled AI agents", "Next.js", "PostgreSQL", "Google Sheets", "Gmail"],
+    metrics: [],
+    narrative: [
+      "An agent pipeline that turns opportunity hunting into a tracked, repeatable process.",
+    ],
+    role: "Design and build: agent roles, schedules, tracking and follow-up",
+    status: "Ran hourly · leads and outreach logged",
+  },
+  {
+    slug: "screen-to-answer",
+    name: "Screen-to-Answer Assistant",
+    category: "Applied AI",
+    kind: "Personal build",
+    experiment: true,
+    oneLiner:
+      "Reads a question from a live camera or shared screen, waits until the text holds steady, then streams an AI answer to any device.",
+    motif: "proctor",
+    featured: false,
+    tech: ["Next.js", "TypeScript", "Tesseract.js", "Claude", "OpenAI", "Pusher"],
+    metrics: [],
+    narrative: [
+      "A proof of concept for live OCR feeding a streamed LLM answer, shared across devices.",
+    ],
+    role: "Solo build: capture pipeline, OCR, streaming and live sharing",
+    status: "Proof of concept",
+  },
+  {
+    slug: "collahead",
+    name: "Collahead",
+    category: "Logistics / Mobility",
+    kind: "Client project",
+    experiment: true,
+    oneLiner:
+      "Driver and admin simulator for truck routes with Mapbox directions, geofenced stops and live location.",
+    motif: "map",
+    featured: false,
+    tech: ["React Native", "Mapbox Directions API", "Node.js", "Socket.IO"],
+    metrics: [],
+    narrative: [
+      "Route navigation, proof of stop and live tracking for delivery drivers.",
+    ],
+    role: "Mobile app, mapping and live-tracking engineering",
+    status: "Client prototype · not launched",
+    frame: "phone",
+    images: [
+      "/images/collahead_1.webp",
+      "/images/collahead_2.webp",
+      "/images/collahead_3.webp",
+      "/images/collahead_4.webp",
+      "/images/collahead_5.webp",
+    ],
   },
 ];
 

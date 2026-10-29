@@ -81,25 +81,57 @@ const projects: GalleryProject[] = [
     images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
     url: "https://vocalxi.com",
   },
+];
+
+type MobileProject = GalleryProject & { title: string; description: string; label: string; tech: string };
+const mobileProjects: MobileProject[] = [
+  {
+    slug: "collahead",
+    name: "Collahead",
+    kind: "Driver app",
+    caption: "Routes, proof of stop and live tracking.",
+    role: "Mobile app, mapping and live-tracking engineering",
+    features: [],
+    images: ["/images/collahead_1.webp", "/images/collahead_2.webp", "/images/collahead_3.webp", "/images/collahead_4.webp", "/images/collahead_5.webp"],
+    phone: true,
+    title: "Every stop, proven on the map.",
+    description: "Mapbox routes, geofenced stops and a 1-mile radius check before a driver can submit.",
+    label: "Collahead",
+    tech: "React Native · Mapbox",
+  },
   {
     slug: "hey-buddy",
     name: "Hey Buddy",
-    kind: "04 / mobile · client project",
+    kind: "Companion app",
     caption: "A little closer to your pet.",
     role: "Mobile & mapping integration",
-    features: ["GPS tracking", "Pet health", "NFC tags"],
-    images: [
-      "/images/heybuddy_4.png",
-      "/images/heybuddy_1.jpeg",
-      "/images/heybuddy_5.jpeg",
-    ],
+    features: [],
+    images: ["/images/heybuddy_4.png", "/images/heybuddy_1.jpeg", "/images/heybuddy_5.jpeg"],
     phone: true,
     url: "https://heybuddy.io",
+    title: "A small companion. A big connection.",
+    description: "Live pet location with Mapbox and NFC tags that connect the physical product to the app.",
+    label: "Hey Buddy",
+    tech: "React Native · NFC",
+  },
+  {
+    slug: "bps-trading",
+    name: "BPS Trading",
+    kind: "Trading app",
+    caption: "A live market does not wait.",
+    role: "Lead engineer",
+    features: [],
+    images: ["/images/bps_1.png", "/images/bps_2.png", "/images/bps_3.png", "/images/bps_4.png"],
+    phone: true,
+    title: "A live market, in your pocket.",
+    description: "Real-time prices over 1,000+ concurrent WebSocket connections, throttled so the screen stays smooth.",
+    label: "BPS Trading",
+    tech: "Socket.IO · Real-time",
   },
 ];
 
 const webScreens = projects.slice(0, 3).flatMap((p) => p.images);
-const phoneScreens = projects[3].images;
+const phoneScreens = mobileProjects.flatMap((p) => p.images);
 
 const query =
   "(min-width: 900px) and (min-height: 680px) and (prefers-reduced-motion: no-preference)";
@@ -110,26 +142,6 @@ function subscribe(callback: () => void) {
 }
 const snapshot = () => window.matchMedia(query).matches;
 const serverSnapshot = () => false;
-const mobileStories = [
-  {
-    title: "A small companion. A big connection.",
-    description:
-      "The mobile companion for pets, their people, and their connected tags.",
-    label: "The companion app",
-  },
-  {
-    title: "One tag. A way to connect.",
-    description:
-      "A welcome experience that connects the physical product with the app.",
-    label: "Meet Hey Buddy",
-  },
-  {
-    title: "From tag to app.",
-    description:
-      "The welcome flow connects pet owners with their tag and companion app.",
-    label: "Getting started",
-  },
-];
 
 class ModelBoundary extends Component<
   { children: ReactNode; fallback: ReactNode; onError: () => void },
@@ -186,8 +198,9 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     [0, DEVICE_TIMELINE.arriveEnd, DEVICE_TIMELINE.exitStart, 1],
     [mobile ? "65%" : "-65%", "0%", "0%", mobile ? "-75%" : "75%"],
     { ease: (value) => value * value * (3 - 2 * value) });
-  const p = mobile ? projects[3] : projects[active];
-  const imageIndex = mobile ? active : screen;
+  const mp = mobileProjects[active];
+  const p: GalleryProject = mobile ? mp : projects[active];
+  const imageIndex = Math.min(screen, p.images.length - 1);
   const image = p.images[imageIndex];
   useMotionValueEvent(sceneProgress, "change", (value) => {
     if (!animated || inspect) return;
@@ -230,10 +243,10 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       aria-label={mobile ? "Mobile project showcase" : "Web project showcase"}
     >
       <div className="chapter-sticky">
-        <ProductScenery project={p.slug} name={mobile ? "A little closer." : p.name} />
+        <ProductScenery project={p.slug} name={p.name} />
         <div className="chapter-topline">
           <span>
-            {mobile ? "02 / A COMPANION, IN YOUR POCKET" : "01 / PRODUCTS IN THE BROWSER"}
+            {mobile ? "02 / BUILT FOR THE PHONE" : "01 / PRODUCTS IN THE BROWSER"}
           </span>
           <span>
             {animated ? phase === "arriving" ? "Scroll to bring the work into view"
@@ -247,7 +260,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
           <div className="chapter-device" ref={stage} data-ready={modelReady} data-scene-ready={modelReady} data-scene-mounted={prepared || entered}>
             <div className="studio-halo" aria-hidden="true" />
             {animated && <motion.p className="chapter-entry-cue" aria-hidden="true" style={{ opacity: entryHintOpacity }}>
-              <ArrowDown size={15} /> {mobile ? "Scroll to meet Hey Buddy" : "Scroll to open the workspace"}
+              <ArrowDown size={15} /> {mobile ? "Scroll through the mobile work" : "Scroll to open the workspace"}
             </motion.p>}
             <div
               className="model-viewport"
@@ -285,7 +298,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
               style={{ opacity: animated ? opacity : 1 }}
               inert={animated && closing}
             >
-              {!mobile && (
+              {(
                 <div role="group" aria-label={`${p.name} screenshots`}>
                   {p.images.map((src, i) => (
                     <button
@@ -317,13 +330,13 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                 initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: reduced ? 0 : 0.48, ease: [0.22, 0.7, 0.2, 1] }}>
-                <p className="eyebrow">{mobile ? `Hey Buddy / 0${active + 1}` : p.kind}</p>
-                <h3>{mobile ? mobileStories[active].title : p.name}</h3>
-                <p className="chapter-description">{mobile ? mobileStories[active].description : p.caption}</p>
+                <p className="eyebrow">{mobile ? `${mp.name} / 0${active + 1}` : p.kind}</p>
+                <h3>{mobile ? mp.title : p.name}</h3>
+                <p className="chapter-description">{mobile ? mp.description : p.caption}</p>
               </motion.div>
             <div className="chapter-evidence">
               <div className="feature-pills">
-                {(mobile ? [mobileStories[active].label, "React Native"] : p.features).map((feature) => <span key={feature}>{feature}</span>)}
+                {(mobile ? mp.tech.split(" · ") : p.features).map((feature) => <span key={feature}>{feature}</span>)}
               </div>
               <p className="cinema-role">{p.role}</p>
             </div>
@@ -331,14 +344,14 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
               <Link className="button-primary" href={`/projects/${p.slug}${p.slug === "quzo-ai" ? "#quzo-architecture" : ""}`}>
                 {p.slug === "quzo-ai" ? "Explore the architecture" : "Inside the build"} <ArrowUpRight size={16} />
               </Link>
-              <a
+              {p.url && <a
                 className="text-link"
                 href={p.url}
                 target="_blank"
                 rel="noreferrer"
               >
                 Live site ↗
-              </a>
+              </a>}
             </div>
           </motion.div>
         </div>
@@ -348,7 +361,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
             className="chapter-selector"
             role="group"
             aria-label={
-              mobile ? "Explore Hey Buddy" : "Select featured web project"
+              mobile ? "Select mobile project" : "Select featured web project"
             }
           >
             {[0, 1, 2].map((i) => (
@@ -358,7 +371,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                 onClick={() => select(i)}
               >
                 <span>0{i + 1}</span>
-                {mobile ? mobileStories[i].label : projects[i].name}
+                {mobile ? mobileProjects[i].label : projects[i].name}
                 <i />
               </button>
             ))}
@@ -378,8 +391,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
         index={imageIndex}
         go={(step) => {
           const next = (imageIndex + step + p.images.length) % p.images.length;
-          if (mobile) setActive(next);
-          else setScreen(next);
+          setScreen(next);
         }}
         onDismiss={() => {
           setInspect(false);
@@ -401,7 +413,7 @@ export default function DeviceGallery() {
       </div>
       <ProjectChapter />
       <div className="mobile-interlude">
-        <div><p className="eyebrow">Different screen. Real lives.</p><h2>Some things belong<br /><em>closer to you.</em></h2><p>Hey Buddy connects pets, their people, and the information that matters.</p></div>
+        <div><p className="eyebrow">Different screen. Real lives.</p><h2>Some things belong<br /><em>closer to you.</em></h2><p>Driver routing, pet tracking and live trading, built for the phone.</p></div>
         <div className="mobile-orbit" aria-hidden="true"><span>✳</span></div>
       </div>
       <ProjectChapter mobile />

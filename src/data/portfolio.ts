@@ -25,7 +25,94 @@ export type PortfolioProject = Project & {
 // Keep historical routes/assets. The presentation layer distinguishes technical
 // responsibility from legal ownership and does not promote unverified statistics.
 const editorial: Record<string, Partial<PortfolioProject>> = {
-  "helpdesk-ai": { kind: "Personal build" },
+  compassrt: {
+    problem: "Market feeds fire many trades a second. Repainting the screen for each one freezes the table and floods every browser with symbols it never asked for.",
+    contribution: "I built the Node.js streaming backend and the React trading grid: one shared upstream socket, RxJS batching on both sides, and Socket.IO rooms so each client only receives the symbols on its watchlist.",
+    decisions: [
+      "Keep one upstream market socket for everyone, and subscribe a symbol only while someone is watching it.",
+      "Buffer trades for one second and send only the newest trade per symbol.",
+      "Emit to a Socket.IO room per symbol, so a client never receives data it did not ask for.",
+      "Buffer again in the browser and apply AG Grid async transactions by row ID, so only changed rows repaint.",
+      "Ship a built-in simulator that fires a tick every 10 ms per symbol to load-test the same path.",
+    ],
+    outcomes: [
+      "A watchlist that stays smooth while trades stream in.",
+      "Upstream subscriptions that follow real demand: added on the first viewer, dropped when the room empties.",
+      "Node.js, Express, RxJS 7, Socket.IO 4, MongoDB, JWT, React 17, Redux Toolkit and AG Grid.",
+    ],
+    narrative: [],
+  },
+  "co-founder-agents": {
+    problem: "Running product work and client projects at the same time means research, planning, task tracking and follow-ups that never stop.",
+    contribution: "I built a multi-agent system on Mastra's TypeScript SDK to manage the project lifecycle, and used it to test how far specialised agents can carry real work.",
+    decisions: [
+      "Give each agent one job: research, planning or execution.",
+      "Keep conversation memory and task state in PostgreSQL so work survives restarts.",
+      "Put approval gates on file changes, deletions and shell commands.",
+      "Expose connected tools as agent tools, and run recurring work on persistent schedules.",
+    ],
+    outcomes: [
+      "Research, web fetch, task tracking and recurring schedules working inside one agent workspace.",
+      "Hands-on findings on where multi-agent setups help and where one well-scoped agent is enough.",
+    ],
+    narrative: ["An R&D build for agentic workflows across product and client work."],
+  },
+  "opportunity-agents": {
+    problem: "Finding the right roles and client work abroad means checking hundreds of listings, companies and visa rules by hand, every day.",
+    contribution: "I designed eleven scheduled agents that run in hourly batches, each owning one step, with a shared sheet as the single source of truth and proof log.",
+    decisions: [
+      "One agent per step: discover, verify, score, track, apply or queue, and follow up.",
+      "Verify that a company and its location are real, and check visa sponsorship fit, before a lead is kept.",
+      "Keep every lead, status and proof in one sheet so nothing is lost between runs.",
+      "Apply automatically only where possible; everything else is queued with notes for manual review.",
+    ],
+    outcomes: [
+      "A repeatable pipeline that ran every hour and logged leads and outreach in a tracker.",
+      "A local dashboard version with a durable PostgreSQL queue and approval-bound email actions, published as Agent OS on GitHub.",
+    ],
+    narrative: ["Built for my own search, designed so anyone can point it at their own profile and market."],
+  },
+  "screen-to-answer": {
+    problem: "Questions often sit on a screen or a page, not in a text box. Copying them out breaks the flow.",
+    contribution: "I built the full pipeline: capture, OCR, a stability check, a streamed model answer, and live sharing to a second device.",
+    decisions: [
+      "Capture from a live camera or a shared screen, each with its own layout.",
+      "Confirm a question only after 3 consecutive OCR readings agree, so scrolling or typing never triggers a request.",
+      "Run Tesseract in the browser by default, with Google Cloud Vision as an optional high-accuracy engine.",
+      "Stream the answer from Claude or OpenAI, with fast, balanced and max-accuracy presets.",
+      "Share a session to another device by scanning a QR code; that device follows the question and answer live over Pusher.",
+    ],
+    outcomes: [
+      "A working proof of concept across camera and screen capture, with live answers on a second device.",
+      "Next.js, TypeScript, Tesseract.js, Cloud Vision, Anthropic and OpenAI SDKs, and Pusher Channels.",
+    ],
+    narrative: ["A proof of concept, built to test live OCR and streamed answers end to end."],
+  },
+  collahead: {
+    frame: "phone",
+    problem: "Delivery drivers need clear routes, and dispatchers need proof that each stop really happened.",
+    contribution: "I built the driver app and an admin simulator: Mapbox routing, geofenced stops, live location and stop outcomes.",
+    decisions: [
+      "Draw each route with the Mapbox Directions API and show the driver's next stops in order.",
+      "Use latitude and longitude zones around each stop to trigger stop events automatically.",
+      "Only accept a stop submission inside a 1-mile radius, and attach a map snapshot as proof.",
+      "Record outcomes as success, partially completed or failed, with a reason.",
+      "Stream live locations and stop events over Socket.IO so the admin view updates in real time.",
+    ],
+    outcomes: [
+      "A working driver and admin simulator with live tracking and proof of stop.",
+      "The client paused the product before launch; the routing and geofencing work stands on its own.",
+    ],
+    narrative: [],
+    imageCaptions: [
+      "Route overview with stops and the driver's live position.",
+      "Turn-by-turn route to the next stop.",
+      "Submitting a stop with a map snapshot as proof.",
+      "Submission blocked outside the 1-mile radius.",
+      "Stop outcome with reason and distance.",
+    ],
+  },
+  "helpdesk-ai": { kind: "Personal build", narrative: ["HelpXI started as a side project to take repetitive support work off small teams. The core flows work; it is not a launched product."] },
   jewelxi: {
     problem: "A jewellery catalog needs to make the details easy to explore, from material and category to the individual piece.",
     contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study.",
@@ -168,6 +255,7 @@ const vocalxi: PortfolioProject = {
   url: "https://vocalxi.com",
   category: "Voice AI",
   kind: "Personal build",
+  experiment: true,
   motif: "forms",
   featured: true,
   oneLiner: "A voice-first way to answer forms through a guided conversation.",

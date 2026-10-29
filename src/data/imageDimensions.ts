@@ -1,6 +1,11 @@
 // Auto-generated real pixel dimensions for every project screenshot —
 // lets the gallery size each frame to its own photo instead of a fixed box.
 export const imageDimensions: Record<string, { w: number; h: number }> = {
+  "/images/collahead_1.webp": { w: 420, h: 890 },
+  "/images/collahead_2.webp": { w: 420, h: 890 },
+  "/images/collahead_3.webp": { w: 420, h: 890 },
+  "/images/collahead_4.webp": { w: 420, h: 890 },
+  "/images/collahead_5.webp": { w: 420, h: 890 },
   "/images/vocalxi-review.jpg": { w: 1265, h: 712 },
   "/images/vocalxi-home.jpg": { w: 1265, h: 712 },
   "/images/jewelxi-shop.jpg": { w: 1274, h: 717 },

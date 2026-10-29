@@ -230,7 +230,7 @@ try {
   // Switching to the non-scroll layout must clear the desktop exit transform.
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
+    .getByRole("button", { name: "02 Hey Buddy", exact: true })
     .click();
   await page.waitForFunction(
     () =>
@@ -272,7 +272,7 @@ try {
   );
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
+    .getByRole("button", { name: "02 Hey Buddy", exact: true })
     .click();
   await page
     .getByRole("heading", { name: "One tag. A way to connect.", exact: true })
