@@ -51,6 +51,6 @@ export const profile = {
   education: {
     degree: "Bachelor of Engineering, Information Technology",
     school: "Gujarat Technological University (SSGEC)",
-    detail: "CGPA 9.0/10 · First Class with Distinction · Completed while working full time",
+    detail: "First Class with Distinction · Completed while working full time",
   },
 };
