@@ -26,7 +26,7 @@ export async function generateMetadata({
     description: guide.intro,
     alternates: { canonical: `/field-guide/${guide.slug}` },
     openGraph: {
-      title: `${guide.title} — The Weekend Builder`,
+      title: `${guide.title} | Bhadresh Malankiya`,
       description: guide.intro,
       type: "article",
       url: `/field-guide/${guide.slug}`,

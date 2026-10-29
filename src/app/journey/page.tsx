@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   description:
     "A Life in Code, Ownership, and the Habit of Starting Again — the full memoir behind the portfolio, in sixteen chapters.",
   alternates: { canonical: "/journey" },
+  robots: { index: false, follow: true },
   openGraph: {
     title: "The Weekend Builder — The Story",
     description:

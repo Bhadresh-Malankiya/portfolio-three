@@ -155,3 +155,13 @@
  .product-world .chapter-selector { grid-template-columns: 1fr; gap: 0; width: calc(100% - 135px); }
  .product-world .chapter-selector button { flex-direction: row; align-items: center; min-height: 46px; padding: 13px 0; gap: 12px; }
 }
+
+.glance-card { background: #11171d; border: 1px solid #ffffff1f; border-radius: 14px; padding: 30px 28px 26px; box-shadow: 0 24px 50px -24px #000c; }
+.glance-card dl { margin: 18px 0 0; display: grid; gap: 0; }
+.glance-card dl > div { display: grid; grid-template-columns: 110px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid #ffffff14; }
+.glance-card dt { font: 10px/1.6 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #8a9097; }
+.glance-card dd { margin: 0; font: 14px/1.5 var(--font-sans); color: #ece7dc; }
+.glance-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.glance-links a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid #ffffff2e; border-radius: 999px; font: 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #ece7dc; transition: border-color .2s, color .2s; }
+.glance-links a:hover { border-color: #d6ad78; color: #d6ad78; }
+@media(max-width:700px) { .glance-card dl > div { grid-template-columns: 1fr; gap: 4px; } }

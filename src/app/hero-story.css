@@ -40,6 +40,9 @@
 .flight-heading h1 > span, .flight-heading h1 > em { display: block; }
 .flight-heading h1 em { margin-top: 5px; color: var(--flight-accent); font: italic 400 1.03em/.97 var(--font-fraunces); letter-spacing: -.06em; }
 .flight-fullstop { font-style: normal; }
+.flight-proof { margin: 16px auto 0; max-width: 92vw; color: #d6ad78; font: 11px/1.6 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.flight-proof > span { margin-inline: 10px; color: #787d84; }
+@media (max-width: 600px) { .flight-proof { font-size: 9.5px; } .flight-proof > span { margin-inline: 6px; } }
 .flight-stage { position: relative; isolation: isolate; width: min(100%, 1280px); min-height: 0; margin: 5px auto 0; }
 .flight-stage-grid {
   position: absolute;

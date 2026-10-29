@@ -71,7 +71,7 @@ function visitorEmailHtml(lead: VisitorLead) {
 <html><body style="margin:0;padding:0;background:#09090a;font-family:'IBM Plex Sans',Arial,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#09090a;padding:32px 16px;"><tr><td align="center">
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background:#131315;border:1px solid #ffffff1f;border-radius:12px;overflow:hidden;">
-<tr><td style="padding:20px 28px;border-bottom:1px solid #ffffff1f;"><span style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#e3a857;">The Weekend Builder</span></td></tr>
+<tr><td style="padding:20px 28px;border-bottom:1px solid #ffffff1f;"><span style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#e3a857;">bhadresh-malankiya.ascendxi.com</span></td></tr>
 <tr><td style="padding:28px;">
 <p style="margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:22px;line-height:1.35;color:#f2f1ee;">Someone landed on your portfolio.</p>
 <p style="margin:0 0 22px;font-size:12px;color:#8f8f95;">${when} IST</p>
@@ -91,7 +91,7 @@ export async function sendVisitorNotification(lead: VisitorLead) {
   const to = process.env.NOTIFY_TO_EMAIL || profile.email;
   await transporter.sendMail({
     to,
-    from: { name: "The Weekend Builder", address: from },
+    from: { name: "Bhadresh Malankiya Portfolio", address: from },
     replyTo: { name: lead.name, address: lead.email },
     subject: `New visitor: ${lead.name} just landed on your portfolio`,
     html: visitorEmailHtml(lead),

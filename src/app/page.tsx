@@ -1,7 +1,6 @@
 import Hero from "@/components/Hero";
 import DeviceGallery from "@/components/DeviceGallery";
 import LifePanel from "@/components/LifePanel";
-import ClientReviews from "@/components/ClientReviews";
 import DownloadsSection from "@/components/DownloadsSection";
 import ContactCTA from "@/components/ContactCTA";
 export default function Home() {
@@ -10,12 +9,11 @@ export default function Home() {
       <Hero />
       <DeviceGallery />
       <LifePanel />
-      <ClientReviews />
       <section id="downloads" className="page-shell take-home exhibition-library">
         <div className="take-home-heading">
-          <p className="eyebrow">06 / Off the screen</p>
+          <p className="eyebrow">05 / For the hiring conversation</p>
           <h2>
-            A few pages<em> to take with you.</em>
+            One page.<em> Everything that matters.</em>
           </h2>
         </div>
         <DownloadsSection />

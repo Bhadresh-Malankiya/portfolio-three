@@ -128,7 +128,7 @@
 .contact-finale .finale-main-link:hover .finale-arrow, .contact-finale .finale-main-link:focus-visible .finale-arrow { transform: rotate(45deg); background: #d9f365; color: #1a2323; border-color: #d9f365; }
 .contact-finale .finale-bottomline { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 25px; }
 .contact-finale .finale-bottomline a { display: flex; gap: 14px; align-items: center; font: 14px/1.6 var(--font-sans); }
-.contact-finale .finale-bottomline a:last-child { font: 10px/1.5 var(--font-mono); letter-spacing: .05em; }
+.contact-finale .finale-bottomline a:not(:first-child) { font: 10px/1.5 var(--font-mono); letter-spacing: .05em; }
 .contact-finale .finale-footnote { display: flex; justify-content: space-between; gap: 24px; padding-top: 60px; font: 9px/1.5 var(--font-mono); color: #9da9a4; }
 .contact-finale .finale-footnote span:last-child { font: italic 15px/1.4 var(--font-fraunces); }
 .contact-finale a:focus-visible { outline: 2px solid #d9f365; outline-offset: 6px; }
@@ -230,3 +230,5 @@
   .field-journal *, .client-voices *, .contact-finale * { scroll-behavior: auto; transition-duration: .01ms !important; }
   .field-journal .journal-impact a:hover svg, .client-voices .voices-pagination button:hover, .contact-finale .finale-main-link:hover .finale-arrow { transform: none; }
 }
+
+.field-journal .journal-capability-icon { display: block; margin-bottom: 14px; color: var(--journal-blue); }

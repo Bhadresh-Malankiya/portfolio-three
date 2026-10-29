@@ -7,7 +7,7 @@ export const companionChapters: CompanionChapter[] = [
   { id: "mobile", selector: "#mobile-work", label: "A smaller screen", number: "03", mood: "curious", note: "Meet Hey Buddy. A little app for pets and their people.", target: "#mobile-work h3" },
   { id: "workbench", selector: "#workbench, .workbench", label: "Still curious?", number: "04", mood: "thinking", note: "There’s more on the workbench. Pick something that interests you.", target: "#workbench a" },
   { id: "about", selector: "#about", label: "A little about me", number: "05", mood: "welcome", note: "This is the other half: the person behind the projects.", target: ".journal-heading h2" },
-  { id: "experience", selector: "#experience", label: "How I got here", number: "06", mood: "thinking", note: "From developer to founder. Tap a chapter to follow the journey.", target: "#experience h3" },
+  { id: "experience", selector: "#experience", label: "How I got here", number: "06", mood: "thinking", note: "From developer to technical lead. Tap a role to see what I owned.", target: "#experience h3" },
   { id: "expertise", selector: "#expertise", label: "Joining the dots", number: "07", mood: "curious", note: "Interfaces, systems, AI—and the team that brings them together.", target: "#expertise h3" },
   { id: "reviews", selector: "#reviews", label: "I’ll let them tell you", number: "08", mood: "grateful", note: "A few words from the people I’ve built things with.", target: "#reviews h2" },
   { id: "downloads", selector: "#downloads", label: "Something to take away", number: "09", mood: "proud", note: "My résumé for the short version. A book for the longer one.", target: "#downloads h2" },

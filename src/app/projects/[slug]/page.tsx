@@ -23,7 +23,7 @@ export async function generateMetadata({
     description: `${project.oneLiner} ${project.metrics.map((m) => `${m.value} ${m.label}`).join(", ")}`,
     alternates: { canonical: `/projects/${project.slug}` },
     openGraph: {
-      title: `${project.name} — The Weekend Builder`,
+      title: `${project.name} | Bhadresh Malankiya`,
       description: project.oneLiner,
       type: "article",
       url: `/projects/${project.slug}`,

@@ -48,9 +48,19 @@ type GalleryProject = {
 };
 const projects: GalleryProject[] = [
   {
+    slug: "extendedforms-io",
+    name: "ExtendedForms",
+    kind: "01 / scale & leadership",
+    caption: "A form. A full assessment.",
+    role: "Technical lead · ExpressTech",
+    features: ["400K+ users", "10M+ exams", "Team of 5"],
+    images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
+    url: "https://extendedforms.io",
+  },
+  {
     slug: "quzo-ai",
     name: "Quzo.ai",
-    kind: "01 / systems & AI",
+    kind: "02 / systems & AI",
     caption: "AI on the surface. Architecture underneath.",
     role: "Full-stack & AI engineering · ExpressTech",
     features: ["AI authoring", "Modular architecture", "Exam delivery"],
@@ -64,22 +74,12 @@ const projects: GalleryProject[] = [
   {
     slug: "vocalxi",
     name: "VocalXI",
-    kind: "02 / my own product",
+    kind: "03 / voice AI build",
     caption: "Forms, with a voice.",
-    role: "Founder & product engineer · AscendXI",
+    role: "Product engineer · voice AI",
     features: ["Voice conversations", "Answer review", "Form workflows"],
     images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
     url: "https://vocalxi.com",
-  },
-  {
-    slug: "extendedforms-io",
-    name: "ExtendedForms",
-    kind: "03 / employer product",
-    caption: "A form. A full assessment.",
-    role: "Technical lead · ExpressTech",
-    features: ["400K+ users", "10M+ exams", "Technical leadership"],
-    images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
-    url: "https://extendedforms.io",
   },
   {
     slug: "hey-buddy",
@@ -397,7 +397,7 @@ export default function DeviceGallery() {
         <p className="eyebrow">Selected work / Three products. Three different challenges.</p>
         <span className="work-prologue-stamp" aria-hidden="true">DESIGNED TO<strong>work.</strong>BUILT TO BE USED</span>
         <h2>Different problems.<br /><em>All the way to live.</em></h2>
-        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>Systems at Quzo. Ownership at VocalXI. Scale at ExtendedForms.</p></div>
+        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>Scale at ExtendedForms. Systems at Quzo. Voice AI at VocalXI.</p></div>
       </div>
       <ProjectChapter />
       <div className="mobile-interlude">

@@ -73,16 +73,16 @@ export const skillGroups: SkillGroup[] = [
   {
     id: "security",
     label: "Security & Auth",
-    items: ["SSO", "JWT-based auth", "AES-256 encryption", "RFC-compliant security standards", "Vulnerability scanning", "Packet sniffing", "Kali Linux"],
+    items: ["SSO", "JWT-based auth", "AES-256 encryption", "RFC-compliant security standards", "Vulnerability scanning", "OWASP practices"],
   },
 ];
 
 // A concise view of the capabilities used across customer-facing delivery.
 export const deliveryExpertise = [
-  { code: "01 / UI", title: "Frontend", detail: "Clear interfaces for real workflows.", tools: "JavaScript · TypeScript · React · Next.js" },
-  { code: "02 / API", title: "Backend", detail: "APIs, business logic and integrations.", tools: "TypeScript · Node.js · PostgreSQL · Redis" },
-  { code: "03 / AI", title: "AI integration", detail: "Connect models to product context.", tools: "LLMs · RAG · OpenAI · pgvector" },
-  { code: "04 / ADOPT", title: "AI adoption", detail: "Make AI useful in day-to-day work.", tools: "Prompt engineering · AI workflows · Claude" },
-  { code: "05 / SHIP", title: "Systems & deployment", detail: "Design for traffic, reliability and growth.", tools: "System design · AWS · Kafka · Docker" },
-  { code: "06 / LEAD", title: "Technical leadership", detail: "Technical direction, code reviews and developer mentoring.", tools: "Team management · Mentoring · Product scope" },
+  { code: "01 / UI", title: "Frontend", detail: "Clear interfaces for real workflows.", tools: "TypeScript · React · Next.js · Vue.js · Tailwind CSS" },
+  { code: "02 / API", title: "Backend", detail: "APIs, business logic and integrations.", tools: "Node.js · NestJS · Express · PostgreSQL · MongoDB · Redis" },
+  { code: "03 / AI", title: "AI integration", detail: "Connect models to product context.", tools: "OpenAI · Claude · Gemini · RAG · pgvector" },
+  { code: "04 / ADOPT", title: "AI adoption", detail: "Make AI useful in day-to-day work.", tools: "Prompt design · Model selection · AI-assisted delivery" },
+  { code: "05 / SHIP", title: "Systems & deployment", detail: "Design for traffic, reliability and growth.", tools: "AWS · Docker · NGINX · CI/CD · Caching" },
+  { code: "06 / LEAD", title: "Technical leadership", detail: "Technical direction, code reviews and developer mentoring.", tools: "Team of 5 · Code review · Mentoring · Release planning" },
 ];

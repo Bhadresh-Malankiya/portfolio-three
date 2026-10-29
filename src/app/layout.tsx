@@ -41,18 +41,21 @@ const siteUrl = `https://${profile.site}`;
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Bhadreshkumar Malankiya — Forward Deployed Engineer",
-    template: "%s — The Weekend Builder",
+    default: "Bhadresh Malankiya | Senior Full Stack Engineer & Tech Lead",
+    template: "%s | Bhadresh Malankiya",
   },
   description: profile.summary,
   keywords: [
+    "Bhadresh Malankiya",
     "Bhadreshkumar Malankiya",
-    "Forward Deployed Engineer",
-    "Full Stack Engineer",
-    "AI integration and adoption",
-    "RAG and LLM engineering",
+    "Senior Full Stack Engineer",
     "Technical Lead",
-    "Software Architect",
+    "Node.js",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "LLM integration",
+    "RAG",
     "ExtendedForms.io",
     "Quzo.ai",
     "HelpDesk AI",
@@ -68,16 +71,16 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: "The Weekend Builder — Bhadreshkumar Malankiya",
+    title: "Bhadresh Malankiya | Senior Full Stack Engineer & Tech Lead",
     description:
-      "Forward Deployed Engineer with 8+ years in full-stack development, applied AI, system design and technical leadership.",
+      "Senior Full Stack Engineer and Tech Lead with 8+ years in Node.js, React and TypeScript. Led ExtendedForms.io (400K+ users) and built Quzo.ai. Available now.",
     type: "website",
     url: siteUrl,
-    siteName: "The Weekend Builder",
+    siteName: "Bhadresh Malankiya",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Weekend Builder — Bhadreshkumar Malankiya",
+    title: "Bhadresh Malankiya | Senior Full Stack Engineer & Tech Lead",
     description: profile.summary,
   },
 };
@@ -108,7 +111,6 @@ export default function RootLayout({
               "@type": "PostalAddress",
               addressLocality: profile.location,
             },
-            worksFor: { "@type": "Organization", name: "AscendXI" },
             knowsAbout: [
               "Full Stack Development",
               "Next.js",
@@ -118,14 +120,14 @@ export default function RootLayout({
               "Software Architecture",
               "Data Visualization",
             ],
-            sameAs: [],
+            sameAs: [profile.linkedin, profile.github],
           }}
         />
         <JsonLd
           data={{
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "The Weekend Builder",
+            name: "Bhadresh Malankiya",
             url: siteUrl,
             description: profile.summary,
             author: { "@type": "Person", name: profile.name },

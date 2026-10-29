@@ -15,7 +15,6 @@ const filters = [
   "All work",
   "Employer products",
   "Client work",
-  "Founder ventures",
   "Personal builds",
 ] as const;
 
@@ -26,9 +25,7 @@ const matches = (kind: string, filter: Filter) =>
     ? ["Employer product", "Sole ownership"].includes(kind)
     : filter === "Personal builds"
       ? kind === "Personal build"
-      : filter === "Founder ventures"
-        ? kind === "Founder venture"
-        : ["Client project", "Freelance"].includes(kind));
+      : ["Client project", "Freelance"].includes(kind));
 
 export default function ProjectIndex() {
   const [filter, setFilter] = useState<Filter>("All work");

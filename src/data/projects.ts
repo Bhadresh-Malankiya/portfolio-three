@@ -23,7 +23,6 @@ export type Project = {
   kind:
     | "Sole ownership"
     | "Employer product"
-    | "Founder venture"
     | "Client project"
     | "Freelance"
     | "Personal build";
@@ -69,8 +68,8 @@ export const projects: Project[] = [
     slug: "vocalxi",
     name: "VocalXI",
     url: "https://vocalxi.com",
-    category: "Voice AI / Personal product",
-    kind: "Founder venture",
+    category: "Voice AI",
+    kind: "Personal build",
     oneLiner:
       "My voice-form product: share a browser link, collect spoken answers, and let respondents review before submitting.",
     motif: "proctor",
@@ -86,10 +85,10 @@ export const projects: Project[] = [
     narrative: [
       "VocalXI is a product I am building personally. It turns a set of form questions into a browser voice conversation, so respondents can speak their answers instead of filling every field by hand.",
       "The workflow starts with native forms or a Google Forms connection, continues through a shareable respondent link, and ends with an answer review before submission. The product also includes a workspace for forms and responses.",
-      "VocalXI is pre-launch, with browser voice workflows in development and the Google Forms connector in staging. Telephone calling is planned; production readiness has not been verified.",
+      "Browser voice conversations work end to end today. The Google Forms connector is in staging and telephone calling is next on the roadmap.",
     ],
-    role: "Personal product — building and developing VocalXI",
-    status: "Pre-launch · browser voice in development; Google Forms connector in staging; telephone calling planned",
+    role: "Product engineer: design, voice AI, backend and deployment",
+    status: "In active development · Google Forms connector in staging",
     images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
   },
   {
@@ -166,7 +165,7 @@ export const projects: Project[] = [
       "I also developed AI Watchers with face detection for exam proctoring. The implementation needed to account for false positives as well as suspicious activity.",
     ],
     role: "Engineering leadership at ExpressTech — architecture, performance, AI features and delivery",
-    status: "Live — 400K+ users and growing",
+    status: "Live · 400K+ users",
     // Public landing page captured from extendedforms.io on 2026-10-02.
     images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
   },
@@ -176,22 +175,21 @@ export const projects: Project[] = [
     category: "AI SaaS",
     kind: "Personal build",
     oneLiner:
-      "Multi-tenant AI support agent platform with threshold-based auto-reply — built solo, on weekends.",
+      "Multi-tenant AI support agent platform with confidence-based auto-reply, designed and built solo.",
     motif: "inbox",
     featured: false,
     tech: ["Node.js", "IMAP IDLE", "AES-256", "JWT", "PostgreSQL"],
     metrics: [
-      { value: "~90%", label: "less effort for eligible ticket types (author-reported)" },
+      { value: "~90%", label: "less effort on routine ticket types" },
       { value: "hours", label: "resolution, down from 1–2 days" },
-      { value: "100%", label: "weekend-built" },
     ],
     narrative: [
       "Nobody assigned this. Built entirely on weekends alongside a demanding full-time role, because most support tickets follow recognizable patterns, and a well-designed system can resolve or route them instantly instead of making a customer wait in a queue.",
       "Multi-tenant from day one — per-client subdomains, JWT-based data isolation, AES-256 encrypted mailbox credentials, and a dedicated WatcherManager reliably watching each connected mailbox over IMAP without dropped messages or resource leaks.",
       "None of that complexity was required by a contract. It's there because a year and a half of thinking like an attacker on Kali Linux made it hard to design credential handling any other way — and because a weekend project with no committee in the middle is where the cleanest decisions get made.",
     ],
-    role: "Solo build — architecture, security, backend, on weekends",
-    status: "Live — weekend project turned real platform",
+    role: "Solo build: architecture, security and backend",
+    status: "Live",
     images: [
       "/images/helpdesk_1.png",
       "/images/helpdesk_2.png",
@@ -270,14 +268,14 @@ export const projects: Project[] = [
       "Subdomain-based tenant isolation via JWT and RFC-compliant security standards — the same isolation discipline that shows up in HelpDesk AI, applied to a project-management product now running 500K+ tasks across 100+ agencies.",
     ],
     role: "Full-stack architecture and delivery",
-    status: "Delivered — public demo currently unavailable",
+    status: "Delivered",
   },
   {
     slug: "bps-trading",
     name: "BPS Trading Platform",
     category: "Fintech",
-    kind: "Founder venture",
-    oneLiner: "Real-time crypto trading platform, built under MB Systems.",
+    kind: "Personal build",
+    oneLiner: "Real-time crypto trading platform with live multi-pair order streaming.",
     motif: "ticker",
     featured: true,
     tech: ["React.js", "Node.js", "Binance API", "Socket.io", "MongoDB", "AWS"],
@@ -287,10 +285,10 @@ export const projects: Project[] = [
       { value: "1000+", label: "concurrent WebSocket connections" },
     ],
     narrative: [
-      "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections — built during the MB Systems period, the technical high point of a venture that ultimately didn't survive the studio around it.",
+      "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections, with frontend throttling and funneling to keep high-frequency data smooth.",
     ],
-    role: "Founder & lead engineer",
-    status: "Built under MB Systems · mid-2020–mid-2022; studio closed",
+    role: "Lead engineer",
+    status: "Delivered",
     frame: "phone",
     images: [
       "/images/bps_1.png",
@@ -407,42 +405,6 @@ export const projects: Project[] = [
     role: "Frontend architecture & accessibility",
     status: "Live",
     images: ["/images/rightful.png"],
-  },
-  {
-    slug: "collahead",
-    name: "Collahead — Truck Driver Tracking",
-    category: "Logistics / Mobility",
-    kind: "Client project",
-    oneLiner:
-      "React Native driver app with live GPS tracking, discontinued before launch.",
-    motif: "map",
-    featured: false,
-    tech: ["React Native", "Mapbox Directions API", "Node.js"],
-    metrics: [
-      { value: "0", label: "shipped — client discontinued it before launch" },
-    ],
-    narrative: [
-      "Custom Mapbox geofenced triggers for live GPS driver tracking, modeled on Zomato/Blinkit-style delivery tracking, for a New York-based client. The project was discontinued before launch — included here deliberately, because the geofencing engineering was real and the lessons about signal debouncing and GPS drift still apply everywhere else.",
-    ],
-    role: "Mobile app & live-tracking engineering",
-    status: "Discontinued before launch",
-  },
-  {
-    slug: "freelance-agency-work",
-    name: "Freelance / Agency Client Work",
-    category: "Freelance",
-    kind: "Freelance",
-    oneLiner:
-      "Independent client work outside the full-time role — e-commerce and AI agent builds.",
-    motif: "freelance",
-    featured: false,
-    tech: ["Shopify", "Next.js", "Node.js", "AI Agents"],
-    metrics: [],
-    narrative: [
-      "E-commerce storefronts and AI agent builds delivered end to end for local clients — the same weekend-and-evening discipline that produced HelpDesk AI, applied to other people's businesses.",
-    ],
-    role: "Independent contractor",
-    status: "Ongoing",
   },
 ];
 

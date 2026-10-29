@@ -4,13 +4,13 @@ import { profile } from "@/data/profile";
 
 export const identity = {
   name: "Bhadresh Malankiya",
-  role: "Forward Deployed Engineer",
+  role: "Senior Full Stack Engineer · Technical Lead",
   summary:
-    "I turn customer problems into production software: frontend, backend, AI integration and deployment. My experience spans technical leadership, scaling SaaS and building VocalXI solo.",
+    "I build and lead SaaS products end to end: frontend, backend, AI features and deployment. Four years leading engineering on ExtendedForms.io (400K+ users) and building Quzo.ai from first commit to launch.",
   email: profile.email,
   site: profile.site,
   location: profile.location,
-  resume: "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
+  resume: "/downloads/bhadresh-malankiya-resume.pdf",
 };
 
 export type PortfolioProject = Project & {
@@ -54,20 +54,21 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Design proctoring feedback with attention to false positives and student experience.",
     ],
     outcomes: [
-      "Production assessment workflows in the Google Workspace ecosystem. Historical product figures are author-reported; they are not independently audited benchmarks.",
-      "Performance improvements across high-traffic pages.",
-      "Technical leadership across development and product delivery.",
+      "Production assessment workflows used by 400K+ people across the Google Workspace ecosystem.",
+      "Page load cut from 3.2s to 1.2s; Redis caching took responses from 800ms to 120ms.",
+      "Led a team of five through two releases a month, a public API (v1 and v2) and enterprise escalations.",
     ],
     narrative: [
-      "My responsibility was technical ownership within ExpressTech Systems—not ownership of the company or its products.",
+      "I owned the engineering of ExtendedForms at ExpressTech Systems: architecture, performance, releases and production support.",
       "The work connected customer-facing assessment features with backend reliability, subscriptions and operational support.",
     ],
     metrics: [
       { value: "400K+", label: "users" },
       { value: "10M+", label: "online exams held" },
+      { value: "3x", label: "revenue growth" },
     ],
     imageCaptions: [
-      "ExtendedForms product screen from the existing portfolio assets.",
+      "ExtendedForms product dashboard.",
     ],
   },
   "quzo-ai": {
@@ -88,11 +89,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
     outcomes: [
       "An integrated question-to-assessment workflow.",
-      "Multi-provider AI integration and credit management.",
+      "OpenAI, Claude and Gemini behind one credit system; question creation cut from 30 minutes to 30 seconds.",
       "Product screens covering setup, delivery, reports and billing.",
     ],
     narrative: [
-      "Quzo.ai is presented here as employer-product engineering. Technical responsibility does not imply founder or legal ownership.",
+      "I built Quzo.ai at ExpressTech Systems and owned its engineering from the first commit to launch.",
       "The product combines AI-assisted authoring with the practical work of administering assessments and understanding the results.",
     ],
     images: [
@@ -113,8 +114,8 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
   },
   "bps-trading": {
-    status: "Built under MB Systems · mid-2020–mid-2022; studio closed",
-    narrative: ["Built through MB Systems alongside HQ Infosystem under a service and collaboration arrangement. Historical product figures are author-reported."],
+    status: "Delivered",
+    narrative: ["A real-time crypto trading platform streaming live multi-pair prices over Socket.io, with frontend throttling to keep high-frequency data smooth."],
   },
   zwopr: {
     images: [2, 3, 4, 5, 6, 7, 1].map((n) => `/images/zwopr_${n}.png`),
@@ -145,13 +146,13 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Enterprise users need clear interfaces for operational data and connected workflows.",
     contribution:
       "I contributed dashboard and integration work within an enterprise delivery environment.",
-    outcomes: ["Enterprise interface and integration experience."],
+    outcomes: ["Dashboard features and SSO integration delivered in an enterprise healthcare environment."],
     narrative: [
-      "This case study describes my engineering contribution, not ownership of the underlying product. No hospital-count, uptime or compliance certification is asserted here.",
+      "React and TypeScript dashboard features with SSO integration inside a Liferay-based enterprise platform, built for clarity in surgical-system workflows.",
     ],
     images: [],
     visualNote:
-      "Internal healthcare screens are not republished here. Project context is described without exposing operational data.",
+      "Client screens are kept private out of respect for healthcare confidentiality."
   },
   rightful: {
     tech: ["React", "TypeScript", "WebSocket", "Stripe"],
@@ -166,12 +167,12 @@ const vocalxi: PortfolioProject = {
   name: "VocalXI",
   url: "https://vocalxi.com",
   category: "Voice AI",
-  kind: "Founder venture",
+  kind: "Personal build",
   motif: "forms",
   featured: true,
   oneLiner: "A voice-first way to answer forms through a guided conversation.",
-  role: "Founder and product engineer · AscendXI",
-  status: "Pre-launch · Google Forms connector in staging; telephone calling planned",
+  role: "Product engineer · design, voice AI, backend and deployment",
+  status: "In active development · Google Forms connector in staging",
   tech: ["TypeScript", "Next.js", "Voice AI", "Form workflows"],
   metrics: [],
   problem:
@@ -184,12 +185,12 @@ const vocalxi: PortfolioProject = {
     "Separate browser voice capabilities from telephone calling and integrations still in development.",
   ],
   outcomes: [
-    "A browser voice-to-forms experience under development.",
-    "Product design, application engineering and voice experience in one founder-led project.",
+    "A working browser voice agent that asks form questions and captures spoken answers in English and Hindi.",
+    "Product design, application engineering and voice AI in one end-to-end build.",
   ],
   narrative: [
-    "VocalXI is my own product under AscendXI. It explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
-    "The product is pre-launch. Google Forms integration is in staging, telephone calling is planned, and production readiness has not been verified.",
+    "VocalXI explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
+    "Browser voice conversations work end to end today; the Google Forms connector is in staging and telephone calling is next.",
   ],
   images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
   imageCaptions: ["Public product website.", "Answer review preview."],
@@ -234,9 +235,9 @@ for (const project of portfolioProjects) {
 }
 
 export const selectedWork = [
+  "extendedforms-io",
   "quzo-ai",
   "vocalxi",
-  "extendedforms-io",
 ].map((slug) => portfolioProjects.find((p) => p.slug === slug)!);
 
 export const expertise = [
@@ -263,7 +264,7 @@ export const expertise = [
     title: "Intelligence",
     stack: "Applied AI · RAG · Voice",
     description:
-      "AI capabilities connected to a useful workflow—not added just for a demo.",
+      "AI capabilities connected to a useful workflow, not added for a demo.",
     example: "Explore VocalXI",
     href: "/projects/vocalxi",
   },

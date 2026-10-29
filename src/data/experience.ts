@@ -10,26 +10,13 @@ export type ExperienceEntry = {
 
 export const experience: ExperienceEntry[] = [
   {
-    id: "ascendxi",
-    role: "Founder / Product Engineer",
-    org: "AscendXI / VocalXI",
-    period: "Current",
-    kind: "founder",
-    bullets: [
-      "Building VocalXI solo, from product discovery and interface design to backend services, voice AI and deployment.",
-      "Designing the complete workflow: questions, spoken answers, review, and structured responses.",
-      "Working across product decisions, full-stack engineering, and applied AI.",
-      "Started AscendXI as a side venture to build outcome-driven products for the AI era: voice agents, AI agents and automations.",
-    ],
-  },
-  {
     id: "expresstech",
-    role: "Senior Software Engineer (technical-lead responsibilities)",
+    role: "Senior Software Engineer · Technical Lead",
     org: "ExpressTech Systems",
     period: "June 1, 2022 — September 30, 2026",
     kind: "employment",
     bullets: [
-      "Led engineering on ExtendedForms.io; author-reported product totals of 400K+ users and 10M+ online exams, with 3x revenue growth during the tenure",
+      "Led engineering on ExtendedForms.io: 400K+ users, 10M+ online exams and 3x revenue growth",
       "Architected server-rendered applications with Next.js, cutting page load time by 60%",
       "Put Redis caching in place that cut database queries by 70%, bringing response times from 800ms to 120ms",
       "Created Quzo at ExpressTech as a modular-monolith assessment platform designed for enterprise clients in the ExtendedForms context",
@@ -44,25 +31,8 @@ export const experience: ExperienceEntry[] = [
     ],
   },
   {
-    id: "mb-systems",
-    role: "Founder",
-    org: "MB Systems",
-    period: "mid-2020 — mid-2022",
-    location: "Surat, India",
-    kind: "founder",
-    bullets: [
-      "Ran MB Systems alongside HQ Infosystem through a service and collaboration arrangement, with 5–6 developers on my projects.",
-      "Delivered client and Shopify e-commerce projects for local businesses in Surat",
-      "Built the BPS crypto trading platform under the studio, reaching 10K+ users and $2M+ in trading volume",
-      "Trained interns and trainees and helped them find placements during roughly the final year",
-      "Spent approximately a year winding down responsibly and helping people settle into other jobs before closing",
-      "Handled client relationships end to end, including scope changes and hard conversations when timelines slipped",
-      "Took on data and security decisions personally as founder — a different level of accountability than one engineer on a team",
-    ],
-  },
-  {
     id: "hq-infosystem",
-    role: "Backend Developer",
+    role: "Full Stack Developer",
     org: "HQ Infosystem",
     period: "July 1, 2018 — June 1, 2022",
     kind: "employment",

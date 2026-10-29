@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { profile } from "@/data/profile";
+import { GithubIcon, LinkedinIcon } from "@/components/SocialIcons";
 
 export default function Footer() {
   return (
@@ -10,7 +11,7 @@ export default function Footer() {
             Bhadresh<span className="text-gold">.</span>
           </Link>
           <p className="mt-2 text-xs text-muted">
-            {"// The Weekend Builder \u00b7 still building."}
+            {"// Senior Full Stack Engineer \u00b7 Technical Lead \u00b7 Available now"}
           </p>
         </div>
         <nav
@@ -20,12 +21,15 @@ export default function Footer() {
           <Link href="/projects" className="hover:text-gold">
             Projects
           </Link>
-          <Link href="/journey" className="hover:text-gold">
-            My story
-          </Link>
           <Link href="/field-guide" className="hover:text-gold">
             Field notes
           </Link>
+          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold">
+            <LinkedinIcon size={13} /> LinkedIn
+          </a>
+          <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold">
+            <GithubIcon size={13} /> GitHub
+          </a>
           <Link href="/contact" className="hover:text-gold">
             Get in touch ↗
           </Link>

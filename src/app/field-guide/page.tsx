@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Two chapters written directly for people earlier in their own career: cracking DSA and technical interviews, and landing a first job with no track record yet.",
   alternates: { canonical: "/field-guide" },
   openGraph: {
-    title: "Field Guide — The Weekend Builder",
+    title: "Field Guide | Bhadresh Malankiya",
     description:
       "Written directly to you, not about him — DSA/interview prep and landing a first job.",
     type: "website",
@@ -29,7 +29,7 @@ export default function FieldGuideIndexPage() {
             as="h1"
             eyebrow="Chapters XIV & XV"
             title="Field guides for your engineering journey."
-            description="Two chapters from The Weekend Builder, focused on technical interviews and finding your first role. Explore the ideas, then adapt them to your own situation."
+            description="Two practical guides on technical interviews and finding your first role, written from years of mentoring developers."
           />
         </div>
       </section>

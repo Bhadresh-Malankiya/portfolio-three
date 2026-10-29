@@ -13,7 +13,7 @@ export default function ContactForm() {
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
   const resetFocusRef = useRef(false);
   const sendingRef = useRef(false);
-  const [intent, setIntent] = useState<Intent>("project");
+  const [intent, setIntent] = useState<Intent>("hire");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [sendError, setSendError] = useState("");
@@ -89,20 +89,20 @@ export default function ContactForm() {
           <p className="contact-small-label">A good place to start</p>
           <h2 ref={successHeadingRef} tabIndex={-1}>Your note is on its way.</h2>
           <p>Thanks for reaching out. I’ll reply to the email address you shared.</p>
-          <button type="button" className="contact-reset" onClick={() => { resetFocusRef.current = true; setStatus("idle"); setIntent("project"); setErrors({}); }}>Write another note <ArrowUpRight size={16} aria-hidden="true" /></button>
+          <button type="button" className="contact-reset" onClick={() => { resetFocusRef.current = true; setStatus("idle"); setIntent("hire"); setErrors({}); }}>Write another note <ArrowUpRight size={16} aria-hidden="true" /></button>
         </div>
       ) : (
         <form ref={formRef} className="contact-form" method="post" action="/api/contact" onSubmit={submit} noValidate aria-busy={status === "sending"}>
           <fieldset className="contact-intents" disabled={status === "sending"}>
             <legend>I’m here because…</legend>
             <div className="contact-intent-options">
-              <label className={intent === "project" ? "is-selected" : undefined}>
-                <input type="radio" name="intent" value="project" checked={intent === "project"} onChange={() => setIntent("project")} />
-                <span>I have a project</span><ArrowUpRight size={17} aria-hidden="true" />
-              </label>
               <label className={intent === "hire" ? "is-selected" : undefined}>
                 <input type="radio" name="intent" value="hire" checked={intent === "hire"} onChange={() => setIntent("hire")} />
-                <span>I want to hire you</span><BriefcaseBusiness size={17} aria-hidden="true" />
+                <span>I’m hiring for a role</span><BriefcaseBusiness size={17} aria-hidden="true" />
+              </label>
+              <label className={intent === "project" ? "is-selected" : undefined}>
+                <input type="radio" name="intent" value="project" checked={intent === "project"} onChange={() => setIntent("project")} />
+                <span>Something else</span><ArrowUpRight size={17} aria-hidden="true" />
               </label>
             </div>
           </fieldset>
@@ -110,7 +110,7 @@ export default function ContactForm() {
             <div className="contact-field"><label htmlFor="contact-name">Your name</label><input id="contact-name" name="name" autoComplete="name" required minLength={2} maxLength={100} disabled={status === "sending"} aria-invalid={!!errors.name} aria-describedby={errors.name ? "contact-name-error" : undefined} onChange={() => clearError("name")} />{errors.name && <p id="contact-name-error" className="contact-field-error">{errors.name}</p>}</div>
             <div className="contact-field"><label htmlFor="contact-email">Email address</label><input id="contact-email" name="email" type="email" inputMode="email" autoComplete="email" required maxLength={254} disabled={status === "sending"} aria-invalid={!!errors.email} aria-describedby={errors.email ? "contact-email-error" : undefined} onChange={() => clearError("email")} />{errors.email && <p id="contact-email-error" className="contact-field-error">{errors.email}</p>}</div>
           </div>
-          <div className="contact-field contact-message"><label htmlFor="contact-message">What do you have in mind?</label><p id="contact-message-hint">{intent === "hire" ? "Tell me about the role, the team and what you’re building." : "A few lines about your idea and where you could use a hand."}</p><textarea id="contact-message" name="message" rows={5} required minLength={10} maxLength={5000} disabled={status === "sending"} aria-invalid={!!errors.message} aria-describedby={`contact-message-hint${errors.message ? " contact-message-error" : ""}`} onChange={() => clearError("message")} />{errors.message && <p id="contact-message-error" className="contact-field-error">{errors.message}</p>}</div>
+          <div className="contact-field contact-message"><label htmlFor="contact-message">What do you have in mind?</label><p id="contact-message-hint">{intent === "hire" ? "Tell me about the role, the team and what you’re building." : "A few lines about what you have in mind."}</p><textarea id="contact-message" name="message" rows={5} required minLength={10} maxLength={5000} disabled={status === "sending"} aria-invalid={!!errors.message} aria-describedby={`contact-message-hint${errors.message ? " contact-message-error" : ""}`} onChange={() => clearError("message")} />{errors.message && <p id="contact-message-error" className="contact-field-error">{errors.message}</p>}</div>
           <div className="contact-honey" aria-hidden="true"><label htmlFor="contact-website">Leave this field empty</label><input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" /></div>
           {status === "error" && <div className="contact-send-error" role="alert"><p>{sendError}</p><a href={`mailto:${profile.email}`}>Email {profile.email} <ArrowUpRight size={14} aria-hidden="true" /></a></div>}
           <div className="contact-submit-row"><p>Just the essentials.<br /> All three fields are required.</p><button type="submit" disabled={status === "sending"}>{status === "sending" ? <>Sending <LoaderCircle size={17} className="contact-spinner" aria-hidden="true" /></> : <>Send your note <Send size={17} strokeWidth={1.5} aria-hidden="true" /></>}</button></div>
