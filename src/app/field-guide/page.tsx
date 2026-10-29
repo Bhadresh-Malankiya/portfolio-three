@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Field Guide | Bhadresh Malankiya",
     description:
-      "Written directly to you, not about him — DSA/interview prep and landing a first job.",
+      "Written directly to you, not about him, DSA/interview prep and landing a first job.",
     type: "website",
     url: "/field-guide",
   },

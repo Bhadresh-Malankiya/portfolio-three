@@ -287,7 +287,7 @@ for (const project of portfolioProjects) {
     const originalCaptions = originalImages.map(
       (_, index) =>
         project.imageCaptions?.[index] ??
-        project.name + " — existing product screen " + (index + 1) + ".",
+        project.name + ", existing product screen " + (index + 1) + ".",
     );
     project.images = [...originalImages, ...publicScreens.images];
     project.imageCaptions = [

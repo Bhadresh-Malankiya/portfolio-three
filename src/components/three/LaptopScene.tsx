@@ -6,7 +6,7 @@ import { RoundedBox, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 import type { MotionValue } from "framer-motion";
 
-// Deterministic PRNG — keeps the generated screen texture a pure function of
+// Deterministic PRNG · keeps the generated screen texture a pure function of
 // its inputs instead of reseeding (and re-triggering the purity lint rule)
 // on every render.
 function mulberry32(seed: number) {
@@ -42,7 +42,7 @@ function useScreenTexture() {
     });
     ctx.fillStyle = "#5a5a60";
     ctx.font = "24px monospace";
-    ctx.fillText("weekend-builder — main.tsx", 140, 35);
+    ctx.fillText("weekend-builder · main.tsx", 140, 35);
 
     // gutter + code lines
     const rand = mulberry32(11);

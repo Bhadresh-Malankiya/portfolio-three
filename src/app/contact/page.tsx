@@ -36,7 +36,7 @@ export default function ContactPage() {
           <div className="contact-direct"><span className="contact-small-label">Prefer your own inbox?</span><a href={`mailto:${profile.email}`}><Mail size={15} aria-hidden="true" />{profile.email}<ArrowUpRight size={15} aria-hidden="true" /></a><a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn: in/bhadresh-malankiya<ArrowUpRight size={15} aria-hidden="true" /></a><a href={`tel:${profile.phone.replace(/\s/g, "")}`}>{profile.phone}<ArrowUpRight size={15} aria-hidden="true" /></a></div>
         </header>
         <div className="contact-letter">
-          <div className="contact-letter-heading"><span className="contact-small-label">A note to Bhadresh</span><span aria-hidden="true">01 — HELLO</span></div>
+          <div className="contact-letter-heading"><span className="contact-small-label">A note to Bhadresh</span><span aria-hidden="true">01 · HELLO</span></div>
           <ContactForm />
         </div>
       </div>

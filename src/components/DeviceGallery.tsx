@@ -414,7 +414,7 @@ export default function DeviceGallery() {
         <p className="eyebrow">Selected work / Three products. Three different challenges.</p>
         <span className="work-prologue-stamp" aria-hidden="true">DESIGNED TO<strong>work.</strong>BUILT TO BE USED</span>
         <h2>Different problems.<br /><em>All the way to live.</em></h2>
-        <div className="work-prologue-bottom"><span>01 — WEB PRODUCTS<br />02 — MOBILE EXPERIENCES</span><p>Scale at ExtendedForms. Systems at Quzo. Voice AI at VocalXI.</p></div>
+        <div className="work-prologue-bottom"><span>01 · WEB PRODUCTS<br />02 · MOBILE EXPERIENCES</span><p>Scale at ExtendedForms. Systems at Quzo. Voice AI at VocalXI.</p></div>
       </div>
       <ProjectChapter />
       <div className="mobile-interlude">

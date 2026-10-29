@@ -163,7 +163,7 @@ function Companion({ pathname }: { pathname: string }) {
         <span className="companion-tooltip-message">{chapter.note}</span>
       </motion.div>}
     </AnimatePresence>
-    <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh — profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card" aria-describedby={speaking && !expanded ? "companion-tooltip" : undefined}
+    <button className="companion-character" type="button" ref={trigger} aria-label="Meet Bhadresh: profile and CV" aria-haspopup="dialog" aria-expanded={expanded} aria-controls="builder-id-card" aria-describedby={speaking && !expanded ? "companion-tooltip" : undefined}
       onClick={() => {
         clearTimeout(hoverTimer.current);
         cancelClose();

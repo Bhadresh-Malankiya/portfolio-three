@@ -42,7 +42,7 @@ export default function ContactForm() {
     if (payload.name.length < 2 || payload.name.length > 100) issues.name = "Please enter a name between 2 and 100 characters.";
     const emailInput = form.elements.namedItem("email") as HTMLInputElement;
     if (!payload.email || payload.email.length > 254 || !emailInput.validity.valid) issues.email = "Please enter a valid email so I can reply.";
-    if (payload.message.length < 10 || payload.message.length > 5000) issues.message = "Please write a little more — between 10 and 5,000 characters.";
+    if (payload.message.length < 10 || payload.message.length > 5000) issues.message = "Please write a little more, between 10 and 5,000 characters.";
     setErrors(issues);
     setSendError("");
     const firstInvalid = (Object.keys(issues) as Field[])[0];
@@ -70,7 +70,7 @@ export default function ContactForm() {
       setStatus("sent");
     } catch (error) {
       setStatus("error");
-      setSendError(error instanceof Error && error.name !== "AbortError" && error.name !== "TypeError" ? error.message : "I couldn’t confirm that your message was sent. Your note is still here — please try again, or email me directly.");
+      setSendError(error instanceof Error && error.name !== "AbortError" && error.name !== "TypeError" ? error.message : "I couldn’t confirm that your message was sent. Your note is still here, please try again, or email me directly.");
     } finally {
       window.clearTimeout(timeout);
       sendingRef.current = false;

@@ -19,7 +19,7 @@ export const fieldGuides: FieldGuide[] = [
     eyebrow: "Chapter XIV",
     quote: "You don't crack an interview in the room. You crack it in the two hundred problems nobody ever watched you solve.",
     intro:
-      "Written directly to whoever is preparing for their own interviews — the exact things I wish someone had told me plainly, without the vague encouragement that fills most advice on this topic.",
+      "Written directly to whoever is preparing for their own interviews, the exact things I wish someone had told me plainly, without the vague encouragement that fills most advice on this topic.",
     sections: [
       {
         heading: "Start with the shapes, not the problems",
@@ -27,11 +27,11 @@ export const fieldGuides: FieldGuide[] = [
       },
       {
         heading: "Talk out loud, every time, starting now",
-        body: "Silent problem-solving and narrated problem-solving are genuinely different skills, and an interview only tests the second. Record yourself narrating a solution occasionally and listen back — almost everyone is surprised how much less clear their spoken reasoning is than it felt inside their own head.",
+        body: "Silent problem-solving and narrated problem-solving are genuinely different skills, and an interview only tests the second. Record yourself narrating a solution occasionally and listen back, almost everyone is surprised how much less clear their spoken reasoning is than it felt inside their own head.",
       },
       {
         heading: "Get comfortable being wrong in front of someone",
-        body: "You will take wrong turns in real interviews. Everyone does. What separates a strong outcome from a weak one is whether you can notice it, say so calmly, and correct course without your composure visibly collapsing. Practice the specific language: \"I'm noticing this approach won't handle this edge case cleanly, let me reconsider\" — said calmly, is a skill in itself.",
+        body: "You will take wrong turns in real interviews. Everyone does. What separates a strong outcome from a weak one is whether you can notice it, say so calmly, and correct course without your composure visibly collapsing. Practice the specific language: \"I'm noticing this approach won't handle this edge case cleanly, let me reconsider\", said calmly, is a skill in itself.",
       },
       {
         heading: "Understand tradeoffs, not just labels",
@@ -47,7 +47,7 @@ export const fieldGuides: FieldGuide[] = [
       },
       {
         heading: "Don't skip system design and behavioral rounds",
-        body: "At a first-job level, system design rounds test whether you can reason clearly about tradeoffs at a small, honest scale — not whether you can architect a global platform. Behavioral rounds test whether you can describe a real situation honestly, with a clear account of what you did and learned. Prepare two or three genuine stories, even from college projects, and tell them clearly rather than searching for a more impressive one.",
+        body: "At a first-job level, system design rounds test whether you can reason clearly about tradeoffs at a small, honest scale, not whether you can architect a global platform. Behavioral rounds test whether you can describe a real situation honestly, with a clear account of what you did and learned. Prepare two or three genuine stories, even from college projects, and tell them clearly rather than searching for a more impressive one.",
       },
     ],
   },
@@ -57,7 +57,7 @@ export const fieldGuides: FieldGuide[] = [
     eyebrow: "Chapter XV",
     quote: "Your first offer isn't proof that you're already excellent. It's only proof that someone was willing to bet you would be.",
     intro:
-      "Landing a first job is a genuinely different problem than landing a fifth. With no track record to point to, you're asking someone to bet on potential — the entire strategy should be built around making that bet feel safe.",
+      "Landing a first job is a genuinely different problem than landing a fifth. With no track record to point to, you're asking someone to bet on potential, the entire strategy should be built around making that bet feel safe.",
     sections: [
       {
         heading: "Build proof before you need it",
@@ -65,7 +65,7 @@ export const fieldGuides: FieldGuide[] = [
       },
       {
         heading: "Treat academic performance as compounding, not a single event",
-        body: "A strong record and a good placement outcome don't happen because of anything dramatic in a final semester. They happen from a long, unglamorous accumulation of consistent effort — available to anyone willing to start it early rather than waiting for deadline pressure.",
+        body: "A strong record and a good placement outcome don't happen because of anything dramatic in a final semester. They happen from a long, unglamorous accumulation of consistent effort, available to anyone willing to start it early rather than waiting for deadline pressure.",
       },
       {
         heading: "Don't wait for the market to be favorable",
@@ -73,7 +73,7 @@ export const fieldGuides: FieldGuide[] = [
       },
       {
         heading: "Talk about projects like responsibilities, not tech-stack trivia",
-        body: "Instead of \"I built a project using React and Node,\" try \"I noticed this specific problem, chose this approach because of this tradeoff, and here's what I'd do differently now.\" That last part — honest reflection on what you'd improve — is disproportionately persuasive.",
+        body: "Instead of \"I built a project using React and Node,\" try \"I noticed this specific problem, chose this approach because of this tradeoff, and here's what I'd do differently now.\" That last part, honest reflection on what you'd improve, is disproportionately persuasive.",
       },
       {
         heading: "Apply broadly, prepare narrowly",
@@ -85,7 +85,7 @@ export const fieldGuides: FieldGuide[] = [
       },
       {
         heading: "The offer is the beginning, not the finish line",
-        body: "A first role's most important job is not prestige — it's giving you real, structured exposure to how software actually gets built and shipped under real constraints. Prepare for the interview seriously. Don't mistake the gate for the destination.",
+        body: "A first role's most important job is not prestige, it's giving you real, structured exposure to how software actually gets built and shipped under real constraints. Prepare for the interview seriously. Don't mistake the gate for the destination.",
       },
     ],
   },

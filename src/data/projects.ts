@@ -64,7 +64,7 @@ export const projects: Project[] = [
       "The site is currently in public preview, with an illustrative collection and test checkout.",
     ],
     role: "E-commerce development and interactive product presentation",
-    status: "Public preview — test checkout",
+    status: "Public preview, test checkout",
     images: ["/images/jewelxi-home.jpg", "/images/jewelxi-shop.jpg", "/images/jewelxi-admin_1.webp", "/images/jewelxi-admin_2.webp", "/images/jewelxi-admin_3.webp", "/images/jewelxi-admin_4.webp"],
   },
   {
@@ -166,7 +166,7 @@ export const projects: Project[] = [
       "I rebuilt performance-critical paths to reduce page load from 3.2 seconds to 1.2 seconds. On a separate high-traffic page, caching and TanStack Query reduced loading from 30–35 seconds to around 5–6 seconds.",
       "I also developed AI Watchers with face detection for exam proctoring. The implementation needed to account for false positives as well as suspicious activity.",
     ],
-    role: "Engineering leadership at ExpressTech — architecture, performance, AI features and delivery",
+    role: "Engineering leadership at ExpressTech: architecture, performance, AI features and delivery",
     status: "Live · 400K+ users",
     // Public landing page captured from extendedforms.io on 2026-10-02.
     images: ["/images/extendedforms.png", "/images/extendedforms-live.jpg"],
@@ -210,7 +210,7 @@ export const projects: Project[] = [
     narrative: [
       "An AI-powered social CMS for a German client, with GraphQL over Hasura Cloud and multilingual content.",
     ],
-    role: "Full-stack delivery — Next.js frontend, NestJS/GraphQL backend",
+    role: "Full-stack delivery: Next.js frontend, NestJS/GraphQL backend",
     status: "Delivered",
     images: [
       "/images/zwopr_1.png",

@@ -125,7 +125,7 @@ export function ScreenshotViewer({
         >
           <Image
             src={selected}
-            alt={`${name} — ${selectedCaption}`}
+            alt={`${name}: ${selectedCaption}`}
             width={dimensions.w}
             height={dimensions.h}
             style={{ "--shot-w": `${dimensions.w}px` } as CSSProperties}
@@ -239,7 +239,7 @@ export default function ProjectGallery({
             <Image
               key={source}
               src={source}
-              alt={imageIndex === index ? `${name} — ${selectedCaption}` : ""}
+              alt={imageIndex === index ? `${name}: ${selectedCaption}` : ""}
               aria-hidden={imageIndex !== index}
               fill
               sizes={edgeToEdge ? "100vw" : fill ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1440px) 1320px, 100vw"}

@@ -41,7 +41,7 @@ export async function sendContactMessage(message: ContactMessage) {
     from: { name: "Bhadresh’s portfolio", address: process.env.SMTP_FROM || process.env.SMTP_USER! },
     to: recipient,
     replyTo: { name: message.name, address: message.email },
-    subject: `${topic} — ${message.name}`,
+    subject: `${topic}: ${message.name}`,
     text: `${topic}\n\nFrom: ${message.name} <${message.email}>\n\n${message.message}\n\nSent from https://${profile.site}/contact. Reply to this email to reach the sender.`,
     html: `<html><body style="margin:0;background:#f2f0e8;color:#202722;font-family:Arial,sans-serif"><div style="max-width:600px;margin:auto;padding:36px 24px"><p style="font-size:12px;letter-spacing:1px">PORTFOLIO / ${topic.toUpperCase()}</p><h1 style="font-size:28px;font-weight:500">${escapeHtml(message.name)} wants to ${message.intent === "hire" ? "work with you" : "talk about a project"}.</h1><p>Reply to: <a href="mailto:${escapeHtml(message.email)}" style="color:#365c3a">${escapeHtml(message.email)}</a></p><div style="margin:28px 0;padding:24px;background:#fff;border-top:2px solid #526848;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere">${escapeHtml(message.message)}</div><p style="font-size:12px;color:#596353">Sent from your portfolio contact page. Reply directly to this email to continue the conversation.</p></div></body></html>`,
   });
@@ -86,7 +86,7 @@ ${row("Name", name)}${row("Email", `<a href="mailto:${email}" style="color:#f4c5
 
 export async function sendVisitorNotification(lead: VisitorLead) {
   const transporter = getTransporter();
-  if (!transporter) throw new Error("SMTP is not configured — set SMTP_HOST, SMTP_USER and SMTP_PASS.");
+  if (!transporter) throw new Error("SMTP is not configured: set SMTP_HOST, SMTP_USER and SMTP_PASS.");
   const from = process.env.SMTP_FROM || process.env.SMTP_USER!;
   const to = process.env.NOTIFY_TO_EMAIL || profile.email;
   await transporter.sendMail({
