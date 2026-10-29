@@ -45,6 +45,8 @@ type GalleryProject = {
   images: string[];
   phone?: boolean;
   url?: string;
+  /** Link text when the URL is not the project itself, e.g. a client's current site. */
+  urlLabel?: string;
 };
 const projects: GalleryProject[] = [
   {
@@ -78,7 +80,7 @@ const projects: GalleryProject[] = [
     caption: "Forms, with a voice.",
     role: "Product engineer · voice AI",
     features: ["Voice conversations", "Answer review", "Form workflows"],
-    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
+    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg", "/images/vocalxi-dashboard_1.webp"],
     url: "https://vocalxi.com",
   },
 ];
@@ -109,6 +111,7 @@ const mobileProjects: MobileProject[] = [
     images: ["/images/heybuddy_4.png", "/images/heybuddy_1.jpeg", "/images/heybuddy_5.jpeg"],
     phone: true,
     url: "https://heybuddy.io",
+    urlLabel: "Client site",
     title: "A small companion. A big connection.",
     description: "Live pet location with Mapbox and NFC tags that connect the physical product to the app.",
     label: "Hey Buddy",
@@ -124,7 +127,7 @@ const mobileProjects: MobileProject[] = [
     images: ["/images/bps_1.png", "/images/bps_2.png", "/images/bps_3.png", "/images/bps_4.png"],
     phone: true,
     title: "A live market, in your pocket.",
-    description: "Real-time prices over 1,000+ concurrent WebSocket connections, throttled so the screen stays smooth.",
+    description: "Real-time prices over WebSockets, throttled so the screen stays smooth.",
     label: "BPS Trading",
     tech: "Socket.IO · Real-time",
   },
@@ -350,7 +353,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Live site ↗
+                {p.urlLabel ?? "Live site"} ↗
               </a>}
             </div>
           </motion.div>

@@ -132,7 +132,7 @@ export default function Hero() {
           </div>
         </div>
         <Link href="#work" className="flight-work-link">See what I’ve built <ArrowDown size={17} /></Link>
-        <a className="flight-resume" href={downloads.resume.file} download={downloads.resume.filename}>Take the résumé <ArrowUpRight size={14} /></a>
+        <a className="flight-resume" href={downloads.resume.file} download={downloads.resume.filename}>Download résumé <ArrowUpRight size={14} /></a>
       </div>
       <div className="flight-chapters" role="group" aria-label="Explore the opening story">{acts.map((item,index) => <button key={item.label} type="button" onClick={() => selectAct(index)} aria-label={`${item.short} — ${item.label}`} aria-pressed={act === index}><span>0{index + 1}</span>{item.short}<i aria-hidden="true" /></button>)}<span className="flight-scroll-note">{pinned ? "SCROLL TO UNFOLD ↓" : "EXPLORE THE STORY ↗"}</span></div>
     </div>

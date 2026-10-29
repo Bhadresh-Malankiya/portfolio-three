@@ -6,8 +6,8 @@ export const capturedScreens: Record<string, { images: string[]; imageCaptions: 
       "/images/captured/vocalxi-mobile.webp"
     ],
     "imageCaptions": [
-      "VocalXI public website · desktop capture. Marketing page, not an authenticated product dashboard.",
-      "VocalXI public website · mobile capture. Marketing page, not an authenticated product dashboard."
+      "VocalXI website on desktop.",
+      "VocalXI website on mobile."
     ]
   }
 };

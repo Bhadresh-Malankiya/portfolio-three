@@ -11,7 +11,7 @@ import "@/app/human-story.css";
 const journey = [
   { year: "Now", title: "Open to the next role", role: "Senior Full Stack Engineer · Technical Lead", detail: "Available immediately. Looking for a product team where I can own outcomes, lead engineers and ship AI features that matter." },
   { year: "2022–2026", title: "ExpressTech Systems", role: "Senior Software Engineer · Technical Lead", detail: "Led a team of five on ExtendedForms.io (400K+ users, 10M+ online exams, 3x revenue growth) and built Quzo.ai, an AI assessment platform, from first commit to launch. Owned performance, releases, the public API and enterprise escalations." },
-  { year: "2018–2022", title: "HQ Infosystem", role: "Full Stack Developer", detail: "Delivered 15+ web applications across edtech, logistics, fintech and e-commerce with React, Node.js and Laravel, including Stripe Connect payouts and APIs serving 50K+ daily requests. Completed my engineering degree alongside this full-time role." },
+  { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Grew from backend into full-stack delivery: 15+ web applications across edtech, logistics, fintech and e-commerce with React, Node.js and Laravel, including Stripe Connect payouts and APIs serving 50K+ daily requests. Completed my engineering degree alongside this full-time role." },
 ];
 const capabilityIcons = [LayoutDashboard, Server, Sparkles, Workflow, Rocket, Users];
 const impact = [

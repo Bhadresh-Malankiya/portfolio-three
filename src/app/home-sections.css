@@ -16,7 +16,8 @@
 .diagram-kicker { margin: 0 0 6px; font: 11px/1.4 var(--font-plex-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gold); }
 .diagram-title { margin: 0 0 16px; font: 600 18px/1.35 var(--font-plex-sans); color: var(--color-fg); }
 .diagram-note { margin: 16px 0 4px; font-size: 14.5px; line-height: 1.62; color: var(--color-muted); max-width: 720px; }
-.diagram-pair { display: grid; grid-template-columns: 1fr; gap: 0; }
+.diagram-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.diagram-card, .diagram-pair > * { min-width: 0; }
 .diagram-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .diagram-svg { display: block; width: 100%; height: auto; }
 

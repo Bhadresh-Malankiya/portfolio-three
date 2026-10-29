@@ -33,20 +33,17 @@ export const profile = {
   tickerStats: [
     "400K+ users on ExtendedForms.io",
     "10M+ online exams on ExtendedForms",
-    "3x revenue growth on ExtendedForms",
+    "3x ExtendedForms revenue growth, 2022 to 2026",
     "Page load cut from 3.2s to 1.2s",
     "Redis caching: 800ms to 120ms responses",
     "Question creation cut from 30 min to 30 sec on Quzo.ai",
     "Team of 5 engineers led",
     "Public API v1 and v2 shipped",
-    "Recovered a ~25K concurrent request outage",
+    "Traced a ~25K-request load-test outage to PHP-FPM worker limits",
   ],
   certifications: [
     "Turing Certified Full Stack Developer",
     "GDG Mobile Track Winner, 2021",
-    "60+ technical courses across AI, DevOps, cybersecurity, analytics, web development",
-    "20+ technical articles on Medium, 2K+ followers",
-    "Open-source contributor in the React ecosystem",
   ],
   education: {
     degree: "Bachelor of Engineering, Information Technology",

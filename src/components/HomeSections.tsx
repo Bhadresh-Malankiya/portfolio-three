@@ -45,9 +45,9 @@ const patterns = [
 const challenges = [
   {
     title: "A load test took the server down",
-    context: "About 25K form requests hit a 16 GB Laravel server at once. Most timed out after 30 seconds.",
-    action: "Traced it to the PHP-FPM worker pool (pm.max_children) running out of workers, then retuned the pool and server capacity.",
-    result: "Root cause found and fixed; the forms feature recovered.",
+    context: "During a load test, about 25K form requests hit a 16 GB Laravel server at once. Most timed out after 30 seconds.",
+    action: "Traced it to PHP-FPM's pm.max_children limit: too few workers for the load while server capacity sat unused. Raised the worker pool to match the hardware.",
+    result: "The forms feature came back once the worker pool matched the server's capacity.",
     proof: "ExtendedForms.io",
     href: "/projects/extendedforms-io",
   },

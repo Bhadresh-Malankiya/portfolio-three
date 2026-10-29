@@ -92,7 +92,7 @@ export const projects: Project[] = [
       "Browser voice conversations work end to end today. The Google Forms connector is in staging and telephone calling is next on the roadmap.",
     ],
     role: "Product engineer: design, voice AI, backend and deployment",
-    status: "In active development · Google Forms connector in staging",
+    status: "Early access · browser voice live · Google Forms connector in staging",
     images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg", "/images/vocalxi-dashboard_1.webp", "/images/vocalxi-dashboard_2.webp"],
   },
   {
@@ -159,9 +159,7 @@ export const projects: Project[] = [
     ],
     metrics: [
       { value: "400K+", label: "users" },
-      { value: "579K", label: "forms analyzed" },
       { value: "10M+", label: "online exams held" },
-      { value: "3x", label: "revenue growth" },
     ],
     narrative: [
       "At ExpressTech, I led engineering on ExtendedForms.io: architecture, feature delivery, performance, and production support.",
@@ -184,14 +182,9 @@ export const projects: Project[] = [
     motif: "inbox",
     featured: false,
     tech: ["Node.js", "IMAP IDLE", "AES-256", "JWT", "PostgreSQL"],
-    metrics: [
-      { value: "~90%", label: "less effort on routine ticket types" },
-      { value: "hours", label: "resolution, down from 1–2 days" },
-    ],
+    metrics: [],
     narrative: [
-      "Nobody assigned this. Built entirely on weekends alongside a demanding full-time role, because most support tickets follow recognizable patterns, and a well-designed system can resolve or route them instantly instead of making a customer wait in a queue.",
-      "Multi-tenant from day one — per-client subdomains, JWT-based data isolation, AES-256 encrypted mailbox credentials, and a dedicated WatcherManager reliably watching each connected mailbox over IMAP without dropped messages or resource leaks.",
-      "None of that complexity was required by a contract. It's there because a year and a half of thinking like an attacker on Kali Linux made it hard to design credential handling any other way — and because a weekend project with no committee in the middle is where the cleanest decisions get made.",
+      "A side project: multi-tenant support agent with per-client subdomains, JWT data isolation, AES-256 encrypted mailbox credentials and a WatcherManager that watches each connected mailbox over IMAP IDLE.",
     ],
     role: "Solo build: architecture, security and backend",
     status: "Side project · core flows working",
@@ -213,13 +206,9 @@ export const projects: Project[] = [
     motif: "cms",
     featured: true,
     tech: ["Next.js", "NestJS", "GraphQL", "Hasura Cloud", "PostgreSQL"],
-    metrics: [
-      { value: "6 mo", label: "delivery timeline" },
-      { value: "70%", label: "less content creation time" },
-      { value: "100K+", label: "content items, 3 languages" },
-    ],
+    metrics: [],
     narrative: [
-      "A social CMS delivered in six months, cutting content creation time by 70% across more than 100,000 content items in three languages — GraphQL over Hasura Cloud keeping the admin layer fast as the catalog scaled.",
+      "An AI-powered social CMS for a German client, with GraphQL over Hasura Cloud and multilingual content.",
     ],
     role: "Full-stack delivery — Next.js frontend, NestJS/GraphQL backend",
     status: "Delivered",
@@ -239,21 +228,16 @@ export const projects: Project[] = [
     category: "IoT / AI",
     kind: "Client project",
     oneLiner:
-      "AI kiosk for automated baggage measurement, deployed across 15+ airports.",
+      "AI kiosk that measures and checks baggage automatically at airport self bag drop.",
     motif: "kiosk",
     featured: false,
     tech: ["React.js", "TensorFlow", "OpenCV", "Node.js", "Socket.io", "AWS"],
-    metrics: [
-      { value: "15+", label: "airports" },
-      { value: "99.2%", label: "measurement accuracy" },
-      { value: "<500ms", label: "AI processing time" },
-      { value: "5M+", label: "baggage items processed" },
-    ],
+    metrics: [],
     narrative: [
-      "Computer vision at the edge of a kiosk, not a lab: TensorFlow and OpenCV measuring luggage in real time, streamed over Socket.io, tuned until sub-500ms processing held up at 99.2% accuracy across five million-plus bags.",
+      "Frontend and AI processing integration for a baggage kiosk: TensorFlow and OpenCV measurements streamed to the interface over Socket.io.",
     ],
     role: "Frontend + AI processing integration",
-    status: "Deployed",
+    status: "Client project",
   },
   {
     slug: "webstack",
@@ -265,12 +249,9 @@ export const projects: Project[] = [
     motif: "pm",
     featured: false,
     tech: ["Next.js", "TypeScript", "NestJS", "PostgreSQL"],
-    metrics: [
-      { value: "100+", label: "agencies" },
-      { value: "500K+", label: "tasks tracked" },
-    ],
+    metrics: [],
     narrative: [
-      "Subdomain-based tenant isolation via JWT and RFC-compliant security standards — the same isolation discipline that shows up in HelpDesk AI, applied to a project-management product now running 500K+ tasks across 100+ agencies.",
+      "Subdomain-based tenant isolation with JWT, built for a US-based client and deployed on Azure.",
     ],
     role: "Full-stack architecture and delivery",
     status: "Delivered",
@@ -280,17 +261,13 @@ export const projects: Project[] = [
     name: "BPS Trading Platform",
     category: "Fintech",
     kind: "Personal build",
-    oneLiner: "Real-time crypto trading platform with live multi-pair order streaming.",
+    oneLiner: "Real-time crypto trading platform with live multi-pair price streaming.",
     motif: "ticker",
     featured: true,
     tech: ["React.js", "Node.js", "Binance API", "Socket.io", "MongoDB", "AWS"],
-    metrics: [
-      { value: "10K+", label: "users" },
-      { value: "$2M+", label: "trading volume" },
-      { value: "1000+", label: "concurrent WebSocket connections" },
-    ],
+    metrics: [],
     narrative: [
-      "Live multi-pair order streaming over more than a thousand concurrent WebSocket connections, with frontend throttling and funneling to keep high-frequency data smooth.",
+      "Live multi-pair price streaming over WebSockets, with frontend throttling to keep high-frequency data smooth.",
     ],
     role: "Lead engineer",
     status: "Delivered",
@@ -318,7 +295,6 @@ export const projects: Project[] = [
   {
     slug: "intuitive-surgical-dashboard",
     name: "Intuitive Surgical Dashboard",
-    url: "https://intuitive.com",
     category: "Medical Tech",
     kind: "Client project",
     oneLiner: "Frontend dashboard for Da Vinci Xi and SP surgical systems.",
@@ -340,7 +316,6 @@ export const projects: Project[] = [
   {
     slug: "kexy-restaurants",
     name: "Kexy Restaurants",
-    url: "https://getkexy.com",
     category: "SaaS",
     kind: "Client project",
     oneLiner:
@@ -348,16 +323,12 @@ export const projects: Project[] = [
     motif: "restaurant",
     featured: false,
     tech: ["CakePHP", "MySQL", "Redis", "Stripe Connect", "Twilio", "AWS"],
-    metrics: [
-      { value: "500+", label: "restaurants" },
-      { value: "$50M+", label: "order volume" },
-      { value: "15–20%", label: "MoM revenue growth" },
-    ],
+    metrics: [],
     narrative: [
-      "Multi-vendor payouts over Stripe Connect for 500+ restaurants moving $50M+ in orders — the same payout discipline first built at HQ Infosystem, at restaurant-industry scale.",
+      "Backend and payments work on a restaurant platform, including multi-vendor payouts over Stripe Connect.",
     ],
     role: "Backend & payments architecture",
-    status: "Live",
+    status: "Client project",
     images: ["/images/kexy.png"],
   },
   {
@@ -370,16 +341,12 @@ export const projects: Project[] = [
     motif: "petmap",
     featured: false,
     tech: ["Vue.js", "React Native", "Firebase", "Mapbox", "NFC APIs"],
-    metrics: [
-      { value: "50K+", label: "downloads" },
-      { value: "$500K", label: "ARR" },
-      { value: "4.6/5", label: "rating, 92% 30-day retention" },
-    ],
+    metrics: [],
     narrative: [
-      "Mapbox-driven live tracking and NFC-based tagging, tuned until 92% of users were still opening the app 30 days later — retention, in a pet-tracking app, is trust made visible.",
+      "Mobile and mapping work on a pet app: Mapbox live location and NFC-based pet tags.",
     ],
     role: "Mobile & mapping integration",
-    status: "Live",
+    status: "Client project",
     frame: "phone",
     images: [
       "/images/heybuddy_1.jpeg",
@@ -392,23 +359,19 @@ export const projects: Project[] = [
   {
     slug: "rightful",
     name: "Rightful",
-    url: "https://rightful.com.au",
     category: "Legal Tech",
     kind: "Client project",
     oneLiner:
-      "Australia's legal services platform, with real-time video consultation.",
+      "Legal services platform for Australia, with real-time video consultations.",
     motif: "legal",
     featured: false,
     tech: ["React.js", "TypeScript", "Python", "WebSocket", "Stripe"],
-    metrics: [
-      { value: "92/100", label: "Lighthouse score" },
-      { value: "AA", label: "WCAG 2.1 compliant" },
-    ],
+    metrics: [],
     narrative: [
-      "Real-time video consultations and GIF-based, time-triggered UI animation, built to a 92/100 Lighthouse score and WCAG 2.1 AA — accessibility as a hard requirement, not an afterthought, for a platform handling legal services.",
+      "Frontend work on real-time video consultations and accessible interaction design.",
     ],
     role: "Frontend architecture & accessibility",
-    status: "Live",
+    status: "Client project",
     images: ["/images/rightful.png"],
   },
   {
@@ -458,7 +421,7 @@ export const projects: Project[] = [
     kind: "Personal build",
     experiment: true,
     oneLiner:
-      "Eleven scheduled agents in hourly batches that find roles and client work abroad, verify, score, track and follow up.",
+      "Eleven scheduled agents in hourly batches that find roles and client work, verify, score, track and follow up.",
     motif: "map",
     featured: false,
     tech: ["Scheduled AI agents", "Next.js", "PostgreSQL", "Google Sheets", "Gmail"],

@@ -68,11 +68,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Agent roles (Scout, Preparer, Analyst, Resolver, Coordinator) with a live audit timeline.",
       "Leads view, shown here with the app's built-in synthetic sample data.",
     ],
-    problem: "Finding the right roles and client work abroad means checking hundreds of listings, companies and visa rules by hand, every day.",
+    problem: "Finding the right roles and client work means checking hundreds of listings, companies and requirements by hand, every day.",
     contribution: "I designed eleven scheduled agents that run in hourly batches, each owning one step, with a shared sheet as the single source of truth and proof log.",
     decisions: [
       "One agent per step: discover, verify, score, track, apply or queue, and follow up.",
-      "Verify that a company and its location are real, and check visa sponsorship fit, before a lead is kept.",
+      "Verify that a company and its location are real, and that the role's requirements fit, before a lead is kept.",
       "Keep every lead, status and proof in one sheet so nothing is lost between runs.",
       "Apply automatically only where possible; everything else is queued with notes for manual review.",
     ],
@@ -172,7 +172,7 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     metrics: [
       { value: "400K+", label: "users" },
       { value: "10M+", label: "online exams held" },
-      { value: "3x", label: "revenue growth" },
+      { value: "3x", label: "product revenue growth, 2022 to 2026" },
     ],
     imageCaptions: [
       "ExtendedForms product dashboard.",
@@ -280,8 +280,8 @@ const vocalxi: PortfolioProject = {
   featured: true,
   oneLiner: "A voice-first way to answer forms through a guided conversation.",
   role: "Product engineer · design, voice AI, backend and deployment",
-  status: "In active development · Google Forms connector in staging",
-  tech: ["TypeScript", "Next.js", "Voice AI", "Form workflows"],
+  status: "Early access · browser voice live · Google Forms connector in staging",
+  tech: ["TypeScript", "Next.js", "FastAPI", "PostgreSQL", "Deepgram", "Claude"],
   metrics: [],
   problem:
     "Forms can be time-consuming to read and complete, especially when a conversation would feel more natural.",
@@ -294,15 +294,15 @@ const vocalxi: PortfolioProject = {
   ],
   outcomes: [
     "A working browser voice agent that asks form questions and captures spoken answers in English and Hindi.",
-    "Phone calling in pilot: the first real call asked a Google Form's questions and wrote the answers back to the form.",
+    "Phone calling is in development; an early test call asked a Google Form's questions and wrote the answers back to the form.",
     "Product design, application engineering and voice AI in one end-to-end build.",
   ],
   narrative: [
     "VocalXI explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
     "Browser voice conversations work end to end today; the Google Forms connector is in staging and telephone calling is next.",
   ],
-  images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
-  imageCaptions: ["Public product website.", "Answer review preview."],
+  images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg", "/images/vocalxi-dashboard_1.webp", "/images/vocalxi-dashboard_2.webp"],
+  imageCaptions: ["Public product website.", "Answer review before submitting.", "Owner workspace: voice agents and starter templates.", "Google Forms connection flow (connector in staging)."],
 };
 
 export const portfolioProjects: PortfolioProject[] = [
