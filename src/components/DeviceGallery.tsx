@@ -24,7 +24,7 @@ import {
 import { ArrowDown, ArrowUpRight, Maximize2 } from "lucide-react";
 import { DEVICE_TIMELINE, PROJECT_STOPS, PROJECT_BREAKS } from "@/lib/device-choreography";
 import DevicePreview from "@/components/DevicePreview";
-import { scheduleDevicePreparation } from "@/lib/device-preparation";
+import { afterHeroSettled } from "@/lib/hero-settled";
 import ProductScenery from "@/components/ProductScenery";
 import WorkArchive from "@/components/WorkArchive";
 import { ScreenshotViewer } from "@/components/ProjectGallery";
@@ -175,11 +175,13 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
   const loseModel = useCallback(() => setModelFailed(true), []);
   useEffect(() => {
     let mounted = true;
-    const cancel = scheduleDevicePreparation(() => {
+    // Mount after the hero plane settles; the phone scene follows the laptop
+    // so two scenes never compile and upload at the same moment.
+    const cancel = afterHeroSettled(() => {
       void import("@/components/three/DeviceScene").then(() => {
         if (mounted) startTransition(() => setPrepared(true));
       }).catch(() => { if (mounted) loseModel(); });
-    }, mobile ? 220 : 0);
+    }, mobile ? 2600 : 900);
     return () => { mounted = false; cancel(); };
   }, [mobile, loseModel]);
   const animated = useSyncExternalStore(subscribe, snapshot, serverSnapshot);

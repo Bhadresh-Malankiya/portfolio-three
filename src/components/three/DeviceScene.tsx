@@ -15,7 +15,6 @@ import {
   Shape,
   ShapeGeometry,
   ExtrudeGeometry,
-  TextureLoader,
   Texture,
   ShaderMaterial,
   PlaneGeometry,
@@ -28,6 +27,44 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { useReducedMotion, type MotionValue } from "framer-motion";
 import { devicePose } from "@/lib/device-choreography";
 import { fitDeviceCamera, DEVICE_DIMENSIONS } from "@/lib/device-framing";
+
+type ScreenTexture = Texture<ImageBitmap | HTMLImageElement>;
+// Screens never render wider than this, so larger screenshots are scaled down
+// off the main thread before the GPU upload.
+const MAX_SCREEN_TEXTURE = 2048;
+
+async function decodeScreen(source: string): Promise<ScreenTexture> {
+  if (typeof createImageBitmap !== "function") {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = source;
+    await image.decode();
+    return new Texture(image);
+  }
+  const blob = await (await fetch(source)).blob();
+  const probe = await createImageBitmap(blob);
+  const scale = Math.min(1, MAX_SCREEN_TEXTURE / Math.max(probe.width, probe.height));
+  const resizeWidth = Math.max(1, Math.round(probe.width * scale));
+  const resizeHeight = Math.max(1, Math.round(probe.height * scale));
+  probe.close();
+  // Decoding, scaling and the vertical flip all happen off the main thread.
+  const bitmap = await createImageBitmap(blob, { imageOrientation: "flipY", resizeWidth, resizeHeight, resizeQuality: "high" });
+  const texture = new Texture(bitmap);
+  texture.flipY = false;
+  return texture;
+}
+
+function releaseScreen(texture: ScreenTexture) {
+  texture.dispose();
+  if (typeof ImageBitmap !== "undefined" && texture.image instanceof ImageBitmap) texture.image.close();
+}
+
+function idle(): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(() => resolve(), { timeout: 600 });
+    else window.setTimeout(resolve, 60);
+  });
+}
 
 type Props = {
   kind: "laptop" | "phone";
@@ -146,9 +183,8 @@ function PhoneShell({
 }
 
 function createScreenResources(gl: WebGLRenderer, width: number, height: number) {
-  const cache = new Map<string, Promise<Texture<HTMLImageElement>>>();
-  const loaded = new Set<Texture<HTMLImageElement>>();
-  const loader = new TextureLoader();
+  const cache = new Map<string, Promise<ScreenTexture>>();
+  const loaded = new Set<ScreenTexture>();
   let disposed = false;
   const placeholder = new CanvasTexture(Object.assign(document.createElement("canvas"), { width: 1, height: 1 }));
   const shader = new ShaderMaterial({
@@ -195,10 +231,10 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
   function load(source: string) {
     const cached = cache.get(source);
     if (cached) return cached;
-    const request = new Promise<Texture<HTMLImageElement>>((resolve, reject) => {
-      const prepare = (texture: Texture<HTMLImageElement>) => {
+    const request = new Promise<ScreenTexture>((resolve, reject) => {
+      const prepare = (texture: ScreenTexture) => {
         if (disposed) {
-          texture.dispose();
+          releaseScreen(texture);
           reject(new Error("Screen disposed"));
           return;
         }
@@ -212,8 +248,7 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
         loaded.add(texture);
         resolve(texture);
       };
-      // Preserve the native screenshot pixels; WebGL caps oversized sources to the GPU limit.
-      loader.load(source, prepare, undefined, reject);
+      decodeScreen(source).then(prepare, reject);
     });
     cache.set(source, request);
     // A failed background request must remain retryable when selected later.
@@ -224,7 +259,7 @@ function createScreenResources(gl: WebGLRenderer, width: number, height: number)
   }
   return { shader, load, activate: () => { disposed = false; }, dispose: () => {
     disposed = true;
-    loaded.forEach((texture) => texture.dispose());
+    loaded.forEach(releaseScreen);
     placeholder.dispose();
     shader.dispose();
   } };
@@ -252,7 +287,7 @@ function Screen({
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const transition = useRef({
-    elapsed: 1, pending: null as Texture<HTMLImageElement> | null, ready: false, readyFrame: 0,
+    elapsed: 1, pending: null as ScreenTexture | null, ready: false, readyFrame: 0,
   });
   const resources = useMemo(() => createScreenResources(gl, width, height), [gl, width, height]);
   const material = useRef<ShaderMaterial>(null);
@@ -288,18 +323,16 @@ function Screen({
     return () => { current = false; };
   }, [src, resources, invalidate, onReady, onUnavailable]);
   useEffect(() => {
-    // Native screenshots can be large. Two workers warm the library without
-    // a burst of image decoding and GPU uploads competing with the hero.
+    // Warm the remaining screens one at a time, only when the browser is idle,
+    // so decoding and GPU uploads never stack up into a visible stall.
     let mounted = true;
-    let index = 0;
-    async function warmScreens() {
-      while (mounted && index < images.length) {
-        const source = images[index++];
+    void (async () => {
+      for (const source of images) {
+        await idle();
+        if (!mounted) return;
         await resources.load(source).catch(() => undefined);
       }
-    }
-    void warmScreens();
-    void warmScreens();
+    })();
     return () => { mounted = false; };
   }, [images, resources]);
   useFrame((_, delta) => {
@@ -579,7 +612,7 @@ const StudioLighting = memo(function StudioLighting() {
       <ambientLight intensity={0.45} />
       <directionalLight position={[-3, 6, 4]} intensity={2.2} color="#f4f5fa" />
       <directionalLight position={[4, 1, -3]} intensity={2} color="#d0d8e2" />
-      <Environment resolution={512} frames={1}>
+      <Environment resolution={256} frames={1}>
         <Lightformer
           form="rect"
           intensity={1.2}

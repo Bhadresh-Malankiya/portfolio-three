@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { afterHeroSettled } from "@/lib/hero-settled";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,6 +32,9 @@ function Companion({ pathname }: { pathname: string }) {
   const [unavailable, setUnavailable] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const [compactContact, setCompactContact] = useState(false);
+  // The 3D avatar mounts once the hero plane has settled; the photo shows until then.
+  const [avatarAllowed, setAvatarAllowed] = useState(false);
+  useEffect(() => afterHeroSettled(() => setAvatarAllowed(true)), []);
   const dock = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const currentSide = useRef<"left" | "right">("right");
@@ -170,7 +174,7 @@ function Companion({ pathname }: { pathname: string }) {
       onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 650); }}>
       <span className="companion-model" aria-hidden="true">
         {(!avatarReady || unavailable) && <span className="companion-fallback"><Image src="/images/profile.png" alt="" width={96} height={96} /><span>hi.</span></span>}
-        {!unavailable && !compactContact && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
+        {!unavailable && !compactContact && avatarAllowed && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
       </span>
       <span className="companion-plinth" aria-hidden="true" /><span className="companion-footsteps" aria-hidden="true"><i /><i /><i /></span>
     </button>

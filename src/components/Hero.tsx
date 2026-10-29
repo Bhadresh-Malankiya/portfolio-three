@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
 import { scrollToPosition } from "@/components/SmoothScroll";
+import { markHeroReady } from "@/lib/hero-settled";
 import { flightStops as stops, flightScrollStops as scrollStops, flightTimelineProgress as timelineProgress, flightChapterAt as chapterAt } from "@/lib/hero-flight";
 import "@/app/hero-story.css";
 
@@ -70,8 +71,8 @@ export default function Hero() {
     // Hydration and breakpoint changes establish a pose, not a new flight.
     springProgress.jump(initial);
   }, [pinned, rawProgress, springProgress]);
-  const onReady = useCallback(() => setReady(true), []);
-  const onUnavailable = useCallback(() => setFailed(true), []);
+  const onReady = useCallback(() => { setReady(true); markHeroReady(); }, []);
+  const onUnavailable = useCallback(() => { setFailed(true); markHeroReady(); }, []);
   function selectAct(index: number) {
     if (pinned && story.current) {
       const top = story.current.getBoundingClientRect().top + window.scrollY;
