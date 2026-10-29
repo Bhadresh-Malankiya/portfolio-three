@@ -110,19 +110,3 @@ export function RealtimeFlowDiagram() {
     </Frame>
   );
 }
-
-export function OpportunityAgentsDiagram() {
-  const W = 160, H = 76, rowA = 24, rowB = 144;
-  return (
-    <Frame id="opp" label="Opportunity agents: eleven scheduled agents, one job each, every hour" height={244}>
-      <Arrows id="opp" paths={["M184 62H206", "M368 62H390", "M552 62H574", "M656 100V142", "M576 182H554", "M392 182H370"]} />
-      <Box x={24} y={rowA} w={W} h={H} name="1 Scheduler" lines={["hourly batches", "11 agent tasks"]} />
-      <Box x={208} y={rowA} w={W} h={H} name="2 Find leads" lines={["roles and client work", "across many markets"]} />
-      <Box x={392} y={rowA} w={W} h={H} name="3 Verify" lines={["real company and city", "role requirements fit"]} accent />
-      <Box x={576} y={rowA} w={W} h={H} name="4 Filter and score" lines={["skills and role fit", "best leads kept"]} />
-      <Box x={576} y={rowB} w={W} h={H} name="5 Track" lines={["sheet with proof", "status and history"]} />
-      <Box x={392} y={rowB} w={W} h={H} name="6 Apply or queue" lines={["apply when possible", "else manual review"]} />
-      <Box x={208} y={rowB} w={W} h={H} name="7 Follow up" lines={["Gmail follow-ups", "calls on Calendar"]} />
-    </Frame>
-  );
-}

@@ -73,7 +73,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Bhadresh Malankiya | Senior Full Stack Engineer & Tech Lead",
     description:
-      "Senior Full Stack Engineer and Tech Lead with 8+ years in Node.js, React and TypeScript. Led ExtendedForms.io (400K+ users) and built Quzo.ai. Available now.",
+      "Senior Full Stack Engineer and Tech Lead with 8+ years in Node.js, React and TypeScript. Led ExtendedForms.io (400K+ users) and built Quzo.ai.",
     type: "website",
     url: siteUrl,
     siteName: "Bhadresh Malankiya",

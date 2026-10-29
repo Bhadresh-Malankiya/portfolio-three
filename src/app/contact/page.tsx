@@ -7,7 +7,7 @@ import "./contact.css";
 
 export const metadata: Metadata = {
   title: "Contact Bhadresh",
-  description: "Hiring a Senior Full Stack Engineer or Tech Lead? Send Bhadresh Malankiya a message. Available immediately.",
+  description: "Hiring a Senior Full Stack Engineer or Tech Lead? Send Bhadresh Malankiya a message.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact Bhadresh Malankiya",
@@ -22,13 +22,13 @@ export default function ContactPage() {
     <section className="contact-page" aria-labelledby="contact-heading">
       <div className="contact-page-topline">
         <Link href="/"><ArrowLeft size={15} aria-hidden="true" /> Back to the portfolio</Link>
-        <span>Available now</span>
+        <span>Surat, India</span>
       </div>
       <div className="contact-page-layout">
         <header className="contact-page-intro">
           <p className="contact-kicker"><span aria-hidden="true">↗</span> Open to new roles</p>
           <h1 id="contact-heading">Let’s talk<br />about the <em>role.</em></h1>
-          <p className="contact-page-description">Senior Full Stack Engineer and Technical Lead.<br />Node.js, React, TypeScript and LLM features.<br />Available immediately.</p>
+          <p className="contact-page-description">Senior Full Stack Engineer and Technical Lead.<br />Node.js, React, TypeScript and LLM features.</p>
           <div className="contact-recipient">
             <span className="contact-recipient-mark" aria-hidden="true">BM<span>↗</span></span>
             <div><span className="contact-small-label">Your note goes to</span><p>{profile.shortName} Malankiya</p><span>Senior Full Stack · Tech Lead · Applied AI</span></div>

@@ -9,7 +9,7 @@ import { deliveryExpertise } from "@/data/skills";
 import "@/app/human-story.css";
 
 const journey = [
-  { year: "Now", title: "Open to the next role", role: "Senior Full Stack Engineer · Technical Lead", detail: "Available immediately. Looking for a product team where I can own outcomes, lead engineers and ship AI features that matter." },
+  { year: "Now", title: "Open to the next role", role: "Senior Full Stack Engineer · Technical Lead", detail: "Looking for a product team where I can own outcomes, lead engineers and ship AI features that matter." },
   { year: "2022–2026", title: "ExpressTech Systems", role: "Senior Software Engineer · Technical Lead", detail: "Led a team of five on ExtendedForms.io (400K+ users, 10M+ online exams, 3x revenue growth) and built Quzo.ai, an AI assessment platform, from first commit to launch. Owned performance, releases, the public API and enterprise escalations." },
   { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Grew from backend into full-stack delivery: 15+ web applications across edtech, logistics, fintech and e-commerce with React, Node.js and Laravel, including Stripe Connect payouts and APIs serving 50K+ daily requests. Completed my engineering degree alongside this full-time role." },
 ];
@@ -31,7 +31,7 @@ export default function LifePanel() {
   return (
     <section className="life-section page-shell field-journal" id="about" ref={section}>
       <div className="journal-inner">
-        <div className="journal-folio"><span>06 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
+        <div className="journal-folio"><span>06 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA</span></div>
         <header className="journal-heading">
           <h2>The code is only<br /><em>half the story.</em></h2>
           <div className="journal-intro"><span className="journal-asterisk" aria-hidden="true">✳</span><p>I’m Bhadresh. A senior engineer who leads teams, talks to customers and owns what ships to production.</p><span className="journal-role">SENIOR FULL STACK ENGINEER · TECH LEAD</span></div>

@@ -11,7 +11,7 @@ export default function Footer() {
             Bhadresh<span className="text-gold">.</span>
           </Link>
           <p className="mt-2 text-xs text-muted">
-            {"// Senior Full Stack Engineer \u00b7 Technical Lead \u00b7 Available now"}
+            {"// Senior Full Stack Engineer \u00b7 Technical Lead"}
           </p>
         </div>
         <nav

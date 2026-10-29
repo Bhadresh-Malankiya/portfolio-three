@@ -397,8 +397,8 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "co-founder-agents",
-    name: "Co-founder agents",
+    slug: "project-lifecycle-agents",
+    name: "Project lifecycle agents",
     category: "AI agents",
     kind: "Personal build",
     experiment: true,
@@ -413,52 +413,6 @@ export const projects: Project[] = [
     ],
     role: "Design and build: agents, tools, memory and approval flow",
     status: "R&D · multi-agent experiments",
-  },
-  {
-    slug: "opportunity-agents",
-    name: "Opportunity agents",
-    category: "AI automation",
-    kind: "Personal build",
-    experiment: true,
-    oneLiner:
-      "Eleven scheduled agents in hourly batches that find roles and client work, verify, score, track and follow up.",
-    motif: "map",
-    featured: false,
-    tech: ["Scheduled AI agents", "Next.js", "PostgreSQL", "Google Sheets", "Gmail"],
-    metrics: [],
-    narrative: [
-      "An agent pipeline that turns opportunity hunting into a tracked, repeatable process.",
-    ],
-    role: "Design and build: agent roles, schedules, tracking and follow-up",
-    status: "Ran hourly · 3,000+ emails, 600+ conversations",
-    images: [
-      "/images/opportunity-agents_1.webp",
-      "/images/opportunity-agents_2.webp",
-      "/images/opportunity-agents_3.webp",
-    ],
-  },
-  {
-    slug: "screen-to-answer",
-    name: "Screen-to-Answer Assistant",
-    category: "Applied AI",
-    kind: "Personal build",
-    experiment: true,
-    oneLiner:
-      "Reads a question from a live camera or shared screen, waits until the text holds steady, then streams an AI answer to any device.",
-    motif: "proctor",
-    featured: false,
-    tech: ["Next.js", "TypeScript", "Tesseract.js", "Claude", "OpenAI", "Pusher"],
-    metrics: [],
-    narrative: [
-      "A proof of concept for live OCR feeding a streamed LLM answer, shared across devices.",
-    ],
-    role: "Solo build: capture pipeline, OCR, streaming and live sharing",
-    status: "Proof of concept",
-    images: [
-      "/images/screen-to-answer_1.webp",
-      "/images/screen-to-answer_2.webp",
-      "/images/screen-to-answer_3.webp",
-    ],
   },
   {
     slug: "collahead",

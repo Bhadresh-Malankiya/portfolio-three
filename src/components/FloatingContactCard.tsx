@@ -186,7 +186,7 @@ function Companion({ pathname }: { pathname: string }) {
         <header className="companion-id-top"><span>BHADRESH MALANKIYA</span><button type="button" onClick={() => closeCard(true)} aria-label="Close profile card"><X size={16} /></button></header>
         <div className="companion-id-person">
           <div className="companion-id-photo"><Image src="/images/profile.png" alt="Bhadresh Malankiya" width={156} height={188} sizes="78px" /></div>
-          <div><span className="companion-id-number">AVAILABLE NOW</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Senior Full Stack<br />Engineer · Tech Lead</p></div>
+          <div><span className="companion-id-number">FULL STACK · TECH LEAD</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Senior Full Stack<br />Engineer · Tech Lead</p></div>
         </div>
         <p className="companion-id-intro">The human behind the little guide.</p>
         <div className="companion-id-facts"><span>Full stack · Applied AI</span><span>Surat, India ↗</span></div>

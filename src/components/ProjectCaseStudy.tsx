@@ -7,7 +7,7 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import ProjectGallery from "@/components/ProjectGallery";
 import QuzoArchitecture from "@/components/QuzoArchitecture";
-import { OpportunityAgentsDiagram, RealtimeFlowDiagram } from "@/components/Diagrams";
+import { RealtimeFlowDiagram } from "@/components/Diagrams";
 import "@/app/home-sections.css";
 import Reveal from "@/components/Reveal";
 import type { PortfolioProject } from "@/data/portfolio";
@@ -71,7 +71,6 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
 
       {project.slug === "quzo-ai" && <QuzoArchitecture />}
       {project.slug === "compassrt" && <section className="case-diagram" aria-label="CompassRT data flow"><div className="case-container"><div className="diagram-card"><p className="diagram-kicker">How the data flows</p><p className="diagram-title">One market feed in, one update per symbol per second out</p><RealtimeFlowDiagram /></div></div></section>}
-      {project.slug === "opportunity-agents" && <section className="case-diagram" aria-label="Opportunity agents workflow"><div className="case-container"><div className="diagram-card"><p className="diagram-kicker">The workflow</p><p className="diagram-title">Eleven scheduled agents, one job each, every hour</p><OpportunityAgentsDiagram /><p className="diagram-note">The sketch it started from:</p><div className="case-sketch"><Image src="/images/opportunity-agents-sketch.webp" alt="Hand-drawn sketch of the seven-step opportunity workflow" width={1100} height={1374} sizes="(max-width: 1100px) 100vw, 1100px" /></div></div></div></section>}
 
       <section className="case-story case-container" aria-labelledby="story-heading">
         <aside className="case-margin"><span className="case-label">02 / The build notes</span><h2 id="story-heading">{world.chapter}</h2><div className="case-role"><span>My role</span><p>{project.role}</p><span>Project status</span><p>{project.status}</p></div></aside>

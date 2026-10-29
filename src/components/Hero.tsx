@@ -107,7 +107,7 @@ export default function Hero() {
       <header className="flight-heading">
         <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span aria-hidden="true">/</span> Senior Full Stack Engineer · Technical Lead</motion.p>
         <h1><span>I build products</span><em>that ship<span className="flight-fullstop">.</span></em></h1>
-        <p className="flight-proof">Node.js · React · TypeScript · LLM features<span aria-hidden="true">/</span>400K+ users on ExtendedForms<span aria-hidden="true">/</span>Available now</p>
+        <p className="flight-proof">Node.js · React · TypeScript · LLM features<span aria-hidden="true">/</span>400K+ users on ExtendedForms</p>
       </header>
       <div className="flight-stage" role="img" aria-label={`A paper plane becoming an aircraft: ${acts[act].label.toLowerCase()}`}>
         <motion.div className="flight-stage-grid" aria-hidden="true" style={{ opacity: reduced ? .2 : gridOpacity }} />

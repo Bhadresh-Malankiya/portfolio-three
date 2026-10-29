@@ -30,15 +30,15 @@ const patterns = [
     icon: Shuffle,
     title: "Multi-model routing",
     body: "OpenAI, Claude and Gemini sit behind one adapter layer. Tasks go to the model that fits on quality and cost; Quzo picked GPT-4o mini for text generation after a side-by-side comparison.",
-    proof: "Quzo.ai, Screen-to-Answer Assistant",
+    proof: "Quzo.ai",
     href: "/projects/quzo-ai",
   },
   {
     icon: Network,
     title: "Multi-agent systems",
-    body: "Each agent gets one job. The Co-founder agents run on Mastra with memory, schedules and approval gates for file and shell actions; the Opportunity agents split discovery, verification, scoring and follow-up across 11 scheduled agents.",
-    proof: "Co-founder agents, Opportunity agents",
-    href: "/projects/opportunity-agents",
+    body: "Each agent gets one job: research, planning or execution. Built on Mastra with shared memory, persistent schedules, and approval gates before any file change or shell command.",
+    proof: "Project lifecycle agents",
+    href: "/projects/project-lifecycle-agents",
   },
 ];
 

@@ -47,7 +47,7 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
     narrative: [],
   },
-  "co-founder-agents": {
+  "project-lifecycle-agents": {
     problem: "Running product work and client projects at the same time means research, planning, task tracking and follow-ups that never stop.",
     contribution: "I built a multi-agent system on Mastra's TypeScript SDK to manage the project lifecycle, and used it to test how far specialised agents can carry real work.",
     decisions: [
@@ -61,52 +61,6 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Hands-on findings on where multi-agent setups help and where one well-scoped agent is enough.",
     ],
     narrative: ["An R&D build for agentic workflows across product and client work."],
-  },
-  "opportunity-agents": {
-    imageCaptions: [
-      "Agent OS, the local desk I built next: batches, leads, drafts and the agent status bar.",
-      "Agent roles (Scout, Preparer, Analyst, Resolver, Coordinator) with a live audit timeline.",
-      "Leads view, shown here with the app's built-in synthetic sample data.",
-    ],
-    problem: "Finding the right roles and client work means checking hundreds of listings, companies and requirements by hand, every day.",
-    contribution: "I designed eleven scheduled agents that run in hourly batches, each owning one step, with a shared sheet as the single source of truth and proof log.",
-    decisions: [
-      "One agent per step: discover, verify, score, track, apply or queue, and follow up.",
-      "Verify that a company and its location are real, and that the role's requirements fit, before a lead is kept.",
-      "Keep every lead, status and proof in one sheet so nothing is lost between runs.",
-      "Apply automatically only where possible; everything else is queued with notes for manual review.",
-    ],
-    outcomes: [
-      "A repeatable pipeline that ran every hour and logged leads and outreach in a tracker.",
-      "A local dashboard version with a durable PostgreSQL queue and approval-bound email actions, published as Agent OS on GitHub.",
-    ],
-    narrative: ["Built for my own search, designed so anyone can point it at their own profile and market."],
-    metrics: [
-      { value: "3,000+", label: "outreach emails sent" },
-      { value: "600+", label: "conversations started" },
-      { value: "800+", label: "leads queued for manual review" },
-    ],
-  },
-  "screen-to-answer": {
-    imageCaptions: [
-      "Start a session from a live camera or a shared screen.",
-      "Settings: local or cloud OCR, and fast, balanced or max-accuracy answer models.",
-      "Share to another device: scan the QR code and follow the answer live.",
-    ],
-    problem: "Questions often sit on a screen or a page, not in a text box. Copying them out breaks the flow.",
-    contribution: "I built the full pipeline: capture, OCR, a stability check, a streamed model answer, and live sharing to a second device.",
-    decisions: [
-      "Capture from a live camera or a shared screen, each with its own layout.",
-      "Confirm a question only after 3 consecutive OCR readings agree, so scrolling or typing never triggers a request.",
-      "Run Tesseract in the browser by default, with Google Cloud Vision as an optional high-accuracy engine.",
-      "Stream the answer from Claude or OpenAI, with fast, balanced and max-accuracy presets.",
-      "Share a session to another device by scanning a QR code; that device follows the question and answer live over Pusher.",
-    ],
-    outcomes: [
-      "A working proof of concept across camera and screen capture, with live answers on a second device.",
-      "Next.js, TypeScript, Tesseract.js, Cloud Vision, Anthropic and OpenAI SDKs, and Pusher Channels.",
-    ],
-    narrative: ["A proof of concept, built to test live OCR and streamed answers end to end."],
   },
   collahead: {
     frame: "phone",

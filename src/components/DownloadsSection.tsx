@@ -9,7 +9,6 @@ const facts = [
   ["Experience", "8+ years · team of 5 led"],
   ["Core stack", "Node.js · React · Next.js · TypeScript · PostgreSQL"],
   ["AI", "OpenAI · Claude · Gemini · RAG with pgvector"],
-  ["Availability", "Immediate"],
 ];
 
 export default function DownloadsSection() {
