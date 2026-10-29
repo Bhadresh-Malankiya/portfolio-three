@@ -1,6 +1,21 @@
 // Auto-generated real pixel dimensions for every project screenshot —
 // lets the gallery size each frame to its own photo instead of a fixed box.
 export const imageDimensions: Record<string, { w: number; h: number }> = {
+  "/images/vocalxi-dashboard_1.webp": { w: 1440, h: 900 },
+  "/images/vocalxi-dashboard_2.webp": { w: 1440, h: 900 },
+  "/images/jewelxi-admin_1.webp": { w: 1440, h: 900 },
+  "/images/jewelxi-admin_2.webp": { w: 1440, h: 900 },
+  "/images/jewelxi-admin_3.webp": { w: 1440, h: 900 },
+  "/images/jewelxi-admin_4.webp": { w: 1440, h: 900 },
+  "/images/opportunity-agents_1.webp": { w: 1440, h: 900 },
+  "/images/opportunity-agents_2.webp": { w: 1440, h: 900 },
+  "/images/opportunity-agents_3.webp": { w: 1440, h: 900 },
+  "/images/compassrt_1.webp": { w: 1440, h: 900 },
+  "/images/compassrt_2.webp": { w: 1440, h: 900 },
+  "/images/compassrt_3.webp": { w: 1440, h: 900 },
+  "/images/screen-to-answer_1.webp": { w: 1440, h: 900 },
+  "/images/screen-to-answer_2.webp": { w: 1440, h: 900 },
+  "/images/screen-to-answer_3.webp": { w: 1440, h: 900 },
   "/images/collahead_1.webp": { w: 420, h: 890 },
   "/images/collahead_2.webp": { w: 420, h: 890 },
   "/images/collahead_3.webp": { w: 420, h: 890 },

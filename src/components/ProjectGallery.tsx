@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
@@ -26,8 +26,14 @@ const captions: Record<string, string> = {
   "/images/quzo_response_report.png": "Response report",
   "/images/vocalxi-home.jpg": "Live website",
   "/images/vocalxi-review.jpg": "Answer review preview",
+  "/images/vocalxi-dashboard_1.webp": "Owner workspace: voice agents and starter templates",
+  "/images/vocalxi-dashboard_2.webp": "Google Forms connection flow",
   "/images/jewelxi-home.jpg": "Storefront",
   "/images/jewelxi-shop.jpg": "Jewellery catalog",
+  "/images/jewelxi-admin_1.webp": "Admin: collection manager",
+  "/images/jewelxi-admin_2.webp": "Admin: inventory with on-hand, reserved and available stock",
+  "/images/jewelxi-admin_3.webp": "Admin: store overview and next steps",
+  "/images/jewelxi-admin_4.webp": "Admin: storefront content and delivery pricing per currency",
 };
 const caption = (src: string, index: number) =>
   captions[src] ?? `Product view ${index + 1}`;
@@ -122,6 +128,7 @@ export function ScreenshotViewer({
             alt={`${name} — ${selectedCaption}`}
             width={dimensions.w}
             height={dimensions.h}
+            style={{ "--shot-w": `${dimensions.w}px` } as CSSProperties}
             unoptimized
           />
         </div>
@@ -199,6 +206,9 @@ export default function ProjectGallery({
     return <div className="gallery-empty">Project imagery coming soon</div>;
   const selectedCaption = imageCaptions?.[index] ?? caption(selected, index);
   const dimensions = imageDimensions[images[0]];
+  // The tallest screenshot sets the frame, so no image in the set is cropped or squeezed.
+  const ratios = images.map((src) => imageDimensions[src]).filter(Boolean).map((d) => d.w / d.h);
+  const shotRatio = ratios.length ? Math.min(...ratios) : undefined;
   const go = (step: number) =>
     setIndex((current) => (current + step + images.length) % images.length);
   return (
@@ -218,7 +228,7 @@ export default function ProjectGallery({
         className={`gallery-stage ${frame === "phone" ? "gallery-phone" : ""} ${mediaClassName ?? ""}`}
         style={
           !fill && frame !== "phone" && dimensions
-            ? { aspectRatio: `${dimensions.w} / ${dimensions.h}` }
+            ? ({ aspectRatio: `${dimensions.w} / ${dimensions.h}`, "--shot-ratio": shotRatio } as CSSProperties)
             : undefined
         }
       >

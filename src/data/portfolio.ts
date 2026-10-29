@@ -26,6 +26,11 @@ export type PortfolioProject = Project & {
 // responsibility from legal ownership and does not promote unverified statistics.
 const editorial: Record<string, Partial<PortfolioProject>> = {
   compassrt: {
+    imageCaptions: [
+      "Live watchlist: two AG Grid tables updating once a second, with green and red flashes on changed cells.",
+      "Symbol search over the lookup API, adding a stock to the watchlist and its Socket.IO room.",
+      "Sign-in screen. Screens captured from the original code running locally against a simulated price feed.",
+    ],
     problem: "Market feeds fire many trades a second. Repainting the screen for each one freezes the table and floods every browser with symbols it never asked for.",
     contribution: "I built the Node.js streaming backend and the React trading grid: one shared upstream socket, RxJS batching on both sides, and Socket.IO rooms so each client only receives the symbols on its watchlist.",
     decisions: [
@@ -58,6 +63,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     narrative: ["An R&D build for agentic workflows across product and client work."],
   },
   "opportunity-agents": {
+    imageCaptions: [
+      "Agent OS, the local desk I built next: batches, leads, drafts and the agent status bar.",
+      "Agent roles (Scout, Preparer, Analyst, Resolver, Coordinator) with a live audit timeline.",
+      "Leads view, shown here with the app's built-in synthetic sample data.",
+    ],
     problem: "Finding the right roles and client work abroad means checking hundreds of listings, companies and visa rules by hand, every day.",
     contribution: "I designed eleven scheduled agents that run in hourly batches, each owning one step, with a shared sheet as the single source of truth and proof log.",
     decisions: [
@@ -78,6 +88,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
   },
   "screen-to-answer": {
+    imageCaptions: [
+      "Start a session from a live camera or a shared screen.",
+      "Settings: local or cloud OCR, and fast, balanced or max-accuracy answer models.",
+      "Share to another device: scan the QR code and follow the answer live.",
+    ],
     problem: "Questions often sit on a screen or a page, not in a text box. Copying them out breaks the flow.",
     contribution: "I built the full pipeline: capture, OCR, a stability check, a streamed model answer, and live sharing to a second device.",
     decisions: [
@@ -120,10 +135,10 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
   "helpdesk-ai": { kind: "Personal build", narrative: ["HelpXI started as a side project to take repetitive support work off small teams. The core flows work; it is not a launched product."] },
   jewelxi: {
     problem: "A jewellery catalog needs to make the details easy to explore, from material and category to the individual piece.",
-    contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study.",
+    contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study, plus the admin atelier behind it.",
     decisions: ["Give the product photography room, and keep the browsing controls close.", "Connect the catalog with product details and a custom-design enquiry path.", "Use 3D for a closer look at the piece, alongside a conventional shopping interface."],
     narrative: ["Jewelxi is a public preview with an illustrative collection and test checkout."],
-    outcomes: ["A filterable jewellery catalog with search, material and category filters.", "A storefront, inspiration gallery and interactive product study."],
+    outcomes: ["A filterable jewellery catalog with search, material and category filters.", "A storefront, inspiration gallery and interactive product study.", "An admin atelier for the collection, inventory, orders, store settings and order processing."],
   },
   "hey-buddy": {
     frame: "phone",

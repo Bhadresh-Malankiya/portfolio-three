@@ -65,7 +65,7 @@ export const projects: Project[] = [
     ],
     role: "E-commerce development and interactive product presentation",
     status: "Public preview — test checkout",
-    images: ["/images/jewelxi-home.jpg", "/images/jewelxi-shop.jpg"],
+    images: ["/images/jewelxi-home.jpg", "/images/jewelxi-shop.jpg", "/images/jewelxi-admin_1.webp", "/images/jewelxi-admin_2.webp", "/images/jewelxi-admin_3.webp", "/images/jewelxi-admin_4.webp"],
   },
   {
     slug: "vocalxi",
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     ],
     role: "Product engineer: design, voice AI, backend and deployment",
     status: "In active development · Google Forms connector in staging",
-    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
+    images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg", "/images/vocalxi-dashboard_1.webp", "/images/vocalxi-dashboard_2.webp"],
   },
   {
     slug: "quzo-ai",
@@ -427,6 +427,11 @@ export const projects: Project[] = [
     ],
     role: "Full-stack engineering: Node.js streaming backend and React trading grid",
     status: "Delivered",
+    images: [
+      "/images/compassrt_1.webp",
+      "/images/compassrt_2.webp",
+      "/images/compassrt_3.webp",
+    ],
   },
   {
     slug: "co-founder-agents",
@@ -463,6 +468,11 @@ export const projects: Project[] = [
     ],
     role: "Design and build: agent roles, schedules, tracking and follow-up",
     status: "Ran hourly · 3,000+ emails, 600+ conversations",
+    images: [
+      "/images/opportunity-agents_1.webp",
+      "/images/opportunity-agents_2.webp",
+      "/images/opportunity-agents_3.webp",
+    ],
   },
   {
     slug: "screen-to-answer",
@@ -481,6 +491,11 @@ export const projects: Project[] = [
     ],
     role: "Solo build: capture pipeline, OCR, streaming and live sharing",
     status: "Proof of concept",
+    images: [
+      "/images/screen-to-answer_1.webp",
+      "/images/screen-to-answer_2.webp",
+      "/images/screen-to-answer_3.webp",
+    ],
   },
   {
     slug: "collahead",
