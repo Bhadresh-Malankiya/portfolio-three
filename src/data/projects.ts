@@ -462,7 +462,7 @@ export const projects: Project[] = [
       "An agent pipeline that turns opportunity hunting into a tracked, repeatable process.",
     ],
     role: "Design and build: agent roles, schedules, tracking and follow-up",
-    status: "Ran hourly · leads and outreach logged",
+    status: "Ran hourly · 3,000+ emails, 600+ conversations",
   },
   {
     slug: "screen-to-answer",

@@ -71,6 +71,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "A local dashboard version with a durable PostgreSQL queue and approval-bound email actions, published as Agent OS on GitHub.",
     ],
     narrative: ["Built for my own search, designed so anyone can point it at their own profile and market."],
+    metrics: [
+      { value: "3,000+", label: "outreach emails sent" },
+      { value: "600+", label: "conversations started" },
+      { value: "800+", label: "leads queued for manual review" },
+    ],
   },
   "screen-to-answer": {
     problem: "Questions often sit on a screen or a page, not in a text box. Copying them out breaks the flow.",
@@ -274,6 +279,7 @@ const vocalxi: PortfolioProject = {
   ],
   outcomes: [
     "A working browser voice agent that asks form questions and captures spoken answers in English and Hindi.",
+    "Phone calling in pilot: the first real call asked a Google Form's questions and wrote the answers back to the form.",
     "Product design, application engineering and voice AI in one end-to-end build.",
   ],
   narrative: [

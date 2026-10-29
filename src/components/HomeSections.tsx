@@ -42,27 +42,62 @@ const patterns = [
   },
 ];
 
-const research = [
+const challenges = [
   {
-    question: "Which speech model handles Hindi best?",
-    tested: "Ran the same Hindi audio, with English words mixed in, through a Hindi-specific model and a multilingual one.",
-    decision: "The Hindi model kept names and cities right; the multilingual one misheard one per sample. Shipped the Hindi model.",
+    title: "A load test took the server down",
+    context: "About 25K form requests hit a 16 GB Laravel server at once. Most timed out after 30 seconds.",
+    action: "Traced it to the PHP-FPM worker pool (pm.max_children) running out of workers, then retuned the pool and server capacity.",
+    result: "Root cause found and fixed; the forms feature recovered.",
+    proof: "ExtendedForms.io",
+    href: "/projects/extendedforms-io",
   },
   {
-    question: "Do agents need Redis and a job queue service?",
-    tested: "Compared Redis plus BullMQ against PostgreSQL row locking for claiming jobs.",
-    decision: "PostgreSQL alone: one less service to run, with safe concurrent workers, until the load proves otherwise.",
+    title: "Exam start brings everyone at once",
+    context: "Respondents taking exams and admins building them shared one app and one database, so traffic spikes slowed everyone.",
+    action: "Split it into two independently deployed apps with separate databases for configuration and responses, linked by short-lived JWT handoffs.",
+    result: "The exam app scales on its own; admin work stays fast during spikes.",
+    proof: "Quzo.ai · Medium write-up",
+    href: "https://medium.com/@bhadreshm3418/how-to-prevent-site-unavailable-errors-on-high-traffic-web-apps-without-breaking-the-bank-babbb5f8ec96",
   },
   {
-    question: "How do you confirm a UPI payment without holding funds?",
-    tested: "Studied two open-source UPI gateways and their verification methods.",
-    decision: "A QR code or reference number does not prove payment. A trusted bank or provider signal, idempotent webhooks and reconciliation are required.",
+    title: "An enterprise client doubted the platform could take their users",
+    context: "A large customer worried that their exam load would overwhelm the service.",
+    action: "Worked directly with them and introduced batched exam sessions and rate limits for their rollout.",
+    result: "The client's load problem was resolved without a platform rewrite.",
+    proof: "ExtendedForms.io",
+    href: "/projects/extendedforms-io",
   },
   {
-    question: "Where should a voice product run at launch?",
-    tested: "Compared four hosting setups on monthly cost, operations work and migration risk.",
-    decision: "Docker plus managed PostgreSQL now; AWS and Kubernetes only when measured load justifies them.",
+    title: "A busy page took 30 seconds to load",
+    context: "One high-traffic page took 30 to 35 seconds, and nobody had filed a ticket.",
+    action: "Added caching and TanStack Query, plus server rendering and Redis across busy paths.",
+    result: "That page dropped to 5 to 6 seconds; typical page load went from 3.2 s to 1.2 s.",
+    proof: "ExtendedForms.io",
+    href: "/projects/extendedforms-io",
   },
+  {
+    title: "A live market freezes the screen",
+    context: "Trades arrive faster than a table can repaint, and every browser was a candidate for every symbol.",
+    action: "Buffered trades each second with RxJS, kept the newest per symbol and sent it only to that symbol's Socket.IO room.",
+    result: "A smooth live grid that repaints only the rows that changed.",
+    proof: "CompassRT",
+    href: "/projects/compassrt",
+  },
+  {
+    title: "Hindi voice answers misheard names",
+    context: "Respondents mix English words into Hindi, and names and cities were coming back wrong.",
+    action: "Ran the same audio through a Hindi-specific and a multilingual speech model and compared the transcripts.",
+    result: "Shipped the Hindi model, which kept names and cities right in the tests.",
+    proof: "VocalXI",
+    href: "/projects/vocalxi",
+  },
+];
+
+const writing = [
+  { title: "How to prevent \u201cSite Unavailable\u201d errors on high-traffic web apps", where: "Medium · Jun 2025", href: "https://medium.com/@bhadreshm3418/how-to-prevent-site-unavailable-errors-on-high-traffic-web-apps-without-breaking-the-bank-babbb5f8ec96" },
+  { title: "Cost-effective and accurate AI prompts", where: "Medium · Mar 2025", href: "https://medium.com/@bhadreshm3418/cost-effective-and-accurate-ai-prompts-optimizing-for-efficiency-b1ce57880210" },
+  { title: "Case study: QR code sharing in ExtendedForms.io", where: "Medium · Feb 2025", href: "https://medium.com/@bhadreshm3418/case-study-enhancing-user-experience-with-qr-code-sharing-in-extendedforms-io-d75ede68ea00" },
+  { title: "Build notes: short explainers on React, TypeScript, debugging and AI agents", where: "LinkedIn · ongoing series", href: "https://www.linkedin.com/in/bhadresh-malankiya/recent-activity/all/" },
 ];
 
 export function AIEngineeringSection() {
@@ -118,25 +153,35 @@ export function SystemDesignSection() {
   );
 }
 
-export function ResearchSection() {
+export function ChallengesSection() {
   return (
-    <section id="research" className="page-shell home-block" aria-labelledby="research-heading">
+    <section id="challenges" className="page-shell home-block" aria-labelledby="challenges-heading">
       <div className="home-block-heading">
-        <p className="eyebrow">07 / Research and decisions</p>
-        <h2 id="research-heading">Test first,<br /><em>then decide.</em></h2>
-        <p className="home-block-intro">Good engineering choices come from evidence, not trends. Here is how I settled four real decisions.</p>
+        <p className="eyebrow">07 / Challenges I solved</p>
+        <h2 id="challenges-heading">Hard problems,<br /><em>solved in production.</em></h2>
+        <p className="home-block-intro">Outages, traffic spikes, slow pages and noisy data. Here is what broke, what I did, and what changed.</p>
       </div>
-      <div className="research-grid">
-        {research.map((item, i) => (
-          <Reveal key={item.question} y={16} delay={(i % 2) * 0.05} className="research-card">
+      <div className="research-grid challenge-grid">
+        {challenges.map((item, i) => (
+          <Reveal key={item.title} y={16} delay={(i % 2) * 0.05} className="research-card">
             <span className="research-index">{String(i + 1).padStart(2, "0")}</span>
-            <h3>{item.question}</h3>
+            <h3>{item.title}</h3>
             <dl>
-              <div><dt>Tested</dt><dd>{item.tested}</dd></div>
-              <div><dt>Decided</dt><dd>{item.decision}</dd></div>
+              <div><dt>The problem</dt><dd>{item.context}</dd></div>
+              <div><dt>What I did</dt><dd>{item.action}</dd></div>
+              <div><dt>Result</dt><dd>{item.result}</dd></div>
             </dl>
+            <a href={item.href} className="pattern-proof challenge-proof" {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{item.proof} <ArrowUpRight size={14} /></a>
           </Reveal>
         ))}
+      </div>
+      <div className="writing-strip">
+        <p className="diagram-kicker">Writing and build notes</p>
+        <ul>
+          {writing.map((item) => (
+            <li key={item.href}><a href={item.href} target="_blank" rel="noopener noreferrer"><span>{item.title}</span><small>{item.where}</small><ArrowUpRight size={16} /></a></li>
+          ))}
+        </ul>
       </div>
     </section>
   );
