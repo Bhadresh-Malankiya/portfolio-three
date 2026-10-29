@@ -2,11 +2,7 @@
 
 import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  Environment,
-  Lightformer,
-  RoundedBox,
-} from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import {
   CanvasTexture,
   Group,
@@ -83,6 +79,19 @@ const metal = {
   envMapIntensity: 1.15,
 };
 
+// Rounded bodies are built once and shared. three's RoundedBoxGeometry already
+// has smooth normals, which avoids the costly crease pass at every mount.
+const bodyGeometries = new Map<string, RoundedBoxGeometry>();
+function roundedBodyGeometry([width, height, depth]: [number, number, number], radius: number) {
+  const key = `${width}|${height}|${depth}|${radius}`;
+  let geometry = bodyGeometries.get(key);
+  if (!geometry) {
+    geometry = new RoundedBoxGeometry(width, height, depth, 5, radius);
+    bodyGeometries.set(key, geometry);
+  }
+  return geometry;
+}
+
 function Body({
   args,
   position,
@@ -96,16 +105,9 @@ function Body({
   color?: string;
   dark?: boolean;
 }) {
+  const geometry = useMemo(() => roundedBodyGeometry(args, radius), [args, radius]);
   return (
-    <RoundedBox
-      args={args}
-      position={position}
-      radius={radius}
-      smoothness={5}
-      bevelSegments={5}
-      castShadow
-      receiveShadow
-    >
+    <mesh geometry={geometry} position={position}>
       <meshPhysicalMaterial
         {...metal}
         color={color ?? (dark ? "#11151b" : metal.color)}
@@ -113,7 +115,7 @@ function Body({
         roughness={dark ? 0.68 : 0.36}
         clearcoat={dark ? 0.3 : 0.12}
       />
-    </RoundedBox>
+    </mesh>
   );
 }
 
@@ -735,14 +737,20 @@ export default function DeviceScene(props: Props) {
 
   return (
     <Canvas
-      frameloop={props.visible || !prepared ? "demand" : "never"}
+      // No frame before the async compile finishes; the first one would compile
+      // every shader synchronously. The 2D preview covers the scene meanwhile.
+      frameloop={prepared && props.visible ? "demand" : "never"}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       camera={{
         position: phone ? [0, 0.2, 6.4] : [0, 2.45, 5.8],
         fov: phone ? 35 : 12,
       }}
-      onCreated={({ camera }) => camera.lookAt(0, phone ? 0 : 0.35, 0)}
+      onCreated={({ camera, gl }) => {
+        camera.lookAt(0, phone ? 0 : 0.35, 0);
+        // Reading shader logs forces the driver to finish compiling synchronously.
+        gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production";
+      }}
     >
       <Suspense fallback={null}>
         <Scene {...props} onReady={completePreparation} />

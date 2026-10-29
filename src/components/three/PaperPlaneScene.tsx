@@ -519,7 +519,7 @@ export default function PaperPlaneScene(props: Props) {
     dpr={[1, 2]}
     frameloop={active && compiled ? (reducedMotion ? "demand" : "always") : "never"}
     gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-    onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); gl.outputColorSpace = SRGBColorSpace; gl.toneMappingExposure = 1; }}
+    onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); gl.outputColorSpace = SRGBColorSpace; gl.toneMappingExposure = 1; gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production"; }}
     style={{ width: "100%", height: "100%", pointerEvents: "none" }}
     aria-hidden="true"
   ><Flight {...props} onCompiled={onCompiled} /></Canvas></SceneBoundary>;

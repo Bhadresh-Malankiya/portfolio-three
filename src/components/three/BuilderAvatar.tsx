@@ -525,6 +525,7 @@ export default function BuilderAvatar({ mood, reducedMotion = false, active = tr
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         style={{ width: "100%", height: "100%", pointerEvents: "none" }}
         fallback={null}
+        onCreated={({ gl }) => { gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production"; }}
       >
         <hemisphereLight args={["#e4eeff", "#bc9b7c", 2.0]} />
         <directionalLight position={[-3, 5, 6]} color="#fff0db" intensity={3.4} />
