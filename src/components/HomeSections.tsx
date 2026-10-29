@@ -158,7 +158,7 @@ export function ChallengesSection() {
     <section id="challenges" className="page-shell home-block" aria-labelledby="challenges-heading">
       <div className="home-block-heading">
         <p className="eyebrow">07 / Challenges I solved</p>
-        <h2 id="challenges-heading">Hard problems,<br /><em>solved in production.</em></h2>
+        <h2 id="challenges-heading">Hard problems,<br /><em>solved on real systems.</em></h2>
         <p className="home-block-intro">Outages, traffic spikes, slow pages and noisy data. Here is what broke, what I did, and what changed.</p>
       </div>
       <div className="research-grid challenge-grid">
