@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { downloads } from "@/data/downloads";
 import { scrollToPosition } from "@/components/SmoothScroll";
+import { markHeroReady } from "@/lib/hero-settled";
 import { flightStops as stops, flightScrollStops as scrollStops, flightTimelineProgress as timelineProgress, flightChapterAt as chapterAt } from "@/lib/hero-flight";
 import "@/app/hero-story.css";
 
@@ -20,7 +21,7 @@ function subscribe(callback: () => void) {
 const pinnedSnapshot = () => window.matchMedia(pinnedQuery).matches;
 const serverSnapshot = () => false;
 const acts = [
-  { label: "Find the question", short: "Sketch it", title: "First, a question.", detail: "I find the problem worth solving.", word: "QUESTION" },
+  { label: "Find the question", short: "Sketch it", title: "First, the real problem.", detail: "Start with the customer and the constraint that matters.", word: "QUESTION" },
   { label: "Make the pieces work", short: "Make it work", title: "Then, something that works.", detail: "Frontend. Backend. AI. One working product.", word: "BUILD" },
   { label: "Put it in the world", short: "Ship it", title: "Finally, out in the world.", detail: "Ship, learn, improve. Then do it again.", word: "SHIP" },
 ];
@@ -70,8 +71,8 @@ export default function Hero() {
     // Hydration and breakpoint changes establish a pose, not a new flight.
     springProgress.jump(initial);
   }, [pinned, rawProgress, springProgress]);
-  const onReady = useCallback(() => setReady(true), []);
-  const onUnavailable = useCallback(() => setFailed(true), []);
+  const onReady = useCallback(() => { setReady(true); markHeroReady(); }, []);
+  const onUnavailable = useCallback(() => { setFailed(true); markHeroReady(); }, []);
   function selectAct(index: number) {
     if (pinned && story.current) {
       const top = story.current.getBoundingClientRect().top + window.scrollY;
@@ -104,8 +105,9 @@ export default function Hero() {
       </motion.div>
       <div className="flight-rule" aria-hidden="true"><span>BH / 01</span><i /><span>IDEA → REALITY</span></div>
       <header className="flight-heading">
-        <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span aria-hidden="true">/</span> Forward Deployed Engineer</motion.p>
-        <h1><span>Ideas don’t</span><em>ship themselves<span className="flight-fullstop">.</span></em></h1>
+        <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span aria-hidden="true">/</span> Senior Full Stack Engineer · Technical Lead</motion.p>
+        <h1><span>I build products</span><em>that ship<span className="flight-fullstop">.</span></em></h1>
+        <p className="flight-proof">Node.js · React · TypeScript · LLM features<span aria-hidden="true">/</span>400K+ users on ExtendedForms<span aria-hidden="true">/</span>Available now</p>
       </header>
       <div className="flight-stage" role="img" aria-label={`A paper plane becoming an aircraft: ${acts[act].label.toLowerCase()}`}>
         <motion.div className="flight-stage-grid" aria-hidden="true" style={{ opacity: reduced ? .2 : gridOpacity }} />
@@ -131,7 +133,7 @@ export default function Hero() {
           </div>
         </div>
         <Link href="#work" className="flight-work-link">See what I’ve built <ArrowDown size={17} /></Link>
-        <a className="flight-resume" href={downloads.resume.file} download={downloads.resume.filename}>Take the résumé <ArrowUpRight size={14} /></a>
+        <a className="flight-resume" href={downloads.resume.file} download={downloads.resume.filename}>Download résumé <ArrowUpRight size={14} /></a>
       </div>
       <div className="flight-chapters" role="group" aria-label="Explore the opening story">{acts.map((item,index) => <button key={item.label} type="button" onClick={() => selectAct(index)} aria-label={`${item.short} — ${item.label}`} aria-pressed={act === index}><span>0{index + 1}</span>{item.short}<i aria-hidden="true" /></button>)}<span className="flight-scroll-note">{pinned ? "SCROLL TO UNFOLD ↓" : "EXPLORE THE STORY ↗"}</span></div>
     </div>

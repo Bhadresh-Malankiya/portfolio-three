@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { afterHeroSettled } from "@/lib/hero-settled";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,6 +32,9 @@ function Companion({ pathname }: { pathname: string }) {
   const [unavailable, setUnavailable] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const [compactContact, setCompactContact] = useState(false);
+  // The 3D avatar mounts once the hero plane has settled; the photo shows until then.
+  const [avatarAllowed, setAvatarAllowed] = useState(false);
+  useEffect(() => afterHeroSettled(() => setAvatarAllowed(true)), []);
   const dock = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const currentSide = useRef<"left" | "right">("right");
@@ -170,7 +174,7 @@ function Companion({ pathname }: { pathname: string }) {
       onPointerEnter={(event) => { if (event.pointerType === "mouse") hoverTimer.current = setTimeout(() => setExpanded(true), 650); }}>
       <span className="companion-model" aria-hidden="true">
         {(!avatarReady || unavailable) && <span className="companion-fallback"><Image src="/images/profile.png" alt="" width={96} height={96} /><span>hi.</span></span>}
-        {!unavailable && !compactContact && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
+        {!unavailable && !compactContact && avatarAllowed && <BuilderAvatar mood={expanded ? "wave" : chapter.mood} travel={travel} interacting={expanded} reducedMotion={reduced} active={pageVisible} onReady={onAvatarReady} onUnavailable={onAvatarUnavailable} />}
       </span>
       <span className="companion-plinth" aria-hidden="true" /><span className="companion-footsteps" aria-hidden="true"><i /><i /><i /></span>
     </button>
@@ -179,10 +183,10 @@ function Companion({ pathname }: { pathname: string }) {
         initial={{ opacity: 0, y: reduced ? 0 : 12, rotate: reduced ? 0 : 2 }} animate={{ opacity: 1, y: 0, rotate: 0 }}
         exit={{ opacity: 0, y: reduced ? 0 : 8 }} transition={{ duration: reduced ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }} onPointerEnter={cancelClose}>
         <div className="companion-id-punch" aria-hidden="true" />
-        <header className="companion-id-top"><span>THE WEEKEND BUILDER</span><button type="button" onClick={() => closeCard(true)} aria-label="Close profile card"><X size={16} /></button></header>
+        <header className="companion-id-top"><span>BHADRESH MALANKIYA</span><button type="button" onClick={() => closeCard(true)} aria-label="Close profile card"><X size={16} /></button></header>
         <div className="companion-id-person">
           <div className="companion-id-photo"><Image src="/images/profile.png" alt="Bhadresh Malankiya" width={156} height={188} sizes="78px" /></div>
-          <div><span className="companion-id-number">BUILDER PASS / 001</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Forward Deployed<br />Engineer</p></div>
+          <div><span className="companion-id-number">AVAILABLE NOW</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Senior Full Stack<br />Engineer · Tech Lead</p></div>
         </div>
         <p className="companion-id-intro">The human behind the little guide.</p>
         <div className="companion-id-facts"><span>Full stack · Applied AI</span><span>Surat, India ↗</span></div>

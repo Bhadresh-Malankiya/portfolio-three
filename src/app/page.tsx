@@ -1,21 +1,23 @@
 import Hero from "@/components/Hero";
 import DeviceGallery from "@/components/DeviceGallery";
 import LifePanel from "@/components/LifePanel";
-import ClientReviews from "@/components/ClientReviews";
 import DownloadsSection from "@/components/DownloadsSection";
 import ContactCTA from "@/components/ContactCTA";
+import { AIEngineeringSection, ChallengesSection, SystemDesignSection } from "@/components/HomeSections";
 export default function Home() {
   return (
     <>
       <Hero />
       <DeviceGallery />
+      <AIEngineeringSection />
+      <SystemDesignSection />
       <LifePanel />
-      <ClientReviews />
+      <ChallengesSection />
       <section id="downloads" className="page-shell take-home exhibition-library">
         <div className="take-home-heading">
-          <p className="eyebrow">06 / Off the screen</p>
+          <p className="eyebrow">08 / For the hiring conversation</p>
           <h2>
-            A few pages<em> to take with you.</em>
+            One page.<em> Everything that matters.</em>
           </h2>
         </div>
         <DownloadsSection />

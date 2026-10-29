@@ -4,20 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowDownRight, ArrowUpRight, Plus } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Plus, LayoutDashboard, Server, Sparkles, Workflow, Rocket, Users } from "lucide-react";
 import { deliveryExpertise } from "@/data/skills";
 import "@/app/human-story.css";
 
 const journey = [
-  { year: "Now", title: "AscendXI / VocalXI", role: "Founder & product engineer", detail: "Building VocalXI solo — from customer conversations and voice AI to the interface, backend and deployment." },
-  { year: "2022–2026", title: "ExpressTech Systems", role: "Senior Software Engineer · technical leadership", detail: "Led engineering across ExtendedForms and created Quzo as an ExpressTech product. Employment ended September 2026. Author-reported product totals: 400K+ users and 10M+ online exams on ExtendedForms." },
-  { year: "2020–2022", title: "MB Systems", role: "Founder · side venture", detail: "Ran venture projects with 5–6 developers alongside HQ through a service and collaboration arrangement, from mid-2020 to mid-2022. Spent about a year winding down and helping people find their next jobs." },
-  { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Web applications, APIs and payment integrations with JavaScript, PHP and Laravel. Where I learned to follow a problem all the way to production." },
+  { year: "Now", title: "Open to the next role", role: "Senior Full Stack Engineer · Technical Lead", detail: "Available immediately. Looking for a product team where I can own outcomes, lead engineers and ship AI features that matter." },
+  { year: "2022–2026", title: "ExpressTech Systems", role: "Senior Software Engineer · Technical Lead", detail: "Led a team of five on ExtendedForms.io (400K+ users, 10M+ online exams, 3x revenue growth) and built Quzo.ai, an AI assessment platform, from first commit to launch. Owned performance, releases, the public API and enterprise escalations." },
+  { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Grew from backend into full-stack delivery: 15+ web applications across edtech, logistics, fintech and e-commerce with React, Node.js and Laravel, including Stripe Connect payouts and APIs serving 50K+ daily requests. Completed my engineering degree alongside this full-time role." },
 ];
+const capabilityIcons = [LayoutDashboard, Server, Sparkles, Workflow, Rocket, Users];
 const impact = [
-  { value: "400K+", label: "ExtendedForms users · author-reported", href: "/projects/extendedforms-io" },
-  { value: "10M+", label: "ExtendedForms exams · author-reported", href: "/projects/extendedforms-io" },
-  { value: "5–6", label: "Developers on MB Systems projects", href: "#experience" },
+  { value: "400K+", label: "ExtendedForms users", href: "/projects/extendedforms-io" },
+  { value: "10M+", label: "Online exams delivered", href: "/projects/extendedforms-io" },
+  { value: "5", label: "Engineers led at ExpressTech", href: "#experience" },
   { value: "8+", label: "Years building production software", href: "/projects" },
 ];
 
@@ -31,10 +31,10 @@ export default function LifePanel() {
   return (
     <section className="life-section page-shell field-journal" id="about" ref={section}>
       <div className="journal-inner">
-        <div className="journal-folio"><span>04 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
+        <div className="journal-folio"><span>06 / THE PERSON BEHIND THE BUILD</span><span>SURAT, INDIA ↗ WORKING EVERYWHERE</span></div>
         <header className="journal-heading">
           <h2>The code is only<br /><em>half the story.</em></h2>
-          <div className="journal-intro"><span className="journal-asterisk" aria-hidden="true">✳</span><p>I’m Bhadresh. An engineer who likes the customer conversation as much as the code that follows.</p><span className="journal-role">FORWARD DEPLOYED ENGINEER</span></div>
+          <div className="journal-intro"><span className="journal-asterisk" aria-hidden="true">✳</span><p>I’m Bhadresh. A senior engineer who leads teams, talks to customers and owns what ships to production.</p><span className="journal-role">SENIOR FULL STACK ENGINEER · TECH LEAD</span></div>
         </header>
         <div className="journal-spread">
           <div className="journal-portrait-column">
@@ -48,10 +48,10 @@ export default function LifePanel() {
               <span className="journal-portrait-number" aria-hidden="true">BM.</span>
               <motion.div className="journal-portrait-image" style={reduced ? undefined : { y: portraitY }}><Image src="/images/profile.png" alt="Bhadresh Malankiya" fill sizes="(min-width: 900px) 45vw, 90vw" /></motion.div>
               <div className="journal-portrait-note"><span>Builder by habit.</span><ArrowDownRight size={36} strokeWidth={1} /></div>
-              <figcaption><strong>Bhadresh Malankiya</strong><span>ENGINEER / TECHNICAL LEAD / FOUNDER</span></figcaption>
+              <figcaption><strong>Bhadresh Malankiya</strong><span>SENIOR ENGINEER / TECHNICAL LEAD</span></figcaption>
               <span className="journal-portrait-stamp" aria-hidden="true">IDEAS<br />INTO<br /><b>PRODUCTION.</b></span>
             </figure>
-            <div className="journal-founder-note"><span>NOTE TO SELF / 001</span><p>Own the problem.<br />Stay for the outcome.</p><small>MB Systems taught me the business side. Building VocalXI solo keeps me close to every product decision.</small><a href="https://vocalxi.com" target="_blank" rel="noopener noreferrer">See what I’m building <ArrowUpRight size={15} /></a></div>
+            <div className="journal-founder-note"><span>NOTE TO SELF / 001</span><p>Own the problem.<br />Stay for the outcome.</p><small>Four years leading ExtendedForms taught me that performance, releases and customer trust are one job.</small><Link href="/projects/extendedforms-io">Read the ExtendedForms story <ArrowUpRight size={15} /></Link></div>
           </div>
           <div className="journal-career" id="experience">
             <div className="journal-subheading"><span>THE LONG WAY ROUND</span><span>2018 → NOW</span></div><h3>A little more<br />ownership, every time.</h3>
@@ -61,13 +61,13 @@ export default function LifePanel() {
                 <AnimatePresence initial={false}>{role === index && <motion.div id={`career-detail-${index}`} initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}><p>{item.detail}</p></motion.div>}</AnimatePresence>
               </li>
             ))}</ol>
-            <Link className="journal-story-link" href="/journey">Read the longer story <ArrowUpRight size={18} /></Link>
+            <a className="journal-story-link" href="/downloads/bhadresh-malankiya-resume.pdf" download="Bhadresh-Malankiya-Resume.pdf">Download the résumé <ArrowUpRight size={18} /></a>
           </div>
         </div>
         <dl className="journal-impact" aria-label="Experience and product impact">{impact.map((item, index) => <div key={item.label}><dt><Link href={item.href}><span className="journal-metric-index" aria-hidden="true">0{index + 1} /</span><strong>{item.value}</strong><ArrowUpRight size={20} /></Link></dt><dd>{item.label}</dd></div>)}</dl>
         <div className="journal-toolbox" id="expertise">
           <div className="journal-toolbox-heading"><div><span className="journal-kicker">THE WORKING TOOLBOX</span><h3>From the interface<br />to the infrastructure.</h3></div><p>One product, many moving parts.<br />I connect them.</p></div>
-          <div className="journal-capabilities">{deliveryExpertise.map((item, index) => <motion.div key={item.code} className="journal-capability" initial={reduced ? false : { y: 20 }} whileInView={{ y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6, delay: index % 3 * 0.06 }}><span>{item.code}</span><h4>{item.title}</h4><p>{item.detail}</p><small>{item.tools}</small></motion.div>)}</div>
+          <div className="journal-capabilities">{deliveryExpertise.map((item, index) => <motion.div key={item.code} className="journal-capability" initial={reduced ? false : { y: 20 }} whileInView={{ y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6, delay: index % 3 * 0.06 }}>{(() => { const Icon = capabilityIcons[index]; return Icon ? <Icon className="journal-capability-icon" size={26} strokeWidth={1.4} aria-hidden="true" /> : null; })()}<span>{item.code}</span><h4>{item.title}</h4><p>{item.detail}</p><small>{item.tools}</small></motion.div>)}</div>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, useEffect, useLayoutEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { Component, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
@@ -31,6 +31,7 @@ type Props = {
   presented?: boolean;
   onReady?: () => void;
   onUnavailable?: () => void;
+  onCompiled?: () => void;
 };
 type Point = [number, number, number];
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
@@ -314,7 +315,7 @@ function fitCamera(camera: OrthographicCamera, width: number, height: number, ai
   camera.updateProjectionMatrix();
 }
 
-function Flight({ progress, reducedMotion = false, active = true, presented = false, onReady, onUnavailable }: Props) {
+function Flight({ progress, reducedMotion = false, active = true, presented = false, onReady, onUnavailable, onCompiled }: Props) {
   const group = useRef<Group>(null);
   const leftWing = useRef<Group>(null);
   const rightWing = useRef<Group>(null);
@@ -374,9 +375,12 @@ function Flight({ progress, reducedMotion = false, active = true, presented = fa
     const canvas = gl.domElement;
     const unavailable = (event: Event) => { event.preventDefault(); onUnavailable?.(); };
     canvas.addEventListener("webglcontextlost", unavailable);
-    gl.compile(scene, camera);
-    return () => canvas.removeEventListener("webglcontextlost", unavailable);
-  }, [camera, gl, scene, onUnavailable]);
+    // Compile shaders in parallel where the GPU driver allows it, and keep the
+    // render loop paused until then, so the plane never starts with a stall.
+    let mounted = true;
+    gl.compileAsync(scene, camera).catch(() => undefined).then(() => { if (mounted) onCompiled?.(); });
+    return () => { mounted = false; canvas.removeEventListener("webglcontextlost", unavailable); };
+  }, [camera, gl, scene, onUnavailable, onCompiled]);
   useEffect(() => {
     const syncVisibility = () => {
       const visible = active && document.visibilityState !== "hidden";
@@ -507,14 +511,16 @@ class SceneBoundary extends Component<{ children: ReactNode; onUnavailable?: () 
 
 export default function PaperPlaneScene(props: Props) {
   const { active = true, reducedMotion = false } = props;
+  const [compiled, setCompiled] = useState(false);
+  const onCompiled = useCallback(() => setCompiled(true), []);
   return <SceneBoundary onUnavailable={props.onUnavailable}><Canvas
     orthographic
     camera={{ position: [0, 2.9, 9], near: .1, far: 50, zoom: 70 }}
     dpr={[1, 2]}
-    frameloop={active ? (reducedMotion ? "demand" : "always") : "never"}
+    frameloop={active && compiled ? (reducedMotion ? "demand" : "always") : "never"}
     gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-    onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); gl.outputColorSpace = SRGBColorSpace; gl.toneMappingExposure = 1; }}
+    onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); gl.outputColorSpace = SRGBColorSpace; gl.toneMappingExposure = 1; gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production"; }}
     style={{ width: "100%", height: "100%", pointerEvents: "none" }}
     aria-hidden="true"
-  ><Flight {...props} /></Canvas></SceneBoundary>;
+  ><Flight {...props} onCompiled={onCompiled} /></Canvas></SceneBoundary>;
 }

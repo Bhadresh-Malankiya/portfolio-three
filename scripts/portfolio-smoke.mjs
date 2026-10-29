@@ -14,13 +14,11 @@ const routes = [
   "/projects/quzo-ai",
   "/projects/vocalxi",
   "/projects/hey-buddy",
-  "/journey",
   "/field-guide",
 ];
 const guideLabels = {
   "/": "The beginning",
   "/projects": "More to explore",
-  "/journey": "The longer story",
   "/field-guide": "For your journey",
 };
 
@@ -230,7 +228,7 @@ try {
   // Switching to the non-scroll layout must clear the desktop exit transform.
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
+    .getByRole("button", { name: "02 Hey Buddy", exact: true })
     .click();
   await page.waitForFunction(
     () =>
@@ -272,7 +270,7 @@ try {
   );
   await page.getByRole("link", { name: "Next: mobile", exact: true }).click();
   await page
-    .getByRole("button", { name: "02 Meet Hey Buddy", exact: true })
+    .getByRole("button", { name: "02 Hey Buddy", exact: true })
     .click();
   await page
     .getByRole("heading", { name: "One tag. A way to connect.", exact: true })
@@ -296,7 +294,7 @@ try {
   for (const file of [
     "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
     "/downloads/bhadreshkumar-malankiya-resume.pdf",
-    "/downloads/the-weekend-builder.pdf",
+    "/downloads/bhadresh-malankiya-resume.pdf",
   ]) {
     const download = await context.request.get(base + file);
     assert.equal(download.status(), 200, `${file} downloads`);

@@ -7,6 +7,8 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import ProjectGallery from "@/components/ProjectGallery";
 import QuzoArchitecture from "@/components/QuzoArchitecture";
+import { OpportunityAgentsDiagram, RealtimeFlowDiagram } from "@/components/Diagrams";
+import "@/app/home-sections.css";
 import Reveal from "@/components/Reveal";
 import type { PortfolioProject } from "@/data/portfolio";
 import { getProjectWorld, type ProjectWorld } from "@/data/project-themes";
@@ -54,7 +56,7 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
         <div className="case-container">
           <div className="case-topline"><Link href="/projects"><ArrowLeft size={15} /> All projects</Link><span>Field notes / {project.category}</span></div>
           <div className="case-cover-content">
-            <Reveal className="case-cover-copy"><p className="case-label">{project.kind}</p><h1>{project.name}</h1><p className="case-cover-line">{world.line}</p></Reveal>
+            <Reveal className="case-cover-copy"><p className="case-label">{project.experiment ? <span className="experiment-badge">Experiment · {project.status}</span> : project.kind}</p><h1>{project.name}</h1><p className="case-cover-line">{world.line}</p></Reveal>
             <motion.div className="case-cover-art" style={reduced ? undefined : { y: artworkY, rotate: artworkRotate }}><WorldDrawing motif={world.motif} /><span className="case-art-caption">A study in {project.category.toLowerCase()}</span></motion.div>
           </div>
           <Reveal className="case-cover-bottom"><p>{project.oneLiner}{project.slug === "quzo-ai" && <a href="#quzo-architecture" className="case-architecture-link">Explore the architecture <ArrowUpRight size={16} /></a>}</p><a href="#project-screens" className="case-round-link" aria-label={`Explore ${project.name}`}><ArrowDown size={23} /></a></Reveal>
@@ -62,12 +64,14 @@ export default function ProjectCaseStudy({ project, next }: { project: Portfolio
       </section>
 
       <section className="case-exhibit" id="project-screens" aria-labelledby="exhibit-heading">
-        <div className="case-exhibit-heading case-container"><div><span className="case-label">01 / In the product</span><h2 id="exhibit-heading">{project.images?.length ? "Take a closer look." : "The shape of the work."}</h2></div>{project.url && <a href={project.url} target="_blank" rel="noreferrer noopener" className="case-live-link">Visit the live site <ArrowUpRight size={17} /></a>}</div>
+        <div className="case-exhibit-heading case-container"><div><span className="case-label">01 / In the product</span><h2 id="exhibit-heading">{project.images?.length ? "Take a closer look." : "The shape of the work."}</h2></div>{project.url && <a href={project.url} target="_blank" rel="noreferrer noopener" className="case-live-link">{project.status.toLowerCase().includes("preview") ? "Open the public preview" : project.kind === "Client project" ? "Visit the client's site" : "Visit the live site"} <ArrowUpRight size={17} /></a>}</div>
         {project.images?.length ? <Reveal y={12} className={`case-product-screens ${project.frame === "phone" ? "case-mobile-screens" : ""}`}><ProjectGallery images={project.images} name={project.name} url={project.url} frame={project.frame} big bare edgeToEdge imageCaptions={project.imageCaptions} /></Reveal> : <div className="case-no-screens case-container"><WorldDrawing motif={world.motif} /><p>{project.visualNote ?? "This project is represented by its engineering scope below. Public product screenshots are not available."}</p></div>}
         <div className="case-sequence case-container" aria-label="Product workflow">{world.sequence.map((step, i) => <span key={step}><i>0{i + 1}</i>{step}{i < 2 && <ArrowRight size={17} />}</span>)}</div>
       </section>
 
       {project.slug === "quzo-ai" && <QuzoArchitecture />}
+      {project.slug === "compassrt" && <section className="case-diagram" aria-label="CompassRT data flow"><div className="case-container"><div className="diagram-card"><p className="diagram-kicker">How the data flows</p><p className="diagram-title">One market feed in, one update per symbol per second out</p><RealtimeFlowDiagram /></div></div></section>}
+      {project.slug === "opportunity-agents" && <section className="case-diagram" aria-label="Opportunity agents workflow"><div className="case-container"><div className="diagram-card"><p className="diagram-kicker">The workflow</p><p className="diagram-title">Eleven scheduled agents, one job each, every hour</p><OpportunityAgentsDiagram /><p className="diagram-note">The sketch it started from:</p><div className="case-sketch"><Image src="/images/opportunity-agents-sketch.webp" alt="Hand-drawn sketch of the seven-step opportunity workflow" width={1100} height={1374} sizes="(max-width: 1100px) 100vw, 1100px" /></div></div></div></section>}
 
       <section className="case-story case-container" aria-labelledby="story-heading">
         <aside className="case-margin"><span className="case-label">02 / The build notes</span><h2 id="story-heading">{world.chapter}</h2><div className="case-role"><span>My role</span><p>{project.role}</p><span>Project status</span><p>{project.status}</p></div></aside>

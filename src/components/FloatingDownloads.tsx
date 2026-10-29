@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { BookOpen, Download, FileText } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { downloads } from "@/data/downloads";
 
 function DownloadRow({
@@ -108,7 +108,7 @@ export default function FloatingDownloads() {
             className="absolute bottom-full left-0 mb-3 w-64 origin-bottom-left overflow-hidden rounded-xl border border-line-strong bg-ink-2/95 shadow-[0_25px_60px_-16px_rgba(0,0,0,0.8)] backdrop-blur"
           >
             <p className="border-b border-line px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-              Take something with you
+              Download the résumé
             </p>
             <DownloadRow
               icon={FileText}
@@ -116,13 +116,6 @@ export default function FloatingDownloads() {
               file={downloads.resume.file}
               filename={downloads.resume.filename}
               sizeLabel={downloads.resume.sizeLabel}
-            />
-            <DownloadRow
-              icon={BookOpen}
-              label="Download the book"
-              file={downloads.ebook.file}
-              filename={downloads.ebook.filename}
-              sizeLabel={downloads.ebook.sizeLabel}
               last
             />
           </motion.div>
@@ -133,7 +126,7 @@ export default function FloatingDownloads() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-label="Résumé and book downloads"
+        aria-label="Résumé download"
         className="flex items-center gap-2 rounded-full border border-line-strong bg-ink-2/90 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg shadow-[0_20px_50px_-18px_rgba(0,0,0,0.75)] backdrop-blur transition-colors hover:border-gold hover:text-gold"
       >
         <Download size={14} className="text-gold" />

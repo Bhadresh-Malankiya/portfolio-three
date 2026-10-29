@@ -1,25 +1,33 @@
-import { ArrowDown, ArrowUpRight } from "lucide-react";
-import Link from "next/link";
+import { ArrowDown, ArrowUpRight, Mail } from "lucide-react";
+import { GithubIcon, LinkedinIcon } from "@/components/SocialIcons";
 import Reveal from "@/components/Reveal";
 import { downloads } from "@/data/downloads";
+import { profile } from "@/data/profile";
+
+const facts = [
+  ["Role", "Senior Full Stack Engineer · Technical Lead"],
+  ["Experience", "8+ years · team of 5 led"],
+  ["Core stack", "Node.js · React · Next.js · TypeScript · PostgreSQL"],
+  ["AI", "OpenAI · Claude · Gemini · RAG with pgvector"],
+  ["Availability", "Immediate"],
+];
 
 export default function DownloadsSection() {
   return <div className="reading-table">
     <Reveal className="reading-book-wrap" y={35}>
-      <a className="reading-book" href={downloads.ebook.file} download={downloads.ebook.filename} aria-label="Download The Weekend Builder book">
-        <div className="reading-book-spine" aria-hidden="true">THE WEEKEND BUILDER / BHADRESH MALANKIYA</div>
-        <div className="reading-book-cover">
-          <span className="book-edition">A life in code & ownership</span>
-          <strong>The<br />Weekend<br /><em>Builder.</em></strong>
-          <div className="book-sculpture" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-          <span className="book-author">Bhadreshkumar<br />Malankiya <ArrowDown size={20} /></span>
+      <div className="glance-card">
+        <p className="eyebrow">At a glance</p>
+        <dl>{facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+        <div className="glance-links">
+          <a href={`mailto:${profile.email}`}><Mail size={15} aria-hidden="true" />Email</a>
+          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer"><LinkedinIcon size={15} />LinkedIn</a>
+          <a href={profile.github} target="_blank" rel="noopener noreferrer"><GithubIcon size={15} />GitHub</a>
         </div>
-      </a>
-      <p className="reading-object-note">16 chapters. The habit of starting again.</p>
+      </div>
     </Reveal>
     <div className="reading-notes">
-      <Reveal y={20}><p className="eyebrow">The longer version</p><h3>There’s a person<br /><em>behind the commits.</em></h3><p className="reading-description">The starts, the detours, and the projects that shaped the way I build. I wrote them down.</p><a className="reading-download" href={downloads.ebook.file} download={downloads.ebook.filename}>{downloads.ebook.cta}<ArrowDown size={15} /><span>PDF · {downloads.ebook.sizeLabel}</span></a><Link href="/journey" className="reading-online">Or read the chapters here <ArrowUpRight size={14} /></Link></Reveal>
-      <Reveal y={20} delay={.1}><div className="resume-slip"><span className="resume-punch" aria-hidden="true" /><p className="eyebrow">For the hiring conversation</p><h3>The résumé.</h3><p>Experience, responsibility, and the work in between.</p><a href={downloads.resume.file} download={downloads.resume.filename}>{downloads.resume.cta}<ArrowDown size={15} /></a></div></Reveal>
+      <Reveal y={20}><div className="resume-slip"><span className="resume-punch" aria-hidden="true" /><p className="eyebrow">For the hiring conversation</p><h3>The résumé.</h3><p>ExtendedForms, Quzo.ai, team leadership and the numbers behind them, on one page.</p><a href={downloads.resume.file} download={downloads.resume.filename}>{downloads.resume.cta}<ArrowDown size={15} /></a></div></Reveal>
+      <Reveal y={20} delay={.1}><a className="reading-online" href={profile.linkedin} target="_blank" rel="noopener noreferrer">Connect on LinkedIn <ArrowUpRight size={14} /></a></Reveal>
     </div>
   </div>;
 }

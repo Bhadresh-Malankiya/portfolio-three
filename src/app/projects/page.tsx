@@ -8,10 +8,10 @@ import { portfolioProjects as projects } from "@/data/portfolio";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Products and platforms built through employer engineering, founder-led work, and client delivery across SaaS, AI, commerce, and enterprise systems.",
+    "SaaS, AI and enterprise products built and led by Bhadresh Malankiya, Senior Full Stack Engineer and Tech Lead.",
   alternates: { canonical: "/projects" },
   openGraph: {
-    title: "Projects — The Weekend Builder",
+    title: "Projects | Bhadresh Malankiya",
     description:
       "SaaS, voice AI, e-commerce, and client projects by Bhadreshkumar Malankiya.",
     type: "website",

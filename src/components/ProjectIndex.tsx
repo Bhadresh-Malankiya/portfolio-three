@@ -13,27 +13,19 @@ const projects = [...selectedWork, ...portfolioProjects.filter(project => !selec
 
 const filters = [
   "All work",
-  "Employer products",
-  "Client work",
-  "Founder ventures",
-  "Personal builds",
+  "Production work",
+  "Experiments and R&D",
 ] as const;
 
 type Filter = (typeof filters)[number];
-const matches = (kind: string, filter: Filter) =>
+const matches = (project: { experiment?: boolean }, filter: Filter) =>
   filter === "All work" ||
-  (filter === "Employer products"
-    ? ["Employer product", "Sole ownership"].includes(kind)
-    : filter === "Personal builds"
-      ? kind === "Personal build"
-      : filter === "Founder ventures"
-        ? kind === "Founder venture"
-        : ["Client project", "Freelance"].includes(kind));
+  (filter === "Experiments and R&D" ? Boolean(project.experiment) : !project.experiment);
 
 export default function ProjectIndex() {
   const [filter, setFilter] = useState<Filter>("All work");
   const [activeSlug, setActiveSlug] = useState(projects[0].slug);
-  const visible = projects.filter(project => matches(project.kind, filter));
+  const visible = projects.filter(project => matches(project, filter));
   const active = visible.find(project => project.slug === activeSlug) ?? visible[0];
   const world = active ? getProjectWorld(active.slug) : undefined;
   return (
@@ -41,7 +33,7 @@ export default function ProjectIndex() {
       <div className="directory-filters" role="group" aria-label="Filter projects by contribution">
         {filters.map(item => (
           <button key={item} onClick={() => setFilter(item)} aria-pressed={filter === item} aria-controls="project-directory-list">
-            {item}<span aria-hidden="true">{projects.filter(project => matches(project.kind, item)).length}</span>
+            {item}<span aria-hidden="true">{projects.filter(project => matches(project, item)).length}</span>
           </button>
         ))}
       </div>
@@ -57,7 +49,7 @@ export default function ProjectIndex() {
             {active.images?.[0] ? <div className={`directory-preview-image ${active.frame === "phone" ? "is-phone" : ""}`}><Image src={active.images[0]} alt={`${active.name} product screen`} fill sizes="(min-width: 1200px) 540px, 45vw" className="object-contain" /></div> : <div className="directory-preview-concept"><span>{active.name.slice(0, 1)}</span><ProjectMotif motif={active.motif} accent="text-current" className="directory-preview-motif" /></div>}
             <span className="directory-art-label">{active.images?.length ? "Inside the product" : "Engineering study"}</span>
           </div>
-          <div className="directory-preview-copy"><p className="directory-preview-category">{active.category} / {active.kind}</p><h2>{active.name}</h2><p>{active.oneLiner}</p><div className="directory-preview-tools">{active.tech.slice(0, 3).map(tech => <span key={tech}>{tech}</span>)}</div><Link href={`/projects/${active.slug}`}>Open the project <ArrowUpRight size={17} /></Link></div>
+          <div className="directory-preview-copy"><p className="directory-preview-category">{active.category} / {active.experiment ? "Experiment" : active.kind}</p><h2>{active.name}</h2><p>{active.oneLiner}</p><div className="directory-preview-tools">{active.tech.slice(0, 3).map(tech => <span key={tech}>{tech}</span>)}</div><Link href={`/projects/${active.slug}`}>Open the project <ArrowUpRight size={17} /></Link></div>
         </aside>}
       </div>
     </div>

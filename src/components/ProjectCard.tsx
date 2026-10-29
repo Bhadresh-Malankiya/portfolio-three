@@ -29,7 +29,7 @@ export default function ProjectCard({
         <span className="directory-mobile-preview" aria-hidden="true">
           {project.images?.[0] ? <Image src={project.images[0]} alt="" fill sizes="72px" className="object-contain" /> : <span>{project.name.slice(0, 1)}</span>}
         </span>
-        <div className="directory-project-name"><span className="directory-project-category">{project.category}</span><h2>{project.name}</h2><span className="directory-project-kind">{project.kind}</span></div>
+        <div className="directory-project-name"><span className="directory-project-category">{project.category}</span><h2>{project.name}</h2><span className="directory-project-kind">{project.experiment ? <span className="experiment-badge">Experiment</span> : project.kind}</span></div>
         <ArrowUpRight size={21} className="directory-entry-arrow" />
       </Link>
     </li>

@@ -4,13 +4,13 @@ import { profile } from "@/data/profile";
 
 export const identity = {
   name: "Bhadresh Malankiya",
-  role: "Forward Deployed Engineer",
+  role: "Senior Full Stack Engineer · Technical Lead",
   summary:
-    "I turn customer problems into production software: frontend, backend, AI integration and deployment. My experience spans technical leadership, scaling SaaS and building VocalXI solo.",
+    "I build and lead SaaS products end to end: frontend, backend, AI features and deployment. Four years leading engineering on ExtendedForms.io (400K+ users) and building Quzo.ai from first commit to launch.",
   email: profile.email,
   site: profile.site,
   location: profile.location,
-  resume: "/downloads/Bhadreshkumar-malankiya-resume-full.pdf",
+  resume: "/downloads/bhadresh-malankiya-resume.pdf",
 };
 
 export type PortfolioProject = Project & {
@@ -25,13 +25,120 @@ export type PortfolioProject = Project & {
 // Keep historical routes/assets. The presentation layer distinguishes technical
 // responsibility from legal ownership and does not promote unverified statistics.
 const editorial: Record<string, Partial<PortfolioProject>> = {
-  "helpdesk-ai": { kind: "Personal build" },
+  compassrt: {
+    imageCaptions: [
+      "Live watchlist: two AG Grid tables updating once a second, with green and red flashes on changed cells.",
+      "Symbol search over the lookup API, adding a stock to the watchlist and its Socket.IO room.",
+      "Sign-in screen. Screens captured from the original code running locally against a simulated price feed.",
+    ],
+    problem: "Market feeds fire many trades a second. Repainting the screen for each one freezes the table and floods every browser with symbols it never asked for.",
+    contribution: "I built the Node.js streaming backend and the React trading grid: one shared upstream socket, RxJS batching on both sides, and Socket.IO rooms so each client only receives the symbols on its watchlist.",
+    decisions: [
+      "Keep one upstream market socket for everyone, and subscribe a symbol only while someone is watching it.",
+      "Buffer trades for one second and send only the newest trade per symbol.",
+      "Emit to a Socket.IO room per symbol, so a client never receives data it did not ask for.",
+      "Buffer again in the browser and apply AG Grid async transactions by row ID, so only changed rows repaint.",
+      "Ship a built-in simulator that fires a tick every 10 ms per symbol to load-test the same path.",
+    ],
+    outcomes: [
+      "A watchlist that stays smooth while trades stream in.",
+      "Upstream subscriptions that follow real demand: added on the first viewer, dropped when the room empties.",
+      "Node.js, Express, RxJS 7, Socket.IO 4, MongoDB, JWT, React 17, Redux Toolkit and AG Grid.",
+    ],
+    narrative: [],
+  },
+  "co-founder-agents": {
+    problem: "Running product work and client projects at the same time means research, planning, task tracking and follow-ups that never stop.",
+    contribution: "I built a multi-agent system on Mastra's TypeScript SDK to manage the project lifecycle, and used it to test how far specialised agents can carry real work.",
+    decisions: [
+      "Give each agent one job: research, planning or execution.",
+      "Keep conversation memory and task state in PostgreSQL so work survives restarts.",
+      "Put approval gates on file changes, deletions and shell commands.",
+      "Expose connected tools as agent tools, and run recurring work on persistent schedules.",
+    ],
+    outcomes: [
+      "Research, web fetch, task tracking and recurring schedules working inside one agent workspace.",
+      "Hands-on findings on where multi-agent setups help and where one well-scoped agent is enough.",
+    ],
+    narrative: ["An R&D build for agentic workflows across product and client work."],
+  },
+  "opportunity-agents": {
+    imageCaptions: [
+      "Agent OS, the local desk I built next: batches, leads, drafts and the agent status bar.",
+      "Agent roles (Scout, Preparer, Analyst, Resolver, Coordinator) with a live audit timeline.",
+      "Leads view, shown here with the app's built-in synthetic sample data.",
+    ],
+    problem: "Finding the right roles and client work means checking hundreds of listings, companies and requirements by hand, every day.",
+    contribution: "I designed eleven scheduled agents that run in hourly batches, each owning one step, with a shared sheet as the single source of truth and proof log.",
+    decisions: [
+      "One agent per step: discover, verify, score, track, apply or queue, and follow up.",
+      "Verify that a company and its location are real, and that the role's requirements fit, before a lead is kept.",
+      "Keep every lead, status and proof in one sheet so nothing is lost between runs.",
+      "Apply automatically only where possible; everything else is queued with notes for manual review.",
+    ],
+    outcomes: [
+      "A repeatable pipeline that ran every hour and logged leads and outreach in a tracker.",
+      "A local dashboard version with a durable PostgreSQL queue and approval-bound email actions, published as Agent OS on GitHub.",
+    ],
+    narrative: ["Built for my own search, designed so anyone can point it at their own profile and market."],
+    metrics: [
+      { value: "3,000+", label: "outreach emails sent" },
+      { value: "600+", label: "conversations started" },
+      { value: "800+", label: "leads queued for manual review" },
+    ],
+  },
+  "screen-to-answer": {
+    imageCaptions: [
+      "Start a session from a live camera or a shared screen.",
+      "Settings: local or cloud OCR, and fast, balanced or max-accuracy answer models.",
+      "Share to another device: scan the QR code and follow the answer live.",
+    ],
+    problem: "Questions often sit on a screen or a page, not in a text box. Copying them out breaks the flow.",
+    contribution: "I built the full pipeline: capture, OCR, a stability check, a streamed model answer, and live sharing to a second device.",
+    decisions: [
+      "Capture from a live camera or a shared screen, each with its own layout.",
+      "Confirm a question only after 3 consecutive OCR readings agree, so scrolling or typing never triggers a request.",
+      "Run Tesseract in the browser by default, with Google Cloud Vision as an optional high-accuracy engine.",
+      "Stream the answer from Claude or OpenAI, with fast, balanced and max-accuracy presets.",
+      "Share a session to another device by scanning a QR code; that device follows the question and answer live over Pusher.",
+    ],
+    outcomes: [
+      "A working proof of concept across camera and screen capture, with live answers on a second device.",
+      "Next.js, TypeScript, Tesseract.js, Cloud Vision, Anthropic and OpenAI SDKs, and Pusher Channels.",
+    ],
+    narrative: ["A proof of concept, built to test live OCR and streamed answers end to end."],
+  },
+  collahead: {
+    frame: "phone",
+    problem: "Delivery drivers need clear routes, and dispatchers need proof that each stop really happened.",
+    contribution: "I built the driver app and an admin simulator: Mapbox routing, geofenced stops, live location and stop outcomes.",
+    decisions: [
+      "Draw each route with the Mapbox Directions API and show the driver's next stops in order.",
+      "Use latitude and longitude zones around each stop to trigger stop events automatically.",
+      "Only accept a stop submission inside a 1-mile radius, and attach a map snapshot as proof.",
+      "Record outcomes as success, partially completed or failed, with a reason.",
+      "Stream live locations and stop events over Socket.IO so the admin view updates in real time.",
+    ],
+    outcomes: [
+      "A working driver and admin simulator with live tracking and proof of stop.",
+      "The client paused the product before launch; the routing and geofencing work stands on its own.",
+    ],
+    narrative: [],
+    imageCaptions: [
+      "Route overview with stops and the driver's live position.",
+      "Turn-by-turn route to the next stop.",
+      "Submitting a stop with a map snapshot as proof.",
+      "Submission blocked outside the 1-mile radius.",
+      "Stop outcome with reason and distance.",
+    ],
+  },
+  "helpdesk-ai": { kind: "Personal build", narrative: ["HelpXI started as a side project to take repetitive support work off small teams. The core flows work; it is not a launched product."] },
   jewelxi: {
     problem: "A jewellery catalog needs to make the details easy to explore, from material and category to the individual piece.",
-    contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study.",
+    contribution: "I built the storefront, catalog filtering, product pages and custom-design enquiry flow, with an interactive 3D pendant study, plus the admin atelier behind it.",
     decisions: ["Give the product photography room, and keep the browsing controls close.", "Connect the catalog with product details and a custom-design enquiry path.", "Use 3D for a closer look at the piece, alongside a conventional shopping interface."],
     narrative: ["Jewelxi is a public preview with an illustrative collection and test checkout."],
-    outcomes: ["A filterable jewellery catalog with search, material and category filters.", "A storefront, inspiration gallery and interactive product study."],
+    outcomes: ["A filterable jewellery catalog with search, material and category filters.", "A storefront, inspiration gallery and interactive product study.", "An admin atelier for the collection, inventory, orders, store settings and order processing."],
   },
   "hey-buddy": {
     frame: "phone",
@@ -54,20 +161,21 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Design proctoring feedback with attention to false positives and student experience.",
     ],
     outcomes: [
-      "Production assessment workflows in the Google Workspace ecosystem. Historical product figures are author-reported; they are not independently audited benchmarks.",
-      "Performance improvements across high-traffic pages.",
-      "Technical leadership across development and product delivery.",
+      "Production assessment workflows used by 400K+ people across the Google Workspace ecosystem.",
+      "Page load cut from 3.2s to 1.2s; Redis caching took responses from 800ms to 120ms.",
+      "Led a team of five through two releases a month, a public API (v1 and v2) and enterprise escalations.",
     ],
     narrative: [
-      "My responsibility was technical ownership within ExpressTech Systems—not ownership of the company or its products.",
+      "I owned the engineering of ExtendedForms at ExpressTech Systems: architecture, performance, releases and production support.",
       "The work connected customer-facing assessment features with backend reliability, subscriptions and operational support.",
     ],
     metrics: [
       { value: "400K+", label: "users" },
       { value: "10M+", label: "online exams held" },
+      { value: "3x", label: "product revenue growth, 2022 to 2026" },
     ],
     imageCaptions: [
-      "ExtendedForms product screen from the existing portfolio assets.",
+      "ExtendedForms product dashboard.",
     ],
   },
   "quzo-ai": {
@@ -88,11 +196,11 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
     outcomes: [
       "An integrated question-to-assessment workflow.",
-      "Multi-provider AI integration and credit management.",
+      "OpenAI, Claude and Gemini behind one credit system; question creation cut from 30 minutes to 30 seconds.",
       "Product screens covering setup, delivery, reports and billing.",
     ],
     narrative: [
-      "Quzo.ai is presented here as employer-product engineering. Technical responsibility does not imply founder or legal ownership.",
+      "I built Quzo.ai at ExpressTech Systems and owned its engineering from the first commit to launch.",
       "The product combines AI-assisted authoring with the practical work of administering assessments and understanding the results.",
     ],
     images: [
@@ -113,8 +221,8 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
     ],
   },
   "bps-trading": {
-    status: "Built under MB Systems · mid-2020–mid-2022; studio closed",
-    narrative: ["Built through MB Systems alongside HQ Infosystem under a service and collaboration arrangement. Historical product figures are author-reported."],
+    status: "Delivered",
+    narrative: ["A real-time crypto trading platform streaming live multi-pair prices over Socket.io, with frontend throttling to keep high-frequency data smooth."],
   },
   zwopr: {
     images: [2, 3, 4, 5, 6, 7, 1].map((n) => `/images/zwopr_${n}.png`),
@@ -145,13 +253,13 @@ const editorial: Record<string, Partial<PortfolioProject>> = {
       "Enterprise users need clear interfaces for operational data and connected workflows.",
     contribution:
       "I contributed dashboard and integration work within an enterprise delivery environment.",
-    outcomes: ["Enterprise interface and integration experience."],
+    outcomes: ["Dashboard features and SSO integration delivered in an enterprise healthcare environment."],
     narrative: [
-      "This case study describes my engineering contribution, not ownership of the underlying product. No hospital-count, uptime or compliance certification is asserted here.",
+      "React and TypeScript dashboard features with SSO integration inside a Liferay-based enterprise platform, built for clarity in surgical-system workflows.",
     ],
     images: [],
     visualNote:
-      "Internal healthcare screens are not republished here. Project context is described without exposing operational data.",
+      "Client screens are kept private out of respect for healthcare confidentiality."
   },
   rightful: {
     tech: ["React", "TypeScript", "WebSocket", "Stripe"],
@@ -166,13 +274,14 @@ const vocalxi: PortfolioProject = {
   name: "VocalXI",
   url: "https://vocalxi.com",
   category: "Voice AI",
-  kind: "Founder venture",
+  kind: "Personal build",
+  experiment: true,
   motif: "forms",
   featured: true,
   oneLiner: "A voice-first way to answer forms through a guided conversation.",
-  role: "Founder and product engineer · AscendXI",
-  status: "Pre-launch · Google Forms connector in staging; telephone calling planned",
-  tech: ["TypeScript", "Next.js", "Voice AI", "Form workflows"],
+  role: "Product engineer · design, voice AI, backend and deployment",
+  status: "Early access · browser voice live · Google Forms connector in staging",
+  tech: ["TypeScript", "Next.js", "FastAPI", "PostgreSQL", "Deepgram", "Claude"],
   metrics: [],
   problem:
     "Forms can be time-consuming to read and complete, especially when a conversation would feel more natural.",
@@ -184,15 +293,16 @@ const vocalxi: PortfolioProject = {
     "Separate browser voice capabilities from telephone calling and integrations still in development.",
   ],
   outcomes: [
-    "A browser voice-to-forms experience under development.",
-    "Product design, application engineering and voice experience in one founder-led project.",
+    "A working browser voice agent that asks form questions and captures spoken answers in English and Hindi.",
+    "Phone calling is in development; an early test call asked a Google Form's questions and wrote the answers back to the form.",
+    "Product design, application engineering and voice AI in one end-to-end build.",
   ],
   narrative: [
-    "VocalXI is my own product under AscendXI. It explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
-    "The product is pre-launch. Google Forms integration is in staging, telephone calling is planned, and production readiness has not been verified.",
+    "VocalXI explores voice as an interface for interviews, intake, feedback and other form-based tasks.",
+    "Browser voice conversations work end to end today; the Google Forms connector is in staging and telephone calling is next.",
   ],
-  images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg"],
-  imageCaptions: ["Public product website.", "Answer review preview."],
+  images: ["/images/vocalxi-home.jpg", "/images/vocalxi-review.jpg", "/images/vocalxi-dashboard_1.webp", "/images/vocalxi-dashboard_2.webp"],
+  imageCaptions: ["Public product website.", "Answer review before submitting.", "Owner workspace: voice agents and starter templates.", "Google Forms connection flow (connector in staging)."],
 };
 
 export const portfolioProjects: PortfolioProject[] = [
@@ -234,9 +344,9 @@ for (const project of portfolioProjects) {
 }
 
 export const selectedWork = [
+  "extendedforms-io",
   "quzo-ai",
   "vocalxi",
-  "extendedforms-io",
 ].map((slug) => portfolioProjects.find((p) => p.slug === slug)!);
 
 export const expertise = [
@@ -263,7 +373,7 @@ export const expertise = [
     title: "Intelligence",
     stack: "Applied AI · RAG · Voice",
     description:
-      "AI capabilities connected to a useful workflow—not added just for a demo.",
+      "AI capabilities connected to a useful workflow, not added for a demo.",
     example: "Explore VocalXI",
     href: "/projects/vocalxi",
   },

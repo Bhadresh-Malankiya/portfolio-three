@@ -1,6 +1,6 @@
 # Portfolio redesign
 
-> Historical record of an earlier redesign. The current direction and implementation are documented in [October 2026 creative refresh](october-creative-refresh.md), which supersedes the no-Lenis/no-WebGL guidance below. The original notes and reports are preserved for context.
+> Historical record of an earlier redesign. The current implementation supersedes the no-Lenis/no-WebGL guidance below. The original notes and reports are preserved for context.
 
 ## Direction
 Recruiter-first introduction, warm editorial surfaces, clear case studies and accessible progressive interaction. The original memoir and field-guide detail routes remain available. The homepage no longer mounts decorative WebGL scenes, Lenis, automatic welcome dialogs or floating contact/download controls.

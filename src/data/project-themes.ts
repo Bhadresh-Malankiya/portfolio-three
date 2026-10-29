@@ -11,6 +11,10 @@ export type ProjectWorld = {
 };
 
 export const projectWorlds: Record<string, ProjectWorld> = {
+  compassrt: { paper: "#e6edf0", ink: "#192d36", accent: "#2f6f86", soft: "#c7dce4", signal: "#8fd0e6", motif: "market", line: "Every tick in. One calm frame out.", sequence: ["Stream", "Buffer", "Render"], chapter: "Keeping a live market readable" },
+  "co-founder-agents": { paper: "#ece9f2", ink: "#2a2438", accent: "#5b4a8c", soft: "#d6cfe8", signal: "#b9a8f0", motif: "workspace", line: "Agents with one job each.", sequence: ["Research", "Plan", "Act"], chapter: "Giving each agent one job" },
+  "opportunity-agents": { paper: "#eef0e4", ink: "#25291c", accent: "#5f6d2a", soft: "#d9dfbf", signal: "#cfe07c", motif: "route", line: "Every hour, a little further.", sequence: ["Find", "Verify", "Follow up"], chapter: "Turning a search into a pipeline" },
+  "screen-to-answer": { paper: "#e9eef4", ink: "#1f2c3d", accent: "#3f6293", soft: "#cdd9ea", signal: "#a7c3ef", motif: "support", line: "Read it once. Answer it live.", sequence: ["Capture", "Confirm", "Stream"], chapter: "From pixels to a streamed answer" },
   vocalxi: { paper: "#f2e9d7", ink: "#272316", accent: "#8c4d0c", soft: "#e4d2a7", signal: "#f7bb54", motif: "voice", line: "A little less typing. A little more human.", sequence: ["Ask", "Speak", "Review"], chapter: "Giving a form a voice" },
   "quzo-ai": { paper: "#eeebf7", ink: "#28223c", accent: "#574392", soft: "#d7d0ed", signal: "#b5a5f5", motif: "assessment", line: "From a question to an assessment.", sequence: ["Create", "Deliver", "Understand"], chapter: "Beyond the generated question" },
   "extendedforms-io": { paper: "#eaf0e3", ink: "#202e25", accent: "#336648", soft: "#cfdfc7", signal: "#b4d989", motif: "forms", line: "Familiar forms. More possibilities.", sequence: ["Configure", "Assess", "Report"], chapter: "Working inside a familiar workflow" },
