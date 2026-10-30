@@ -5,7 +5,7 @@ import { phoneHref, whatsappHref } from "@/lib/contact-links";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line py-8">
+    <footer className="border-t border-line py-8 pb-24 sm:pb-8">
       <div className="page-shell flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Link href="/" className="font-display text-xl">

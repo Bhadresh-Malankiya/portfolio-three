@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, AudioLines, BookOpenCheck, ShieldCheck, Shuffle, Network } from "lucide-react";
+import { ArrowUpRight, AudioLines, BookOpenCheck, Shuffle, Network } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import { AIRequestPathDiagram, QuzoMonolithDiagram, RealtimeFlowDiagram } from "@/components/Diagrams";
 import "@/app/home-sections.css";
@@ -7,8 +7,8 @@ import "@/app/home-sections.css";
 const patterns = [
   {
     icon: AudioLines,
-    title: "Voice agents",
-    body: "A state machine owns the conversation; the model only assesses each answer. Speech-to-text, text-to-speech and the model sit behind swappable interfaces, so Hindi and English each get the provider that performs best.",
+    title: "Voice agents with guardrails",
+    body: "A state machine owns the conversation; the model only assesses each answer. Speech-to-text, text-to-speech and the model sit behind swappable interfaces, so Hindi and English each get the provider that performs best. The model cannot add fields or submit anything, and every response is reviewed before it is sent.",
     proof: "VocalXI",
     href: "/projects/vocalxi",
   },
@@ -18,13 +18,6 @@ const patterns = [
     body: "Answers come from the owner's content first. Quzo generates question banks from a pgvector retrieval step; each VocalXI form agent answers questions only from its owner's knowledge notes.",
     proof: "Quzo.ai, VocalXI",
     href: "/projects/quzo-ai",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Guardrails",
-    body: "The model cannot add fields, change required answers or submit anything. Free text is captured word for word, and every response is reviewed before it is sent.",
-    proof: "VocalXI",
-    href: "/projects/vocalxi",
   },
   {
     icon: Shuffle,
@@ -94,7 +87,7 @@ export function AIEngineeringSection() {
           </Reveal>
         ))}
       </div>
-      <Reveal y={16} className="diagram-card">
+      <Reveal y={16} className="diagram-card diagram-card--figure">
         <p className="diagram-title">Every AI feature follows one path</p>
         <AIRequestPathDiagram />
       </Reveal>

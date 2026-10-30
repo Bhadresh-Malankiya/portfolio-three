@@ -238,3 +238,7 @@
 .contact-finale .finale-quick a:hover { transform: translateY(-2px); filter: brightness(1.07); }
 .contact-finale .finale-quick-whatsapp { background: #25d366; color: #06210f; }
 .contact-finale .finale-quick-call { background: #f4c572; color: #241a08; }
+
+@media (max-width: 700px) {
+  .field-journal .journal-portrait-note, .field-journal .journal-portrait-stamp, .field-journal .journal-portrait-orbit, .field-journal .journal-founder-note { display: none; }
+}

@@ -411,10 +411,19 @@ export default function DeviceGallery() {
   return (
     <>
       <div className="work-prologue">
-        <p className="eyebrow">Selected work / Three products. Three different challenges.</p>
-        <span className="work-prologue-stamp" aria-hidden="true">DESIGNED TO<strong>work.</strong>BUILT TO BE USED</span>
-        <h2>Different problems.<br /><em>All the way to live.</em></h2>
-        <div className="work-prologue-bottom"><span>01 · WEB PRODUCTS<br />02 · MOBILE EXPERIENCES</span><p>Scale at ExtendedForms. Systems at Quzo. Voice AI at VocalXI.</p></div>
+        <p className="eyebrow">Selected work</p>
+        <h2>Results first.<br /><em>Then the projects.</em></h2>
+        <dl className="work-results">
+          <div><dt>400K+</dt><dd>ExtendedForms users</dd></div>
+          <div><dt>10M+</dt><dd>online exams delivered</dd></div>
+          <div><dt>3x</dt><dd>revenue growth</dd></div>
+          <div><dt>5</dt><dd>engineers led</dd></div>
+        </dl>
+        <div className="work-links" aria-label="Open a project">
+          <Link href="/projects/extendedforms-io">ExtendedForms <ArrowUpRight size={15} aria-hidden="true" /></Link>
+          <Link href="/projects/quzo-ai">Quzo.ai <ArrowUpRight size={15} aria-hidden="true" /></Link>
+          <Link href="/projects/vocalxi">VocalXI <ArrowUpRight size={15} aria-hidden="true" /></Link>
+        </div>
       </div>
       <ProjectChapter />
       <ProjectChapter mobile />

@@ -52,3 +52,15 @@
 .writing-strip a small { font: 10.5px/1.4 var(--font-plex-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); }
 .writing-strip a:hover span { color: var(--color-gold); }
 @media (max-width: 700px) { .writing-strip a { grid-template-columns: 1fr 20px; } .writing-strip a small { grid-column: 1; } }
+
+/* Phones: fewer decorations, tighter blocks, no side-scrolling diagrams. */
+@media (max-width: 700px) {
+  .home-block { padding-block: 56px; }
+  .home-block-heading { margin-bottom: 28px; }
+  .home-block-intro { font-size: 15.5px; margin-top: 16px; }
+  .diagram-scroll { display: none; }
+  .diagram-card--figure { display: none; }
+  .diagram-card { padding: 20px 18px; }
+  .diagram-title { margin-bottom: 8px; }
+  .writing-strip { margin-top: 28px; padding: 18px; }
+}

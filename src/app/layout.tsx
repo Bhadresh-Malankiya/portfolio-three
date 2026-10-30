@@ -7,7 +7,6 @@ import "./portfolio-theme.css";
 import "./exhibition.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingContactCard from "@/components/FloatingContactCard";
-import FloatingDownloads from "@/components/FloatingDownloads";
 import QuickContact from "@/components/QuickContact";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -148,7 +147,6 @@ export default function RootLayout({
         </SmoothScroll>
         <div className="original-artifacts">
           <FloatingContactCard />
-          <FloatingDownloads />
           <QuickContact />
         </div>
         <Analytics />
