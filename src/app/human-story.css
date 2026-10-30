@@ -232,3 +232,9 @@
 }
 
 .field-journal .journal-capability-icon { display: block; margin-bottom: 14px; color: var(--journal-blue); }
+
+.contact-finale .finale-quick { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.contact-finale .finale-quick a { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 999px; font: 600 15px/1 var(--font-sans); text-decoration: none; transition: transform .2s ease, filter .2s ease; }
+.contact-finale .finale-quick a:hover { transform: translateY(-2px); filter: brightness(1.07); }
+.contact-finale .finale-quick-whatsapp { background: #25d366; color: #06210f; }
+.contact-finale .finale-quick-call { background: #f4c572; color: #241a08; }

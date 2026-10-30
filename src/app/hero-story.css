@@ -155,3 +155,6 @@
   .flight-object > div { transition: none; }
   .flight-air-currents path { animation: none; stroke-dasharray: none; opacity: .2; }
 }
+
+/* Keep the opening chapters clear of the fixed WhatsApp and call buttons. */
+@media (min-width: 900px) { .flight-story .flight-theatre { padding-bottom: 74px; } }

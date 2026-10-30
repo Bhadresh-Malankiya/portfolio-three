@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { profile } from "@/data/profile";
-import { GithubIcon, LinkedinIcon } from "@/components/SocialIcons";
+import { GithubIcon, LinkedinIcon, WhatsAppIcon } from "@/components/SocialIcons";
+import { phoneHref, whatsappHref } from "@/lib/contact-links";
 
 export default function Footer() {
   return (
@@ -29,6 +30,12 @@ export default function Footer() {
           </a>
           <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold">
             <GithubIcon size={13} /> GitHub
+          </a>
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-gold">
+            <WhatsAppIcon size={13} /> WhatsApp
+          </a>
+          <a href={phoneHref} className="hover:text-gold">
+            Call {profile.phone}
           </a>
           <Link href="/contact" className="hover:text-gold">
             Get in touch ↗

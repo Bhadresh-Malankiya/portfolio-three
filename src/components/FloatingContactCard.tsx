@@ -7,7 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Download, Mail, X } from "lucide-react";
+import { ArrowUpRight, Download, Mail, Phone, X } from "lucide-react";
+import { WhatsAppIcon } from "@/components/SocialIcons";
+import { phoneHref, whatsappHref } from "@/lib/contact-links";
 import { downloads } from "@/data/downloads";
 import { getCompanionChapter, type CompanionChapter } from "@/lib/companion-sections";
 import type { CompanionTravel } from "@/components/three/BuilderAvatar";
@@ -188,11 +190,15 @@ function Companion({ pathname }: { pathname: string }) {
           <div className="companion-id-photo"><Image src="/images/profile.png" alt="Bhadresh Malankiya" width={156} height={188} sizes="78px" /></div>
           <div><span className="companion-id-number">FULL STACK · TECH LEAD</span><h2>Bhadresh<br />Malankiya<span aria-hidden="true">.</span></h2><p>Senior Full Stack<br />Engineer · Tech Lead</p></div>
         </div>
-        <p className="companion-id-intro">The human behind the little guide.</p>
+        <p className="companion-id-intro">Call me. WhatsApp me. I answer.</p>
         <div className="companion-id-facts"><span>Full stack · Applied AI</span><span>Surat, India ↗</span></div>
         <div className="companion-id-bottom"><div className="companion-id-barcode" aria-hidden="true">{BARCODE.map((width, index) => <i key={index} style={{ width }} />)}</div><span>8+ YEARS<br />BUILDING THINGS</span></div>
         <a className="companion-cv" href={downloads.resume.file} download={downloads.resume.filename}><Download size={16} /><span>Take my CV</span><span>PDF <ArrowUpRight size={13} /></span></a>
-        <Link className="companion-email" href="/contact" onClick={() => closeCard()}><Mail size={13} />Say hello<ArrowUpRight size={13} /></Link>
+        <div className="companion-reach">
+          <a className="companion-reach-whatsapp" href={whatsappHref} target="_blank" rel="noopener noreferrer"><WhatsAppIcon size={15} />WhatsApp me</a>
+          <a className="companion-reach-call" href={phoneHref}><Phone size={14} aria-hidden="true" />Call me</a>
+        </div>
+        <Link className="companion-email" href="/contact" onClick={() => closeCard()}><Mail size={13} />Or send a message<ArrowUpRight size={13} /></Link>
       </motion.section>}
     </AnimatePresence>
   </motion.div>;

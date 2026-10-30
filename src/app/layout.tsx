@@ -8,6 +8,7 @@ import "./exhibition.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingContactCard from "@/components/FloatingContactCard";
 import FloatingDownloads from "@/components/FloatingDownloads";
+import QuickContact from "@/components/QuickContact";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
@@ -107,6 +108,7 @@ export default function RootLayout({
             description: profile.summary,
             url: siteUrl,
             email: `mailto:${profile.email}`,
+            telephone: profile.phone,
             address: {
               "@type": "PostalAddress",
               addressLocality: profile.location,
@@ -147,6 +149,7 @@ export default function RootLayout({
         <div className="original-artifacts">
           <FloatingContactCard />
           <FloatingDownloads />
+          <QuickContact />
         </div>
         <Analytics />
         <SpeedInsights />

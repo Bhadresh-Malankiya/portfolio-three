@@ -417,10 +417,6 @@ export default function DeviceGallery() {
         <div className="work-prologue-bottom"><span>01 · WEB PRODUCTS<br />02 · MOBILE EXPERIENCES</span><p>Scale at ExtendedForms. Systems at Quzo. Voice AI at VocalXI.</p></div>
       </div>
       <ProjectChapter />
-      <div className="mobile-interlude">
-        <div><p className="eyebrow">Different screen. Real lives.</p><h2>Some things belong<br /><em>closer to you.</em></h2><p>Driver routing, pet tracking and live trading, built for the phone.</p></div>
-        <div className="mobile-orbit" aria-hidden="true"><span>✳</span></div>
-      </div>
       <ProjectChapter mobile />
       <WorkArchive />
     </>

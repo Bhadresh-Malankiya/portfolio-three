@@ -91,7 +91,7 @@ export default function FloatingDownloads() {
 
   return (
     <motion.div
-      className="fixed bottom-5 left-5 z-40"
+      className="fixed bottom-[76px] left-3 z-40 sm:left-[14px]"
       ref={dock}
       hidden={pathname === "/contact" || (pathname === "/" && contextControlsVisible && !open)}
     >
