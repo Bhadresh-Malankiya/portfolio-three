@@ -13,10 +13,10 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/#work", label: "work()" },
-  { href: "/#about", label: "about()" },
-  { href: "/#experience", label: "timeline()" },
-  { href: "/projects", label: "projects/" },
+  { href: "/#work", label: "Work" },
+  { href: "/#about", label: "About" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/projects", label: "Projects" },
 ];
 
 export default function Nav() {
@@ -84,7 +84,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "font-mono text-xs uppercase tracking-[0.14em] transition-colors",
+                  "text-[14px] font-medium tracking-[-0.005em] transition-colors",
                   active ? "text-gold" : "text-fg/90 hover:text-gold",
                 )}
               >
@@ -95,9 +95,9 @@ export default function Nav() {
           <Link
             href="/contact"
             aria-current={pathname === "/contact" ? "page" : undefined}
-            className="rounded-full border border-line-strong px-4 py-1.5 font-mono text-xs uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold"
+            className="rounded-full bg-gold px-5 py-2 text-[14px] font-medium text-ink transition-colors hover:bg-gold-bright"
           >
-            contact()
+            Contact
           </Link>
         </div>
 
@@ -131,7 +131,7 @@ export default function Nav() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="rounded px-2 py-2.5 font-mono text-sm uppercase tracking-wide text-fg/90 hover:bg-ink-2"
+                  className="rounded px-2 py-2.5 text-base font-medium text-fg/90 hover:bg-ink-2"
                 >
                   {l.label}
                 </Link>
@@ -140,9 +140,9 @@ export default function Nav() {
                 href="/contact"
                 onClick={() => setOpen(false)}
                 aria-current={pathname === "/contact" ? "page" : undefined}
-                className="mt-2 rounded px-2 py-2.5 font-mono text-sm uppercase tracking-wide text-gold"
+                className="mt-2 rounded px-2 py-2.5 text-base font-medium text-gold"
               >
-                contact() →
+                Contact
               </Link>
             </div>
           </motion.div>

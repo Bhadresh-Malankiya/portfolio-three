@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, AudioLines, BookOpenCheck, Shuffle, Network } from "lucide-react";
 import Reveal from "@/components/Reveal";
-import { AIRequestPathDiagram, QuzoMonolithDiagram, RealtimeFlowDiagram } from "@/components/Diagrams";
+import ScrollFlow, { type FlowStep } from "@/components/ScrollFlow";
 import "@/app/home-sections.css";
 
 const patterns = [
@@ -69,6 +69,34 @@ const writing = [
   { title: "Build notes: short explainers on React, TypeScript, debugging and AI agents", where: "LinkedIn · ongoing series", href: "https://www.linkedin.com/in/bhadresh-malankiya/recent-activity/all/" },
 ];
 
+const aiFlow: FlowStep[] = [
+  { title: "Input", what: "A person speaks or types: a form answer, a question, a request.", why: "Voice and text enter the same pipeline, so every channel gets the same safety rules." },
+  { title: "Context", what: "Retrieve only the notes or documents that matter for this request (RAG).", why: "The model answers from the owner's content instead of guessing." },
+  { title: "Model", what: "Route the task to the model that fits it, through one adapter for OpenAI, Claude and Gemini.", why: "Quality and cost differ by task, and switching providers should not mean rewriting features." },
+  { title: "Guardrails", what: "Check the output against a schema before anything else sees it.", why: "The model cannot add fields, trigger actions or submit anything on its own." },
+  { title: "Review", what: "A person approves anything that is about to leave the system.", why: "AI drafts and assesses. People stay accountable for what gets sent." },
+  { title: "Action", what: "The approved result is submitted, saved or sent.", why: "Only validated, reviewed output reaches users or other systems." },
+];
+
+const quzoFlow: FlowStep[] = [
+  { title: "Two kinds of traffic", what: "Educators build and manage exams; learners take them.", why: "Authoring is steady all day. Exams start with everyone arriving in the same minute." },
+  { title: "Forms and admin app", what: "Authoring, question banks, AI generation, sharing and reporting live in one app.", why: "Day-to-day product work stays in one codebase that is simple to change and ship." },
+  { title: "Models and forms data", what: "AI generation calls the model providers; forms live in PostgreSQL with pgvector.", why: "Retrieval for question banks sits right next to the data it searches." },
+  { title: "Exam delivery app", what: "Exam sessions and response capture run as a separate app.", why: "Exam start is the spike, so this part scales on its own without dragging the admin app with it." },
+  { title: "Shared Redis cache", what: "Both apps read exam definitions from one Redis cache.", why: "Thousands of learners starting together hit the cache, not the database." },
+  { title: "Separate responses store", what: "Answers are written to their own PostgreSQL path.", why: "Heavy exam writes never slow down authoring queries." },
+];
+
+const realtimeFlow: FlowStep[] = [
+  { title: "One market feed", what: "The server opens a single shared socket to Finnhub.", why: "A hundred viewers should never mean a hundred upstream connections." },
+  { title: "RxJS stream", what: "Every trade becomes an event on one stream.", why: "One stream can be batched, filtered and split per symbol in a few operators." },
+  { title: "Buffer each second", what: "Trades are collected for one second with bufferTime.", why: "Busy symbols can trade hundreds of times a second; batching keeps CPU and bandwidth flat." },
+  { title: "Latest price only", what: "Each batch keeps only the newest price per symbol.", why: "Screens need the current price, not every tick in between." },
+  { title: "Room per symbol", what: "Socket.IO sends each update only to that symbol's room.", why: "Clients receive just the symbols on their watchlist." },
+  { title: "Calm client updates", what: "The browser batches again and AG Grid updates rows by ID.", why: "Prices move live without re-rendering the whole table." },
+  { title: "Watchlist drives the feed", what: "Joining a symbol subscribes upstream; when its room empties, it unsubscribes.", why: "The server only pays for symbols someone is actually watching." },
+];
+
 export function AIEngineeringSection() {
   return (
     <section id="ai" className="page-shell home-block" aria-labelledby="ai-heading">
@@ -87,10 +115,13 @@ export function AIEngineeringSection() {
           </Reveal>
         ))}
       </div>
-      <Reveal y={16} className="diagram-card diagram-card--figure">
-        <p className="diagram-title">Every AI feature follows one path</p>
-        <AIRequestPathDiagram />
-      </Reveal>
+      <ScrollFlow
+        kind="ai"
+        kicker="The request path"
+        title="Every AI feature follows one path"
+        summary="Scroll to follow a single request from the moment someone speaks to the moment something is sent."
+        steps={aiFlow}
+      />
     </section>
   );
 }
@@ -102,22 +133,22 @@ export function SystemDesignSection() {
         <p className="eyebrow">05 / System design</p>
         <h2 id="system-heading">Built for the traffic<br /><em>that actually arrives.</em></h2>
       </div>
-      <div className="diagram-pair">
-        <Reveal y={16} className="diagram-card">
-          <p className="diagram-kicker">Quzo.ai · modular monolith</p>
-          <p className="diagram-title">Forms and exams scale apart, sharing one read cache</p>
-          <QuzoMonolithDiagram />
-          <p className="diagram-note">Exam start brings everyone at once, so exam delivery runs as its own app and scales independently while both apps reuse one Redis cache.</p>
-          <Link href="/projects/quzo-ai#quzo-architecture" className="pattern-proof">Explore the full architecture <ArrowUpRight size={14} /></Link>
-        </Reveal>
-        <Reveal y={16} delay={0.05} className="diagram-card">
-          <p className="diagram-kicker">CompassRT · real-time data flow</p>
-          <p className="diagram-title">One feed in, one calm update per second out</p>
-          <RealtimeFlowDiagram />
-          <p className="diagram-note">One shared market socket feeds an RxJS stream, buffered each second and sent only to the Socket.IO room for that symbol. Symbols are subscribed upstream when the first viewer arrives and dropped when the room empties.</p>
-          <Link href="/projects/compassrt" className="pattern-proof">Inside CompassRT <ArrowUpRight size={14} /></Link>
-        </Reveal>
-      </div>
+      <ScrollFlow
+        kind="quzo"
+        kicker="Quzo.ai · modular monolith"
+        title="Forms and exams scale apart, sharing one read cache"
+        summary="Exam start brings everyone at once. Scroll to see how the system is split so that spike stays contained."
+        steps={quzoFlow}
+        link={{ href: "/projects/quzo-ai#quzo-architecture", label: "Explore the full architecture" }}
+      />
+      <ScrollFlow
+        kind="realtime"
+        kicker="CompassRT · real-time data flow"
+        title="One feed in, one calm update per second out"
+        summary="Scroll to follow a single trade from the market feed to a row in the grid."
+        steps={realtimeFlow}
+        link={{ href: "/projects/compassrt", label: "Inside CompassRT" }}
+      />
     </section>
   );
 }

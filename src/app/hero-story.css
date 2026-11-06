@@ -19,7 +19,7 @@
 /* Match the JS media query before hydration so the canvas never changes its
    framing when the client takes over the server-rendered hero. */
 @media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
-  .flight-story { height: 320svh; }
+  .flight-story { height: 230svh; }
   .flight-story .flight-theatre { position: sticky; top: 0; height: 100svh; min-height: 0; }
 }
 .flight-atmosphere { position: absolute; z-index: -1; inset: -35px; overflow: hidden; pointer-events: none; transform-origin: 60% 56%; }

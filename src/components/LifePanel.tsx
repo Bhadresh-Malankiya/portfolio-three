@@ -14,12 +14,6 @@ const journey = [
   { year: "2018–2022", title: "HQ Infosystem", role: "Backend Developer", detail: "Grew from backend into full-stack delivery: 15+ web applications across edtech, logistics, fintech and e-commerce with React, Node.js and Laravel, including Stripe Connect payouts and APIs serving 50K+ daily requests. Completed my engineering degree alongside this full-time role." },
 ];
 const capabilityIcons = [LayoutDashboard, Server, Sparkles, Workflow, Rocket, Users];
-const impact = [
-  { value: "400K+", label: "ExtendedForms users", href: "/projects/extendedforms-io" },
-  { value: "10M+", label: "Online exams delivered", href: "/projects/extendedforms-io" },
-  { value: "5", label: "Engineers led at ExpressTech", href: "#experience" },
-  { value: "8+", label: "Years building production software", href: "/projects" },
-];
 
 export default function LifePanel() {
   const [role, setRole] = useState<number | null>(0);
@@ -64,7 +58,6 @@ export default function LifePanel() {
             <a className="journal-story-link" href="/downloads/bhadresh-malankiya-resume.pdf" download="Bhadresh-Malankiya-Resume.pdf">Download the résumé <ArrowUpRight size={18} /></a>
           </div>
         </div>
-        <dl className="journal-impact" aria-label="Experience and product impact">{impact.map((item, index) => <div key={item.label}><dt><Link href={item.href}><span className="journal-metric-index" aria-hidden="true">0{index + 1} /</span><strong>{item.value}</strong><ArrowUpRight size={20} /></Link></dt><dd>{item.label}</dd></div>)}</dl>
         <div className="journal-toolbox" id="expertise">
           <div className="journal-toolbox-heading"><div><span className="journal-kicker">THE WORKING TOOLBOX</span><h3>From the interface<br />to the infrastructure.</h3></div><p>One product, many moving parts.<br />I connect them.</p></div>
           <div className="journal-capabilities">{deliveryExpertise.map((item, index) => <motion.div key={item.code} className="journal-capability" initial={reduced ? false : { y: 20 }} whileInView={{ y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6, delay: index % 3 * 0.06 }}>{(() => { const Icon = capabilityIcons[index]; return Icon ? <Icon className="journal-capability-icon" size={26} strokeWidth={1.4} aria-hidden="true" /> : null; })()}<span>{item.code}</span><h4>{item.title}</h4><p>{item.detail}</p><small>{item.tools}</small></motion.div>)}</div>

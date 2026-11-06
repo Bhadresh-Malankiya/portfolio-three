@@ -2,8 +2,8 @@
 .device-chapter.product-world.center-stage {
   width: 100%; max-width: none; margin: 0; border: 0; overflow: visible;
 }
-.device-chapter.product-world.center-stage[data-scroll="true"] { height: 350svh; }
-.device-chapter.product-world.center-stage.phone-chapter[data-scroll="true"] { height: 310svh; }
+.device-chapter.product-world.center-stage[data-scroll="true"] { height: 270svh; }
+.device-chapter.product-world.center-stage.phone-chapter[data-scroll="true"] { height: 240svh; }
 .device-chapter.product-world.center-stage .chapter-sticky {
   padding: 88px 0 18px; width: 100%; max-width: none; overflow: clip;
 }

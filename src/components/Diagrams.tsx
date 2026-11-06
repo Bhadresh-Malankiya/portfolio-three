@@ -1,9 +1,14 @@
 import type { ReactNode } from "react";
 
-const INK = "#f2f1ee";
-const MUTED = "#a1a1a8";
-const EDGE = "rgba(255,255,255,0.32)";
-const GOLD = "#e3a857";
+/*
+ * Architecture diagrams that can build themselves one step at a time.
+ * Every node and arrow carries `at`, the step that reveals it. Pass `step`
+ * to show the build up to that point; leave it out for the finished picture.
+ */
+
+type Stage = { step?: number };
+const ALL = Number.POSITIVE_INFINITY;
+const stateOf = (at: number, step: number) => (at > step ? "ghost" : at === step ? "active" : "done");
 
 type BoxProps = {
   x: number;
@@ -12,19 +17,42 @@ type BoxProps = {
   h: number;
   name: string;
   lines?: string[];
-  accent?: boolean;
   align?: "middle" | "start";
+  at: number;
+  step: number;
 };
 
-function Box({ x, y, w, h, name, lines = [], accent = false, align = "middle" }: BoxProps) {
+function Box({ x, y, w, h, name, lines = [], align = "middle", at, step }: BoxProps) {
   const tx = align === "middle" ? x + w / 2 : x + 16;
   return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx="8" fill={accent ? GOLD : "none"} fillOpacity={accent ? 0.14 : 1} stroke={accent ? GOLD : EDGE} strokeWidth={accent ? 2 : 1.25} />
-      <text x={tx} y={y + 24} textAnchor={align} fontSize="13" fontWeight="600" fill={INK}>{name}</text>
+    <g className="flow-node" data-state={stateOf(at, step)}>
+      <rect x={x} y={y} width={w} height={h} rx="8" />
+      <text x={tx} y={y + 24} textAnchor={align} className="flow-node-name">{name}</text>
       {lines.map((line, i) => (
-        <text key={line} x={tx} y={y + 44 + i * 16} textAnchor={align} fontSize="11.5" fill={accent ? INK : MUTED}>{line}</text>
+        <text key={line} x={tx} y={y + 44 + i * 16} textAnchor={align} className="flow-node-line">{line}</text>
       ))}
+    </g>
+  );
+}
+
+type Edge = { d: string; at: number };
+
+function Edges({ id, edges, step, animate }: { id: string; edges: Edge[]; step: number; animate: boolean }) {
+  return (
+    <g className="flow-edges">
+      {edges.map(({ d, at }) => {
+        const state = stateOf(at, step);
+        return (
+          <g key={d} className="flow-edge" data-state={state}>
+            <path d={d} pathLength={1} markerEnd={`url(#${id}-arrow)`} />
+            {animate && state === "active" && (
+              <circle r="4" className="flow-packet">
+                <animateMotion dur="1.3s" repeatCount="indefinite" path={d} />
+              </circle>
+            )}
+          </g>
+        );
+      })}
     </g>
   );
 }
@@ -32,10 +60,10 @@ function Box({ x, y, w, h, name, lines = [], accent = false, align = "middle" }:
 function Frame({ id, label, height, children }: { id: string; label: string; height: number; children: ReactNode }) {
   return (
     <div className="diagram-scroll">
-      <svg viewBox={`0 0 760 ${height}`} role="img" aria-label={label} className="diagram-svg" fontFamily="var(--font-plex-sans), system-ui, sans-serif">
+      <svg viewBox={`0 0 760 ${height}`} role="img" aria-label={label} className="diagram-svg flow-svg" fontFamily="var(--font-plex-sans), system-ui, sans-serif">
         <defs>
           <marker id={`${id}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0 0L10 5L0 10z" fill={EDGE} />
+            <path d="M0 0L10 5L0 10z" className="flow-arrowhead" />
           </marker>
         </defs>
         {children}
@@ -44,69 +72,79 @@ function Frame({ id, label, height, children }: { id: string; label: string; hei
   );
 }
 
-function Arrows({ id, paths }: { id: string; paths: string[] }) {
-  return (
-    <g fill="none" stroke={EDGE} strokeWidth="1.25">
-      {paths.map((d) => <path key={d} d={d} markerEnd={`url(#${id}-arrow)`} />)}
-    </g>
-  );
-}
-
-export function AIRequestPathDiagram() {
+export function AIRequestPathDiagram({ step = ALL }: Stage) {
   const W = 112, y = 24, H = 60;
   const xs = [14, 138, 262, 386, 510, 634];
+  const names: [string, string][] = [["Input", "voice or text"], ["Context", "RAG or notes"], ["Model", "best-fit model"], ["Guardrails", "schema checks"], ["Review", "human sign-off"], ["Action", "submit, send"]];
+  const live = Number.isFinite(step);
   return (
     <Frame id="ai-path" label="Every AI feature follows one path: input, context, model, guardrails, human review, action" height={108}>
-      <Arrows id="ai-path" paths={xs.slice(0, -1).map((x) => `M${x + W} ${y + 30}H${x + W + 10}`)} />
-      <Box x={xs[0]} y={y} w={W} h={H} name="Input" lines={["voice or text"]} />
-      <Box x={xs[1]} y={y} w={W} h={H} name="Context" lines={["RAG or notes"]} />
-      <Box x={xs[2]} y={y} w={W} h={H} name="Model" lines={["best-fit model"]} />
-      <Box x={xs[3]} y={y} w={W} h={H} name="Guardrails" lines={["schema checks"]} accent />
-      <Box x={xs[4]} y={y} w={W} h={H} name="Review" lines={["human sign-off"]} />
-      <Box x={xs[5]} y={y} w={W} h={H} name="Action" lines={["submit, send"]} />
+      <Edges id="ai-path" step={step} animate={live} edges={xs.slice(0, -1).map((x, i) => ({ d: `M${x + W} ${y + 30}H${x + W + 10}`, at: i + 1 }))} />
+      {names.map(([name, line], i) => <Box key={name} x={xs[i]} y={y} w={W} h={H} name={name} lines={[line]} at={i} step={step} />)}
     </Frame>
   );
 }
 
-export function QuzoMonolithDiagram() {
+export function QuzoMonolithDiagram({ step = ALL }: Stage) {
+  const live = Number.isFinite(step);
   return (
     <Frame id="quzo" label="Quzo.ai: forms and exams scale apart, sharing one read cache" height={340}>
-      <Arrows id="quzo" paths={["M350 64V84H168V108", "M410 64V84H596V108", "M312 170H326", "M456 170H434", "M92 222V258", "M244 222V258", "M596 222V258"]} />
-      <Box x={280} y={24} w={200} h={40} name="Educators and learners" />
-      <Box x={24} y={110} w={288} h={112} name="Forms and admin app" align="start" lines={["Authoring and question banks", "AI generation, credit based", "Access and sharing", "Reporting"]} />
-      <Box x={328} y={142} w={104} h={56} name="Redis" lines={["shared reads"]} />
-      <Box x={456} y={110} w={280} h={112} name="Exam delivery app" align="start" lines={["Exam sessions", "Response capture", "Scales on its own at exam start"]} accent />
-      <Box x={24} y={260} w={136} h={72} name="Model providers" lines={["OpenAI, Claude,", "and Gemini"]} />
-      <Box x={176} y={260} w={136} h={72} name="Forms data" lines={["PostgreSQL", "with pgvector"]} />
-      <Box x={496} y={260} w={200} h={72} name="Responses data" lines={["PostgreSQL write path", "separate from forms"]} />
+      <Edges id="quzo" step={step} animate={live} edges={[
+        { d: "M350 64V84H168V108", at: 1 },
+        { d: "M92 222V258", at: 2 },
+        { d: "M244 222V258", at: 2 },
+        { d: "M410 64V84H596V108", at: 3 },
+        { d: "M312 170H326", at: 4 },
+        { d: "M456 170H434", at: 4 },
+        { d: "M596 222V258", at: 5 },
+      ]} />
+      <Box x={280} y={24} w={200} h={40} name="Educators and learners" at={0} step={step} />
+      <Box x={24} y={110} w={288} h={112} name="Forms and admin app" align="start" lines={["Authoring and question banks", "AI generation, credit based", "Access and sharing", "Reporting"]} at={1} step={step} />
+      <Box x={24} y={260} w={136} h={72} name="Model providers" lines={["OpenAI, Claude,", "and Gemini"]} at={2} step={step} />
+      <Box x={176} y={260} w={136} h={72} name="Forms data" lines={["PostgreSQL", "with pgvector"]} at={2} step={step} />
+      <Box x={456} y={110} w={280} h={112} name="Exam delivery app" align="start" lines={["Exam sessions", "Response capture", "Scales on its own at exam start"]} at={3} step={step} />
+      <Box x={328} y={142} w={104} h={56} name="Redis" lines={["shared reads"]} at={4} step={step} />
+      <Box x={496} y={260} w={200} h={72} name="Responses data" lines={["PostgreSQL write path", "separate from forms"]} at={5} step={step} />
     </Frame>
   );
 }
 
-export function RealtimeFlowDiagram() {
+export function RealtimeFlowDiagram({ step = ALL }: Stage) {
   const W = 120, H = 60, sy = 52, cy = 200;
-  const lane = (y: number, label: string, labelX: number) => (
-    <g>
-      <rect x="24" y={y} width="712" height="112" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.14)" />
-      <text x={labelX} y={y + 20} fontSize="11.5" fontWeight="600" fill={MUTED}>{label}</text>
+  const live = Number.isFinite(step);
+  const lane = (y: number, label: string, labelX: number, at: number) => (
+    <g className="flow-lane" data-state={stateOf(at, step)}>
+      <rect x="24" y={y} width="712" height="112" rx="8" />
+      <text x={labelX} y={y + 20}>{label}</text>
     </g>
   );
   return (
     <Frame id="rt" label="CompassRT: one market feed in, one update per symbol per second out" height={300}>
-      {lane(16, "Node.js server", 40)}
-      {lane(164, "React client", 320)}
-      <Arrows id="rt" paths={["M160 82H178", "M300 82H318", "M440 82H458", "M580 82H598", "M660 112V198", "M600 230H582", "M460 230H442", "M100 200V114"]} />
-      <Box x={40} y={sy} w={W} h={H} name="Finnhub feed" lines={["shared socket"]} />
-      <Box x={180} y={sy} w={W} h={H} name="RxJS stream" lines={["event per trade"]} />
-      <Box x={320} y={sy} w={W} h={H} name="Buffer 1 s" lines={["bufferTime"]} accent />
-      <Box x={460} y={sy} w={W} h={H} name="Latest only" lines={["per symbol"]} />
-      <Box x={600} y={sy} w={W} h={H} name="Socket.IO" lines={["room per symbol"]} />
-      <Box x={600} y={cy} w={W} h={H} name="Browser" lines={["socket client"]} />
-      <Box x={460} y={cy} w={W} h={H} name="Buffer 1 s" lines={["bufferTime"]} />
-      <Box x={320} y={cy} w={W} h={H} name="AG Grid" lines={["row-ID updates"]} />
-      <Box x={40} y={cy} w={W} h={H} name="Watchlist" lines={["join or leave"]} />
-      <text x="112" y="144" fontSize="11.5" fill={MUTED}>subscribes on first viewer,</text>
-      <text x="112" y="158" fontSize="11.5" fill={MUTED}>unsubscribes when room empties</text>
+      {lane(16, "Node.js server", 40, 0)}
+      {lane(164, "React client", 320, 5)}
+      <Edges id="rt" step={step} animate={live} edges={[
+        { d: "M160 82H178", at: 1 },
+        { d: "M300 82H318", at: 2 },
+        { d: "M440 82H458", at: 3 },
+        { d: "M580 82H598", at: 4 },
+        { d: "M660 112V198", at: 5 },
+        { d: "M600 230H582", at: 5 },
+        { d: "M460 230H442", at: 5 },
+        { d: "M100 200V114", at: 6 },
+      ]} />
+      <Box x={40} y={sy} w={W} h={H} name="Finnhub feed" lines={["shared socket"]} at={0} step={step} />
+      <Box x={180} y={sy} w={W} h={H} name="RxJS stream" lines={["event per trade"]} at={1} step={step} />
+      <Box x={320} y={sy} w={W} h={H} name="Buffer 1 s" lines={["bufferTime"]} at={2} step={step} />
+      <Box x={460} y={sy} w={W} h={H} name="Latest only" lines={["per symbol"]} at={3} step={step} />
+      <Box x={600} y={sy} w={W} h={H} name="Socket.IO" lines={["room per symbol"]} at={4} step={step} />
+      <Box x={600} y={cy} w={W} h={H} name="Browser" lines={["socket client"]} at={5} step={step} />
+      <Box x={460} y={cy} w={W} h={H} name="Buffer 1 s" lines={["bufferTime"]} at={5} step={step} />
+      <Box x={320} y={cy} w={W} h={H} name="AG Grid" lines={["row-ID updates"]} at={5} step={step} />
+      <Box x={40} y={cy} w={W} h={H} name="Watchlist" lines={["join or leave"]} at={6} step={step} />
+      <g className="flow-node" data-state={stateOf(6, step)}>
+        <text x="112" y="144" className="flow-node-line">subscribes on first viewer,</text>
+        <text x="112" y="158" className="flow-node-line">unsubscribes when room empties</text>
+      </g>
     </Frame>
   );
 }

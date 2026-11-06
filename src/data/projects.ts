@@ -419,7 +419,6 @@ export const projects: Project[] = [
     name: "Collahead",
     category: "Logistics / Mobility",
     kind: "Client project",
-    experiment: true,
     oneLiner:
       "Driver and admin simulator for truck routes with Mapbox directions, geofenced stops and live location.",
     motif: "map",

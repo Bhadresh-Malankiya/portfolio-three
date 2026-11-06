@@ -196,9 +196,9 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
     offset: ["start start", "end end"],
   });
   const sceneProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 28, mass: 0.7 });
-  const opacity = useTransform(sceneProgress, [0.16, 0.25, 0.76, 0.83], [0, 1, 1, 0]);
-  const deviceOpacity = useTransform(sceneProgress, [0, 0.04, 0.12, 0.94, 1], [0, 0.15, 1, 1, 0]);
-  const entryHintOpacity = useTransform(sceneProgress, [0, 0.08, 0.16], [1, 1, 0]);
+  const opacity = useTransform(sceneProgress, [0.11, 0.18, 0.82, 0.87], [0, 1, 1, 0]);
+  const deviceOpacity = useTransform(sceneProgress, [0, 0.03, 0.08, 0.95, 1], [0, 0.15, 1, 1, 0]);
+  const entryHintOpacity = useTransform(sceneProgress, [0, 0.05, 0.11], [1, 1, 0]);
   const deviceX = useTransform(sceneProgress,
     [0, DEVICE_TIMELINE.arriveEnd, DEVICE_TIMELINE.exitStart, 1],
     [mobile ? "65%" : "-65%", "0%", "0%", mobile ? "-75%" : "75%"],
@@ -214,7 +214,7 @@ function ProjectChapter({ mobile = false }: { mobile?: boolean }) {
       setActive(next);
       setScreen(0);
     }
-    const exiting = value < 0.2 || value > 0.79;
+    const exiting = value < 0.13 || value > 0.84;
     if (exiting !== closing) setClosing(exiting);
     const nextPhase = value < DEVICE_TIMELINE.arriveEnd ? "arriving"
       : value < DEVICE_TIMELINE.openEnd ? "opening"

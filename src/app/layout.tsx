@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "./portfolio-theme.css";
 import "./exhibition.css";
+import "./refinement.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingContactCard from "@/components/FloatingContactCard";
 import QuickContact from "@/components/QuickContact";
@@ -51,6 +52,8 @@ export const metadata: Metadata = {
     "Senior Full Stack Engineer",
     "Technical Lead",
     "Node.js",
+    "Laravel",
+    "PHP",
     "React",
     "Next.js",
     "TypeScript",
@@ -73,7 +76,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Bhadresh Malankiya | Senior Full Stack Engineer & Tech Lead",
     description:
-      "Senior Full Stack Engineer and Tech Lead with 8+ years in Node.js, React and TypeScript. Led ExtendedForms.io (400K+ users) and built Quzo.ai.",
+      "Senior Full Stack Engineer and Tech Lead with 8+ years building SaaS, APIs and AI products. Led ExtendedForms.io (400K+ users) and built Quzo.ai.",
     type: "website",
     url: siteUrl,
     siteName: "Bhadresh Malankiya",

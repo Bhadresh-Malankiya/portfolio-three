@@ -103,11 +103,11 @@ export default function Hero() {
           </motion.g>
         </svg>
       </motion.div>
-      <div className="flight-rule" aria-hidden="true"><span>BH / 01</span><i /><span>IDEA → REALITY</span></div>
+      <div className="flight-rule" aria-hidden="true"><span>Portfolio · 2026</span><i /><span>Idea to production</span></div>
       <header className="flight-heading">
-        <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline">Bhadresh Malankiya <span aria-hidden="true">/</span> Senior Full Stack Engineer · Technical Lead</motion.p>
+        <motion.p initial={{ y: reduced ? 0 : 12 }} animate={{ y: 0 }} transition={{ duration: .6 }} className="flight-byline"><strong>Bhadresh Malankiya</strong><span aria-hidden="true" /><small>Available now · Surat, India</small></motion.p>
         <h1><span>I build products</span><em>that ship<span className="flight-fullstop">.</span></em></h1>
-        <p className="flight-proof">Node.js · React · TypeScript · LLM features<span aria-hidden="true">/</span>400K+ users on ExtendedForms</p>
+        <p className="flight-intro">Senior Full Stack Engineer &amp; Tech Lead · 8+ years building SaaS, APIs and AI products</p>
       </header>
       <div className="flight-stage" role="img" aria-label={`A paper plane becoming an aircraft: ${acts[act].label.toLowerCase()}`}>
         <motion.div className="flight-stage-grid" aria-hidden="true" style={{ opacity: reduced ? .2 : gridOpacity }} />
@@ -127,7 +127,7 @@ export default function Hero() {
           <div className="flight-copy">
             <AnimatePresence initial={false} mode="wait">
               <motion.div key={act} initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : -3 }} transition={{ duration: reduced ? 0 : .18, ease: "easeOut" }}>
-                <h2>{acts[act].title}</h2><p>{acts[act].detail}</p>
+                <small className="flight-step-label">Step {act + 1} of {acts.length} · {acts[act].short}</small><h2>{acts[act].title}</h2><p>{acts[act].detail}</p>
               </motion.div>
             </AnimatePresence>
           </div>
